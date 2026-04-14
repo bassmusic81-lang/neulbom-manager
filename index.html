@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="늘봄관리">
+<meta name="theme-color" content="#1F3864">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<title>정라초 늘봄 관리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --primary:#1F3864;--primary2:#833C00;--accent:#4472C4;
+  --bg:#F4F6FB;--card:#fff;--danger:#C00000;
+  --muted:#8892A4;--border:#E2E8F0;--text:#1A1A2E;
+  --green:#2C5F2E;
+}
+html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif;color:var(--text);}
+#app{display:flex;flex-direction:column;height:100dvh;max-width:480px;margin:0 auto;position:relative;overflow:hidden;}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.screen.hidden{display:none;}
+
+/* 헤더 */
+.header{padding:env(safe-area-inset-top,20px) 20px 20px;padding-top:calc(env(safe-area-inset-top,0px) + 20px);}
+.header h1{color:#fff;font-size:20px;font-weight:800;}
+.header .sub{color:rgba(255,255,255,0.7);font-size:12px;margin-top:2px;}
+.back-btn{color:#fff;font-size:20px;background:none;border:none;cursor:pointer;margin-bottom:8px;padding:4px 0;}
+
+/* 탭바 */
+#tabbar{display:flex;background:#fff;border-top:1px solid var(--border);box-shadow:0 -2px 8px rgba(0,0,0,0.08);padding-bottom:env(safe-area-inset-bottom,0px);}
+.tab-btn{flex:1;padding:10px 4px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.tab-btn .icon{font-size:20px;}
+.tab-btn .label{font-size:10px;color:var(--muted);font-weight:600;}
+.tab-btn.active .label{color:var(--accent);}
+
+/* 카드 */
+.card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.07);margin-bottom:12px;}
+
+/* 배지 */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;margin-right:4px;}
+
+/* 검색바 */
+.search-bar{padding:12px;background:#fff;border-bottom:1px solid var(--border);}
+.search-bar input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;outline:none;}
+.search-bar input:focus{border-color:var(--accent);}
+
+/* 필터 탭 */
+.filter-tabs{display:flex;overflow-x:auto;padding:10px 12px;gap:6px;background:#fff;border-bottom:1px solid var(--border);}
+.filter-tabs::-webkit-scrollbar{display:none;}
+.filter-tab{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.filter-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* 학생 아이템 */
+.student-item{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer;background:#fff;}
+.student-item:active{background:#f5f5f5;}
+.stu-avatar{width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;}
+.stu-info{flex:1;}
+.stu-name{font-weight:700;font-size:15px;}
+.stu-phone{font-size:12px;color:var(--accent);font-weight:600;margin-top:2px;}
+.stu-note{font-size:11px;color:var(--danger);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* 모달 */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:flex-end;}
+.modal-overlay.hidden{display:none;}
+.modal-sheet{background:var(--bg);border-radius:24px 24px 0 0;width:100%;max-height:90dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.modal-header{border-radius:24px 24px 0 0;padding:18px;}
+.modal-header h2{color:#fff;font-size:20px;font-weight:900;}
+.modal-header .cls-label{color:rgba(255,255,255,0.8);font-size:12px;}
+.modal-close{background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:34px;height:34px;color:#fff;font-size:16px;cursor:pointer;}
+.modal-body{padding:14px;}
+
+/* 출석부 */
+.att-row{display:flex;align-items:center;border-bottom:1px solid var(--border);}
+.att-info{flex:1;padding:10px 14px;cursor:pointer;}
+.att-num{font-size:11px;color:var(--muted);min-width:22px;display:inline-block;text-align:right;margin-right:8px;}
+.att-name{font-size:13px;font-weight:700;}
+.att-status-btn{padding:10px 12px;border:none;background:none;cursor:pointer;display:flex;align-items:center;gap:4px;border-left:1px solid var(--border);min-width:82px;}
+.att-dropdown{background:#fff;border-bottom:1px solid var(--border);padding:8px;display:flex;flex-wrap:wrap;gap:6px;}
+.att-opt{flex:1;min-width:60px;padding:7px 8px;border-radius:20px;border:1.5px solid;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:700;}
+
+/* 시간표 */
+.tt-table{width:100%;border-collapse:collapse;}
+.tt-table th,.tt-table td{border:1px solid var(--border);padding:4px 2px;text-align:center;font-size:9px;}
+.tt-table th{font-weight:700;}
+.subj-cell{border-radius:6px;padding:4px 3px;cursor:pointer;font-weight:800;font-size:9px;line-height:1.3;}
+
+/* 캘린더 */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);}
+.cal-cell{background:#fff;padding:6px 2px;text-align:center;cursor:pointer;min-height:44px;}
+.cal-cell.today .day-num{background:var(--green);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;margin:0 auto;}
+.cal-cell.selected{background:#E8F5E9;}
+.cal-dot{width:5px;height:5px;border-radius:50%;margin:2px auto 0;}
+
+/* 홈 배너 */
+.banner{background:var(--danger);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.banner-text h3{color:#fff;font-size:14px;font-weight:800;}
+.banner-text p{color:rgba(255,255,255,0.85);font-size:11px;margin-top:1px;}
+.banner-btn{background:rgba(255,255,255,0.25);border-radius:8px;padding:5px 10px;color:#fff;font-size:12px;font-weight:700;}
+
+/* 홈 통계 */
+.stats-row{display:flex;justify-content:space-around;background:rgba(255,255,255,0.12);border-radius:12px;padding:12px;margin-top:16px;}
+.stat{text-align:center;}
+.stat .val{color:#fff;font-size:24px;font-weight:900;}
+.stat .lbl{color:#fff;font-size:11px;opacity:0.8;}
+.stat-div{width:1px;background:rgba(255,255,255,0.2);}
+
+/* 메뉴 그리드 */
+.menu-grid{display:flex;flex-wrap:wrap;gap:12px;padding:16px;}
+.menu-item{border-radius:14px;padding:16px;border:1.5px solid;cursor:pointer;}
+.menu-item.wide{width:100%;}
+.menu-item.half{width:calc(50% - 6px);}
+.menu-item .menu-icon{font-size:28px;margin-bottom:8px;}
+.menu-item h3{font-size:15px;font-weight:800;margin-bottom:3px;}
+.menu-item p{font-size:11px;color:var(--muted);}
+
+/* 요일 탭 */
+.day-tabs{display:flex;background:#fff;border-bottom:1px solid var(--border);}
+.day-tab{flex:1;padding:12px 4px;border:none;background:none;cursor:pointer;text-align:center;border-bottom:3px solid transparent;}
+.day-tab .day{font-weight:700;font-size:14px;}
+.day-tab .date{font-size:10px;color:var(--muted);}
+
+/* 세션 카드 */
+.session-card{border-radius:12px;overflow:hidden;margin-bottom:10px;}
+.session-header{padding:10px 12px;}
+.session-header h3{color:#fff;font-weight:800;font-size:14px;}
+
+/* 특이사항 */
+.incident-card{border-left:4px solid;border-radius:12px;padding:12px;background:#fff;margin-bottom:10px;}
+
+/* 팝업 */
+.popup{background:#fff;border-radius:18px;padding:0;overflow:hidden;width:calc(100% - 40px);max-height:80dvh;overflow-y:auto;}
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.popup-overlay.hidden{display:none;}
+
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- 배너 -->
+  <div id="banner" class="banner" onclick="openURL('https://docs.google.com/forms/d/e/1FAIpQLScndihUuYMWSAQRb9qGUPQRQHQUqKS7lGK7H-krm_i4Ijq5Bg/viewform?usp=header')">
+    <div class="banner-text">
+      <h3>📝 맞춤형 프로그램 결석 신청</h3>
+      <p>구글폼으로 결석 사유를 제출해주세요</p>
+    </div>
+    <div class="banner-btn">신청하기 ›</div>
+  </div>
+
+  <!-- 스크린들 -->
+  <div id="screen-home" class="screen"></div>
+  <div id="screen-students" class="screen hidden"></div>
+  <div id="screen-attendance" class="screen hidden"></div>
+  <div id="screen-timetable" class="screen hidden"></div>
+  <div id="screen-notes" class="screen hidden"></div>
+  <div id="screen-calendar" class="screen hidden"></div>
+
+  <!-- 탭바 -->
+  <div id="tabbar">
+    <button class="tab-btn active" onclick="goTo('home')"><span class="icon">🏠</span><span class="label">홈</span></button>
+    <button class="tab-btn" onclick="goTo('students')"><span class="icon">👨‍🎓</span><span class="label">학생</span></button>
+    <button class="tab-btn" onclick="goTo('attendance')"><span class="icon">📋</span><span class="label">출석부</span></button>
+    <button class="tab-btn" onclick="goTo('timetable')"><span class="icon">🗓️</span><span class="label">시간표</span></button>
+    <button class="tab-btn" onclick="goTo('notes')"><span class="icon">⚠️</span><span class="label">특이사항</span></button>
+  </div>
+</div>
+
+<!-- 학생 상세 모달 -->
+<div class="modal-overlay hidden" id="stu-modal" onclick="closeStuModal()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header" id="stu-modal-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div id="stu-modal-avatar" style="width:48px;height:48px;border-radius:24px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;"></div>
+          <div>
+            <div id="stu-modal-name" style="color:#fff;font-size:20px;font-weight:900;"></div>
+            <div id="stu-modal-cls" style="color:rgba(255,255,255,0.8);font-size:12px;"></div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeStuModal()">✕</button>
+      </div>
+      <div id="stu-modal-phone"></div>
+    </div>
+    <div class="modal-body" id="stu-modal-body"></div>
+  </div>
+</div>
+
+<!-- 팝업 -->
+<div class="popup-overlay hidden" id="popup-overlay" onclick="closePopup()">
+  <div class="popup" onclick="event.stopPropagation()" id="popup-content"></div>
+</div>
+
+<script>
+// ── 데이터 ──
+const STUDENTS = [
+  {id:"11박민재",name:"박민재",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:2,phone:"010-3375-6907",note:""},
+  {id:"11이승빈",name:"이승빈",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:3,phone:"010-7704-6079",note:""},
+  {id:"11이연우",name:"이연우",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:4,phone:"010-2607-1430",note:""},
+  {id:"11전준서",name:"전준서",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:5,phone:"010-9255-4678",note:"월·화·수·목 1교시만 / 금 1·2교시"},
+  {id:"11정건",name:"정  건",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:6,phone:"010-6653-3510",note:""},
+  {id:"11최예준",name:"최예준",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:7,phone:"010-2489-3734",note:"매일 1교시만 / 2교시 취소"},
+  {id:"11김선유",name:"김선유",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:9,phone:"010-7116-7920",note:""},
+  {id:"11유하연",name:"유하연",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:13,phone:"010-8285-5724",note:""},
+  {id:"11이나은",name:"이나은",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:15,phone:"010-4878-5686",note:""},
+  {id:"11이소율1",name:"이소율1",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:17,phone:"010-2788-1434",note:"월취소 / 화·수 1·2교시 / 목·금 1교시만"},
+  {id:"11이예나",name:"이예나",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:18,phone:"010-9182-3541",note:""},
+  {id:"11정윤솔",name:"정윤솔",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:20,phone:"010-8901-8531",note:"화요일 로봇과학A+음악줄넘기\n⚠ [4/3] 전래놀이 중 1-2 남학생 3명 불쾌 행동 → 조기하교"},
+  {id:"12김연준",name:"김연준",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:2,phone:"010-8008-0701",note:""},
+  {id:"12박무율",name:"박무율",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:3,phone:"010-7739-0704",note:""},
+  {id:"12양우진",name:"양우진",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:5,phone:"010-9028-6567",note:""},
+  {id:"12황준표",name:"황준표",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:8,phone:"010-2622-9589",note:""},
+  {id:"12김단아",name:"김단아",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:11,phone:"010-8728-8125",note:""},
+  {id:"12오슬기",name:"오슬기",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:14,phone:"010-3150-8536",note:""},
+  {id:"12이윤슬1",name:"이윤슬1",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:16,phone:"010-5146-3811",note:""},
+  {id:"12이지아A",name:"이지아A",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:17,phone:"010-2907-5379",note:""},
+  {id:"13고태규",name:"고태규",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:1,phone:"010-9604-8549",note:""},
+  {id:"13이산",name:"이  산",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:5,phone:"010-8670-5704",note:"월·수 2교시 후 14:30 하교\n화·목·금 1교시만"},
+  {id:"13조경준",name:"조경준",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:6,phone:"010-9154-5194",note:""},
+  {id:"13최우찬",name:"최우찬",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:7,phone:"010-3358-0231",note:""},
+  {id:"13박서린",name:"박서린",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:9,phone:"010-3996-1582",note:""},
+  {id:"13박서현",name:"박서현",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:10,phone:"010-3996-1582",note:""},
+  {id:"13박은빈",name:"박은빈",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:11,phone:"010-7534-5180",note:""},
+  {id:"13박하나",name:"박하나",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:12,phone:"010-3234-7879",note:"⚠ 민원 [3/23]"},
+  {id:"13양해린",name:"양해린",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:13,phone:"010-3390-5158",note:"월·수 1교시만 / 화·목·금 취소"},
+  {id:"13윤가인",name:"윤가인",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:14,phone:"010-4907-1370",note:""},
+  {id:"13이다은",name:"이다은",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:15,phone:"010-8241-8819",note:"월·수 1·2교시 / 화·목·금 1교시만\n2시40분 하교"},
+  {id:"13이지아B",name:"이지아B",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:16,phone:"010-7228-2581",note:""},
+  {id:"13최연서",name:"최연서",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:18,phone:"010-7125-1507",note:""},
+  {id:"14김민우",name:"김민우",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:1,phone:"010-9304-7804",note:"월 도자공예(1교시)만 / 화·수·목·금 1교시만\n후문 학원차량"},
+  {id:"14박시율",name:"박시율",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:2,phone:"010-4567-0940",note:""},
+  {id:"14배준원",name:"배준원",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:3,phone:"010-2920-3865",note:"매일 1교시만 / 보호자 동행 귀가"},
+  {id:"14백창훈",name:"백창훈",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:4,phone:"010-2581-4937",note:""},
+  {id:"14양준열",name:"양준열",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:5,phone:"010-7658-7536",note:"월·화·수·금 1·2교시 / 목 취소"},
+  {id:"14김라움",name:"김라움",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:8,phone:"010-8708-0607",note:""},
+  {id:"14서가윤",name:"서가윤",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:11,phone:"010-3246-9003",note:"월 도자공예(1교시) → 칼라클레이(2교시)"},
+  {id:"14송다은",name:"송다은",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:12,phone:"010-6303-1249",note:""},
+  {id:"14신다혜",name:"신다혜",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:13,phone:"010-9337-5092",note:"월 도자공예(1교시) → 칼라클레이(2교시)"},
+  {id:"14양희서",name:"양희서",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:16,phone:"010-3263-6669",note:"월 도자공예(1교시) → 칼라클레이(2교시)"},
+  {id:"14윤하람",name:"윤하람",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:17,phone:"010-7189-7188",note:"월·수 1교시만 (켈스케네디)"},
+  {id:"14정나은",name:"정나은",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:18,phone:"010-7583-2326",note:"월 도자공예(1교시) → 칼라클레이(2교시)"},
+  {id:"14최아린",name:"최아린",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:19,phone:"010-2794-0397",note:"월 도자공예(1교시) → 칼라클레이(2교시)\n화요일 로봇과학A+오카리나"},
+  {id:"21구도안",name:"구도안",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:1,phone:"010-7475-1359",note:"목 취소 / 화 로봇과학A만"},
+  {id:"21김재준",name:"김재준",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:2,phone:"010-3435-8715",note:"화 로봇과학A / 목·금 2교시 제외\n⚠ [4/2] 전래놀이 결보강 중 폭행 피해"},
+  {id:"21김주안",name:"김주안",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:3,phone:"010-8927-1127",note:""},
+  {id:"21고율아",name:"고율아",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:10,phone:"010-9604-8549",note:""},
+  {id:"21문채빈",name:"문채빈",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:12,phone:"010-7174-6106",note:"월 발레(2교시) 수강 / 나머지 요일 1교시만 / 도보 귀가"},
+  {id:"21유지우",name:"유지우",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:14,phone:"010-5432-8107",note:"월 발레(2교시)+책놀이(3교시)\n화 뉴스포츠+칼라클레이 / 목 1교시만"},
+  {id:"21윤효은",name:"윤효은",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:15,phone:"010-4248-8997",note:"수 종이접기(1교시)만 / 월 전체취소"},
+  {id:"21이소율2",name:"이소율2",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:16,phone:"010-2849-3614",note:"맞춤형 전체 취소"},
+  {id:"21이하린",name:"이하린",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:18,phone:"010-2848-1331",note:""},
+  {id:"21한봄",name:"한  봄",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:19,phone:"010-8206-7592",note:"⚠ 민원 6회\n화·목 컴퓨터(방과후) → 1교시 취소\n⚠ [4/2] 컴퓨터 첫날 미이동 → 어머니 방문 후 조기하교"},
+  {id:"22김다운",name:"김다운",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:1,phone:"010-3386-4519",note:""},
+  {id:"22김민재",name:"김민재",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:3,phone:"010-8266-0829",note:"수·목·금 1교시 후 이지향피아노학원 차량 탑승 (4/6~)"},
+  {id:"22오윤오",name:"오윤오",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:5,phone:"010-5543-8924",note:"화 1교시 컴퓨터(방과후)"},
+  {id:"22왕선호",name:"왕선호",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:6,phone:"010-7392-8793",note:""},
+  {id:"22육민준",name:"육민준",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:7,phone:"010-8865-5774",note:""},
+  {id:"22최성윤",name:"최성윤",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:8,phone:"010-8626-0407",note:""},
+  {id:"22김나온",name:"김나온",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:10,phone:"010-9430-0537",note:""},
+  {id:"22김시경",name:"김시경",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:11,phone:"010-2499-2062",note:""},
+  {id:"22김아름",name:"김아름",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:12,phone:"010-3386-4519",note:""},
+  {id:"22김주아",name:"김주아",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:13,phone:"010-2683-7615",note:""},
+  {id:"22오선",name:"오  선",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:14,phone:"010-7255-3454",note:""},
+  {id:"22이선우",name:"이선우",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:15,phone:"010-8898-3935",note:""},
+  {id:"22이윤솔",name:"이윤솔",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:16,phone:"010-9382-5731",note:""},
+  {id:"22이효주",name:"이효주",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:17,phone:"010-6616-2672",note:""},
+  {id:"22천하늘",name:"천하늘",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:18,phone:"010-8530-1544",note:""},
+  {id:"22최라희",name:"최라희",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:19,phone:"010-7686-7679",note:"금 2교시 취소 / 그림책놀이(1교시)만 하교"},
+  {id:"23정래은",name:"정래은",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:4,phone:"010-3305-4699",note:""},
+  {id:"23조연준",name:"조연준",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:5,phone:"010-5697-8882",note:""},
+  {id:"23주원",name:"주  원",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:6,phone:"010-6391-9450",note:""},
+  {id:"23최지훈",name:"최지훈",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:8,phone:"010-8237-3226",note:"화·목 컴퓨터(방과후) → 1교시 취소\n14:50 후 2교시 늦게 도착"},
+  {id:"23최하담",name:"최하담",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:9,phone:"010-9929-8792",note:"화 컴퓨터방과후+로봇과학B / 목 취소"},
+  {id:"23최하율",name:"최하율",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:10,phone:"010-9929-8792",note:"화 컴퓨터방과후+로봇과학B / 목 취소"},
+  {id:"23김리안",name:"김리안",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:11,phone:"010-6249-6442",note:"월·수 정규수업 후 1시간 교실 공부 → 맞춤형 참여"},
+  {id:"23김서율",name:"김서율",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:12,phone:"010-9447-0801",note:""},
+  {id:"23김지유",name:"김지유",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:13,phone:"010-5001-7827",note:""},
+  {id:"23김하윤",name:"김하윤",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:14,phone:"010-3370-0308",note:""},
+  {id:"23이나연",name:"이나연",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:17,phone:"010-4710-7532",note:""},
+  {id:"23최서우",name:"최서우",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:19,phone:"010-8580-9053",note:""},
+  {id:"23최예린",name:"최예린",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:20,phone:"010-2794-0397",note:""},
+  {id:"24강현우",name:"강현우",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:1,phone:"010-9347-4880",note:""},
+  {id:"24김태범",name:"김태범",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:3,phone:"010-9947-5505",note:"화·목 컴퓨터(방과후) → 1교시 취소\n14:50 후 2교시 늦게 도착"},
+  {id:"24안건우",name:"안건우",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:6,phone:"010-5121-0070",note:"월 도자공예(2교시) 후 하교 | 화·목·금 1교시만\n수 주산암산(1교시)+보드게임(2교시)"},
+  {id:"24윤재영",name:"윤재영",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:7,phone:"010-9010-6618",note:"화·목 컴퓨터(방과후) → 1교시 취소\n14:50 후 2교시 늦게 도착"},
+  {id:"24정선우",name:"정선우",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:8,phone:"010-3226-9512",note:"월 2교시 결석(부진학생 지도) / 월 3교시·화·목·금 정상\n수 1교시 결석(부진학생 지도) / 7월 복귀 예정"},
+  {id:"24허산",name:"허  산",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:9,phone:"010-9154-2398",note:"월~금 전체 취소"},
+  {id:"24김가온",name:"김가온",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:10,phone:"010-9507-4578",note:"수 주산암산(1교시)+보드게임(2교시) 특별 수강"},
+  {id:"24박하윤",name:"박하윤",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:11,phone:"010-3411-1624",note:"화 로봇과학A(1)+방송댄스(2)\n⚠ [4/2] 전래놀이 결보강 폭행 가담"},
+  {id:"24이다연",name:"이다연",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:13,phone:"010-4710-7532",note:"수 주산암산(1교시)+보드게임(2교시) 특별 수강"},
+  {id:"24이연희",name:"이연희",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:14,phone:"010-9109-5838",note:"수 주산암산(1교시)만 수강 / 월·화·목·금 전체 취소"},
+  {id:"24임라임",name:"임라임",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:15,phone:"010-7149-8917",note:"⚠ 민원 [3/23]"},
+  {id:"24임하임",name:"임하임",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:16,phone:"010-7149-8917",note:""},
+  {id:"24최가윤",name:"최가윤",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:17,phone:"010-4439-8584",note:"월 도자공예(2교시) 후 하교(깐스뮤직) | 화·목·금 1교시만\n수 주산암산(1교시)+보드게임(2교시)"},
+  {id:"24황아라",name:"황아라",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:19,phone:"010-8289-0734",note:""}
+];
+
+const SCHEDULES = {
+  "1-1":{월:["발레","칼라클레이"],화:["오카리나","음악줄넘기"],수:["주산암산","종이접기"],목:["오카리나","영어회화"],금:["놀이체육","전래놀이"]},
+  "1-2":{월:["주산암산","종이접기"],화:["음악줄넘기","오카리나"],수:["보드게임","주산암산"],목:["영어회화","오카리나"],금:["영어야놀자","전래놀이"]},
+  "1-3":{월:["칼라클레이","주산암산"],화:["방송댄스","음악줄넘기"],수:["보드게임","주산암산"],목:["영어회화","토탈공예"],금:["놀이체육","영어야놀자"]},
+  "1-4":{월:["종이접기+도자공예","칼라클레이"],화:["음악줄넘기","오카리나"],수:["창의과학","종이접기"],목:["토탈공예","오카리나"],금:["전래놀이","영어야놀자"]},
+  "2-1":{월:["—","축구(풋살)","그림책놀이"],화:["뉴스포츠","칼라클레이"],수:["종이접기","우쿨렐레"],목:["뉴스포츠","중국어"],금:["창의미술","놀이체육"]},
+  "2-2":{월:["—","발레","축구(풋살)"],화:["뉴스포츠","칼라클레이"],수:["우쿨렐레","창의과학"],목:["중국어","방송댄스"],금:["그림책놀이","창의미술"]},
+  "2-3":{월:["—","종이접기","그림책놀이"],화:["칼라클레이","뉴스포츠"],수:["종이접기","우쿨렐레"],목:["방송댄스","뉴스포츠"],금:["영어야놀자","놀이체육"]},
+  "2-4":{월:["—","도자공예","종이접기"],화:["칼라클레이","방송댄스"],수:["창의과학","보드게임"],목:["뉴스포츠","중국어"],금:["창의미술","그림책놀이"]}
+};
+
+const INSTRUCTOR_MAP = {
+  "영어회화":{name:"윤형숙",phone:"010-2358-1168"},"창의과학":{name:"윤정민",phone:"010-6379-5200"},
+  "주산암산":{name:"김금봉",phone:"010-7454-8319"},"중국어":{name:"니 화",phone:"010-2707-1931"},
+  "우쿨렐레":{name:"구현미",phone:"010-4985-7970"},"바이올린":{name:"이가은",phone:"010-9025-2250"},
+  "토탈공예":{name:"김영애",phone:"010-3925-9047"},"칼라클레이":{name:"송현주",phone:"010-7539-0438"},
+  "도자공예":{name:"최대성",phone:"010-8798-0367"},"방송댄스":{name:"이다영",phone:"010-4632-8258"},
+  "로봇과학":{name:"김소영",phone:"010-8009-5841"},"보드게임":{name:"이혜진",phone:"010-4007-7792"},
+  "발레":{name:"김조안",phone:"010-8961-3421"},"전래놀이":{name:"박순정",phone:"010-4182-2818"},
+  "놀이체육":{name:"노준호",phone:"010-3242-7591"},"종이접기":{name:"김지수",phone:"010-8977-4748"},
+  "오카리나":{name:"이신애",phone:"010-3391-3960"},"그림책놀이":{name:"김정이",phone:"010-2927-8490"},
+  "창의미술":{name:"전은정",phone:"010-4769-8805"},"음악줄넘기":{name:"김권일",phone:"010-7116-7920"},
+  "축구(풋살)":{name:"백우식",phone:"010-6334-1551"},"컴퓨터":{name:"남주영",phone:"010-5388-9029"},
+  "영어야놀자":{name:"권효주",phone:"010-3664-1598"},"뉴스포츠":{name:"이기백",phone:"010-7257-0759"},
+  "책놀이":{name:"김정이",phone:"010-2927-8490"}
+};
+
+const INCIDENTS = [
+  {seq:1,date:"3/23(월)",subject:"발레",student:"2-2 오윤오",content:"오윤오가 발레 수업 중 여학생을 놀림",action:"재발 시 반 변경 / 상대 신원 확인",tag:"⚠ 요주의"},
+  {seq:2,date:"3/23(월)",subject:"종이접기(1교시)",student:"1-4 김라움 / 1-4 윤하람",content:"김라움 복통 귀가 → 강사가 윤하람으로 착각 → 어머니 갈등",action:"윤하람 어머니 오해 해소 / 강사 재교육",tag:"⚠ 민원"},
+  {seq:3,date:"3/24(화)",subject:"종이접기(월1교시)",student:"1-2 박무율",content:"박무율 어머니 전화 — 종이접기 10분 일찍 종료",action:"강사 수업 시간 준수 안내",tag:"민원 1회"},
+  {seq:4,date:"3/27(목)",subject:"돌봄교실(맞춤형)",student:"민원인(학부모)",content:"국민신문고 1AA-2603-1097277\n돌봄 학생 맞춤형 참여 제한 → 역차별 주장",action:"교육지원청 이첩 / 처리기한 4/6 → 답변 완료",tag:"✅ 처리완료"},
+  {seq:5,date:"3/31(화)",subject:"뉴스포츠(1교시)",student:"2-2 이윤솔",content:"3/31 하교 시 흰색 겉옷 분실",action:"담임선생님과 확인 / 수강 학생 중 확인 필요",tag:"분실물 확인필요"},
+  {seq:6,date:"4/2(목)",subject:"뉴스포츠→전래놀이 결보강",student:"피해: 2-1 김재준\n가해: 2-1 문채빈·이하린 / 2-4 박하윤",content:"수업 중 폭행 사건 발생 / 강사 지도 소홀",action:"강사 주의 / 담임 통보 / 재발 방지",tag:"⚠ 폭행사건"},
+  {seq:7,date:"4/6~",subject:"맞춤형(정선우)",student:"2-4 정선우",content:"부진학생 보충수업으로 월·수 일부 결석",action:"출석부 비고란 결석 사유 기재 완료",tag:"📋 출석관리"},
+  {seq:8,date:"4/2(목)",subject:"컴퓨터→중국어",student:"2-1 한봄",content:"컴퓨터 방과후 첫날 교실 이동 몰라 맞춤형으로 이동\n어머니 방문 후 조기하교",action:"이동 경로 재안내 필요",tag:"⚠ 조기하교"},
+  {seq:9,date:"4/3(금)",subject:"전래놀이(2교시)",student:"1-1 정윤솔",content:"1-2 남학생 3명 불쾌 행동으로 조기하교",action:"신원 확인 / 담임 통보",tag:"⚠ 조기하교"}
+];
+
+const CALENDAR = {
+  "2026-03-01":[{type:"holiday",label:"삼일절"}],
+  "2026-03-02":[{type:"holiday",label:"대체공휴일"}],
+  "2026-03-03":[{type:"event",label:"입학식·개학식"}],
+  "2026-03-25":[{type:"event",label:"학교교육설명회·학부모총회"}],
+  "2026-04-06":[{type:"event",label:"학생정서행동특성검사(~14)"}],
+  "2026-04-20":[{type:"event",label:"장애이해 및 장애인권교육(~26)"}],
+  "2026-05-01":[{type:"holiday",label:"노동절"}],
+  "2026-05-04":[{type:"holiday",label:"재량휴업일"}],
+  "2026-05-05":[{type:"holiday",label:"어린이날"}],
+  "2026-05-14":[{type:"event",label:"전교생 구강검진"}],
+  "2026-05-25":[{type:"holiday",label:"대체공휴일"}],
+  "2026-06-03":[{type:"holiday",label:"지방선거"}],
+  "2026-06-07":[{type:"holiday",label:"개교기념일"}],
+  "2026-07-17":[{type:"holiday",label:"제헌절"}],
+  "2026-07-24":[{type:"event",label:"여름방학식"}],
+  "2026-07-25":[{type:"vacation",label:"여름방학 시작(~8/18)"}]
+};
+
+const DAYS = ["월","화","수","목","금"];
+const DAY_DATES = {월:"4/6",화:"4/7",수:"4/8",목:"4/9",금:"4/10"};
+const CLASS_LABELS = ["1학년 1반","1학년 2반","1학년 3반","1학년 4반","2학년 1반","2학년 2반","2학년 3반","2학년 4반"];
+
+// 색상
+const SC = {
+  발레:"#1F3864",음악줄넘기:"#1F3864",놀이체육:"#1F3864",뉴스포츠:"#215868","축구(풋살)":"#1F3864",
+  오카리나:"#7030A0",종이접기:"#7030A0",그림책놀이:"#7030A0",책놀이:"#7030A0",
+  주산암산:"#833C00",토탈공예:"#833C00",창의미술:"#833C00",칼라클레이:"#843C0C",
+  창의과학:"#17375E",중국어:"#17375E",영어회화:"#375623",영어야놀자:"#375623",
+  방송댄스:"#C00000",전래놀이:"#C00000",보드게임:"#4B2A94",우쿨렐레:"#215868",
+  도자공예:"#7B2C00",로봇과학:"#FF6B35",로봇과학A:"#FF6B35",로봇과학B:"#E55A00"
+};
+function gc(s){
+  if(!s) return "#555";
+  if(s.includes("+")) return "#5C2D91";
+  for(const [k,v] of Object.entries(SC)){if(s.includes(k)) return v;}
+  return "#555";
+}
+
+// 출석 데이터
+let attData = {};
+try{ attData = JSON.parse(localStorage.getItem('att')||'{}'); }catch(e){}
+function saveAtt(){ try{localStorage.setItem('att',JSON.stringify(attData));}catch(e){} }
+
+const ATT_STATUS = [
+  {key:"",label:"미체크",color:"#CCC",bg:"#F5F5F5",icon:"○"},
+  {key:"present",label:"출석",color:"#2E7D32",bg:"#E8F5E9",icon:"✓"},
+  {key:"absent",label:"결석",color:"#C62828",bg:"#FFEBEE",icon:"✗"},
+  {key:"late",label:"지각",color:"#E65100",bg:"#FFF3E0",icon:"▲"},
+  {key:"early",label:"조기하교",color:"#1565C0",bg:"#E3F2FD",icon:"◀"}
+];
+
+// 현재 화면
+let currentScreen = 'home';
+let currentDay = getTodayDay();
+let currentCalMonth = new Date();
+let currentTTClass = '1-1';
+let stuFilter = '전체';
+let stuQuery = '';
+let notesTab = 'students';
+let openDrop = null;
+
+function getTodayDay(){
+  const d = ["일","월","화","수","목","금","토"][new Date().getDay()];
+  return DAYS.includes(d) ? d : "월";
+}
+
+// 화면 전환
+function goTo(screen){
+  document.getElementById('screen-'+currentScreen).classList.add('hidden');
+  document.getElementById('screen-'+screen).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    const screens = ['home','students','attendance','timetable','notes'];
+    b.classList.toggle('active', screens[i]===screen);
+  });
+  const banner = document.getElementById('banner');
+  banner.style.display = screen==='home' ? 'flex' : 'none';
+  currentScreen = screen;
+  renderScreen(screen);
+}
+
+function renderScreen(s){
+  if(s==='home') renderHome();
+  else if(s==='students') renderStudents();
+  else if(s==='attendance') renderAttendance();
+  else if(s==='timetable') renderTimetable();
+  else if(s==='notes') renderNotes();
+}
+
+function openURL(url){ window.open(url,'_blank'); }
+
+// ── 홈 ──
+function renderHome(){
+  const today = new Date();
+  const dayNames = ["일","월","화","수","목","금","토"];
+  const todayDay = dayNames[today.getDay()];
+  const todayDate = `${today.getMonth()+1}/${today.getDate()}`;
+  const withNotes = STUDENTS.filter(s=>s.note).length;
+
+  const menus = [
+    {icon:"👨‍🎓",label:"학생 목록",sub:"수강현황 조회·검색",screen:"students",color:"#4472C4"},
+    {icon:"📋",label:"출석부",sub:"요일별 학생 명단",screen:"attendance",color:"#70AD47"},
+    {icon:"🗓️",label:"시간표",sub:"반별 주간 시간표",screen:"timetable",color:"#ED7D31"},
+    {icon:"⚠️",label:"특이사항",sub:"메모·민원·연락 기록",screen:"notes",color:"#C00000"},
+    {icon:"📅",label:"학사일정",sub:"1학기 주요 행사·공휴일",screen:"calendar",color:"#2C5F2E"}
+  ];
+
+  // 오늘 특이사항
+  const ATT_KEYWORDS = ["하교","취소","결석","지각","불참","학원","도보 귀가","보호자","1교시만","조기","컴퓨터","늦게 도착","미이동","결보강","공부","지연"];
+  const todayNotes = STUDENTS.filter(s=>{
+    if(!s.note) return false;
+    const hasAtt = ATT_KEYWORDS.some(k=>s.note.includes(k));
+    if(!hasAtt) return false;
+    return s.note.includes("⚠")||s.note.includes(todayDay)||s.note.includes("매일")||s.note.includes("전체")||s.note.includes("월~금");
+  });
+
+  document.getElementById('screen-home').innerHTML = `
+    <div style="background:var(--primary);padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
+      <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-bottom:4px">2026 정라초등학교</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="color:#fff;font-size:22px;font-weight:800;margin-bottom:2px">늘봄학교 관리</div>
+          <div style="color:#fff;font-size:13px;opacity:0.8">맞춤형 프로그램 · 4/6~4/10주</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="val">${STUDENTS.length}</div><div class="lbl">총 학생</div></div>
+        <div class="stat-div"></div>
+        <div class="stat"><div class="val">8</div><div class="lbl">학급</div></div>
+        <div class="stat-div"></div>
+        <div class="stat"><div class="val" style="color:#FFD700">${withNotes}</div><div class="lbl">특이사항</div></div>
+      </div>
+    </div>
+    ${DAYS.includes(todayDay) ? `
+    <div style="padding:16px 16px 0">
+      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px">오늘 수업 · ${todayDay}요일 (${todayDate})</div>
+      <div style="display:flex;overflow-x:auto;gap:8px;padding-bottom:4px">
+        ${Object.entries(SCHEDULES).map(([k,sc])=>{
+          const subjs=sc[todayDay]; if(!subjs) return '';
+          const [s1,s2,s3]=subjs;
+          return `<div style="min-width:90px;background:#fff;border-radius:10px;padding:10px;box-shadow:0 1px 4px rgba(0,0,0,0.05);flex-shrink:0">
+            <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:6px">${k}반</div>
+            ${s1&&s1!=="—"?`<div style="font-size:10px;color:${gc(s1)};font-weight:600;margin-bottom:2px">1교시 ${s1}</div>`:''}
+            ${s2&&s2!=="—"?`<div style="font-size:10px;color:${gc(s2)};font-weight:600;margin-bottom:2px">2교시 ${s2}</div>`:''}
+            ${s3?`<div style="font-size:10px;color:${gc(s3)};font-weight:600">3교시 ${s3}</div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : ''}
+    <div style="padding:16px 16px 0">
+      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px">메뉴</div>
+      <div class="menu-grid" style="padding:0">
+        ${menus.map(m=>`
+          <div class="menu-item ${m.screen==='calendar'?'wide':'half'}" 
+               style="background:${m.color}15;border-color:${m.color}30;${m.screen==='calendar'?'display:flex;align-items:center;gap:14px':''}"
+               onclick="${m.screen==='calendar'?'goToCalendar()':'goTo(\''+m.screen+'\')'}">
+            <div class="menu-icon" style="margin-bottom:${m.screen==='calendar'?'0':'8px'}">${m.icon}</div>
+            <div>
+              <h3 style="color:${m.color}">${m.label}</h3>
+              <p>${m.sub}</p>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:700;color:var(--muted)">📋 오늘의 특이사항</div>
+        <div style="background:#FFEBEE;border-radius:10px;padding:3px 8px;font-size:11px;color:var(--danger);font-weight:700">${todayNotes.length}명</div>
+      </div>
+      ${todayNotes.map(s=>{
+        const isWarn=s.note.includes("⚠");
+        const bc=isWarn?"#F44336":"#4472C4";
+        return `<div style="background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;border-left:4px solid ${bc};box-shadow:0 1px 4px rgba(0,0,0,0.05);display:flex;align-items:center;gap:10px;cursor:pointer" onclick="openStuModal('${s.id}')">
+          <div style="width:38px;height:38px;border-radius:19px;background:${bc}18;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:${isWarn?16:14}px">${isWarn?"⚠":"📌"}</div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">
+              <span style="font-weight:800;font-size:14px">${s.name}</span>
+              <span style="background:${s.grade===1?"#1F386420":"#833C0020"};color:${s.grade===1?"var(--primary)":"var(--primary2)"};border-radius:4px;padding:1px 5px;font-size:10px;font-weight:700">${s.clsLabel}</span>
+            </div>
+            <div style="font-size:12px;color:#555;line-height:17px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${s.note}</div>
+            ${s.phone?`<a href="tel:${s.phone}" style="font-size:11px;color:var(--accent);font-weight:600;margin-top:4px;display:block">📞 ${s.phone}</a>`:''}
+          </div>
+          <span style="color:var(--muted);font-size:16px">›</span>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function goToCalendar(){
+  document.getElementById('screen-'+currentScreen).classList.add('hidden');
+  document.getElementById('screen-calendar').classList.remove('hidden');
+  document.getElementById('banner').style.display='none';
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  currentScreen='calendar';
+  renderCalendar();
+}
+
+// ── 학생 목록 ──
+function renderStudents(){
+  const filtered = STUDENTS.filter(s=>
+    (stuFilter==='전체'||s.clsLabel===stuFilter) &&
+    (!stuQuery||s.name.includes(stuQuery)||s.phone.includes(stuQuery))
+  );
+
+  document.getElementById('screen-students').innerHTML = `
+    <div style="background:var(--primary);padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
+      <div style="color:#fff;font-size:20px;font-weight:800">학생 목록</div>
+      <div style="color:#fff;font-size:12px;opacity:0.7">총 ${filtered.length}명</div>
+    </div>
+    <div class="search-bar">
+      <input type="search" placeholder="이름 또는 전화번호 검색..." value="${stuQuery}" oninput="stuQuery=this.value;renderStudents()" />
+    </div>
+    <div class="filter-tabs">
+      ${['전체',...CLASS_LABELS].map(cl=>`
+        <div class="filter-tab ${stuFilter===cl?'active':''}" onclick="stuFilter='${cl}';renderStudents()">
+          ${cl==='전체'?'전체':cl.replace('학년 ','').replace('반','')+'반'}
+        </div>`).join('')}
+    </div>
+    <div>
+      ${filtered.map(s=>`
+        <div class="student-item" onclick="openStuModal('${s.id}')">
+          <div class="stu-avatar" style="background:${s.grade===1?"#1F386420":"#833C0020"};color:${s.grade===1?"var(--primary)":"var(--primary2)"}">
+            ${s.num||'?'}
+          </div>
+          <div class="stu-info">
+            <div class="stu-name">${s.name} ${s.note?'<span style="font-size:14px">⚠</span>':''}</div>
+            <span style="background:${s.grade===1?"#1F386420":"#833C0020"};color:${s.grade===1?"var(--primary)":"var(--primary2)"};border-radius:4px;padding:1px 5px;font-size:10px;font-weight:700">${s.clsLabel}</span>
+            ${s.phone?`<div class="stu-phone" onclick="event.stopPropagation();location.href='tel:${s.phone}'">📞 ${s.phone}</div>`:''}
+            ${s.note?`<div class="stu-note">${s.note}</div>`:''}
+          </div>
+          <span style="color:var(--muted);font-size:18px">›</span>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+// ── 학생 모달 ──
+function openStuModal(id){
+  const s = STUDENTS.find(x=>x.id===id);
+  if(!s) return;
+  const hc = s.grade===1 ? 'var(--primary)' : 'var(--primary2)';
+  const sc = SCHEDULES[s.clsKey]||{};
+  const dc = {월:"#4472C4",화:"#70AD47",수:"#ED7D31",목:"#9B59B6",금:"#C00000"};
+
+  document.getElementById('stu-modal-header').style.background = hc;
+  document.getElementById('stu-modal-avatar').textContent = s.num||'?';
+  document.getElementById('stu-modal-name').textContent = s.name;
+  document.getElementById('stu-modal-cls').textContent = s.clsLabel;
+  document.getElementById('stu-modal-phone').innerHTML = s.phone
+    ? `<a href="tel:${s.phone}" style="background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 12px;color:#fff;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px">📞 ${s.phone}</a>`
+    : `<span style="color:rgba(255,255,255,0.5);font-size:12px">연락처 없음</span>`;
+
+  document.getElementById('stu-modal-body').innerHTML = `
+    ${s.note?`<div style="background:#FFF0F0;border-radius:12px;padding:14px;border:1.5px solid #FFCDD2;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px">⚠ 특이사항</div>
+      <div style="font-size:13px;color:var(--danger);line-height:20px;white-space:pre-line">${s.note}</div>
+    </div>`:''}
+    <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--border)">
+      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px">📅 이번주 수강 현황 (4/6~4/10)</div>
+      ${DAYS.map(day=>{
+        const subjs = sc[day];
+        const s1=subjs?.[0], s2=subjs?.[1];
+        const show = s1&&s1!=="—" ? `<span style="background:${gc(s1)}20;color:${gc(s1)};border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;border:1px solid ${gc(s1)}44;margin-right:4px">${s1}</span>` : '';
+        const show2 = s2 ? `<span style="background:${gc(s2)}20;color:${gc(s2)};border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;border:1px solid ${gc(s2)}44">${s2}</span>` : '';
+        return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="width:28px;height:28px;border-radius:7px;background:${dc[day]}20;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span style="font-weight:800;font-size:12px;color:${dc[day]}">${day}</span>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:3px">${day}요일 (${DAY_DATES[day]})</div>
+            <div>${show}${show2}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="height:20px"></div>
+  `;
+
+  document.getElementById('stu-modal').classList.remove('hidden');
+}
+
+function closeStuModal(){
+  document.getElementById('stu-modal').classList.add('hidden');
+}
+
+// ── 출석부 ──
+function renderAttendance(){
+  // 세션 계산
+  const sessions = {};
+  for(const [k,sc] of Object.entries(SCHEDULES)){
+    const [g,cl] = k.split('-').map(Number);
+    const dj = sc[currentDay]; if(!dj) continue;
+    const [s1,s2,s3] = dj;
+    const roster = STUDENTS.filter(s=>s.grade===g&&s.cls===cl);
+    for(const stu of roster){
+      if(s1&&s1!=="—"){
+        const key=`${s1}(1교시)`;
+        if(!sessions[key]) sessions[key]=[];
+        sessions[key].push(stu);
+      }
+      if(s2&&s2!=="—"){
+        const key=`${s2}(2교시)`;
+        if(!sessions[key]) sessions[key]=[];
+        sessions[key].push(stu);
+      }
+      if(s3){
+        const key=`${s3}(3교시)`;
+        if(!sessions[key]) sessions[key]=[];
+        sessions[key].push(stu);
+      }
+    }
+  }
+  const dc = {월:"#4472C4",화:"#70AD47",수:"#ED7D31",목:"#9B59B6",금:"#C00000"};
+
+  document.getElementById('screen-attendance').innerHTML = `
+    <div style="background:var(--primary);padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="color:#fff;font-size:20px;font-weight:800">요일별 출석부</div>
+        <button onclick="resetAtt()" style="background:rgba(255,255,255,0.2);border:none;border-radius:8px;padding:5px 10px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">🔄 초기화</button>
+      </div>
+      <div style="color:rgba(255,255,255,0.7);font-size:11px">${currentDay}요일(${DAY_DATES[currentDay]}) · 출석 체크 시 자동 저장</div>
+    </div>
+    <div class="day-tabs">
+      ${DAYS.map(d=>`
+        <button class="day-tab ${currentDay===d?'active':''}" onclick="currentDay='${d}';renderAttendance()" 
+          style="border-bottom-color:${currentDay===d?dc[d]:'transparent'}">
+          <div class="day" style="color:${currentDay===d?dc[d]:'var(--muted)'}">${d}</div>
+          <div class="date">${DAY_DATES[d]}</div>
+        </button>`).join('')}
+    </div>
+    <div style="padding:12px">
+      ${Object.entries(sessions).map(([session,stus])=>{
+        const subj = session.split('(')[0];
+        const color = gc(subj);
+        const instr = INSTRUCTOR_MAP[subj];
+        const stats = {present:0,absent:0,late:0,early:0,none:0};
+        stus.forEach(s=>{
+          const st = attData[`${session}|${s.id}`]||'';
+          if(st==='present') stats.present++;
+          else if(st==='absent') stats.absent++;
+          else if(st==='late') stats.late++;
+          else if(st==='early') stats.early++;
+          else stats.none++;
+        });
+        return `
+          <div class="session-card" style="margin-bottom:10px">
+            <div class="session-header" style="background:${color}">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;align-items:center;gap:8px;flex:1">
+                  <span style="color:#fff;font-weight:800;font-size:14px">${session}</span>
+                  ${instr?`<button onclick="location.href='tel:${instr.phone}'" style="background:rgba(255,255,255,0.2);border:none;border-radius:10px;padding:2px 7px;color:#fff;font-size:10px;font-weight:600;cursor:pointer">👩‍🏫 ${instr.name}</button>`:''}
+                </div>
+                <div style="display:flex;gap:6px;align-items:center">
+                  <button onclick="markAllPresent('${session}',${JSON.stringify(stus.map(s=>s.id))})" 
+                    style="background:rgba(255,255,255,0.25);border:none;border-radius:8px;padding:3px 8px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">✓ 전원출석</button>
+                  <span style="background:rgba(255,255,255,0.2);border-radius:10px;padding:2px 8px;color:#fff;font-size:12px;font-weight:700">${stus.length}명</span>
+                </div>
+              </div>
+              ${stats.present+stats.absent+stats.late+stats.early>0?`
+              <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+                ${stats.present>0?`<span style="background:rgba(255,255,255,0.25);border-radius:6px;padding:2px 6px;color:#fff;font-size:10px">✓ 출석 ${stats.present}</span>`:''}
+                ${stats.absent>0?`<span style="background:rgba(255,100,100,0.4);border-radius:6px;padding:2px 6px;color:#fff;font-size:10px">✗ 결석 ${stats.absent}</span>`:''}
+                ${stats.late>0?`<span style="background:rgba(255,200,0,0.35);border-radius:6px;padding:2px 6px;color:#fff;font-size:10px">▲ 지각 ${stats.late}</span>`:''}
+                ${stats.early>0?`<span style="background:rgba(100,180,255,0.35);border-radius:6px;padding:2px 6px;color:#fff;font-size:10px">◀ 조기 ${stats.early}</span>`:''}
+              </div>`:''}
+            </div>
+            ${stus.map((s,i)=>{
+              const dropKey=`${session}|${s.id}`;
+              const status=attData[dropKey]||'';
+              const stObj=ATT_STATUS.find(a=>a.key===status)||ATT_STATUS[0];
+              const rowBg=status==='absent'?'#FFF5F5':status==='present'?'#F5FFF6':status==='late'?'#FFFBF0':status==='early'?'#F0F7FF':(i%2===0?'#fff':'#FAFAFA');
+              return `
+              <div>
+                <div class="att-row" style="background:${rowBg}">
+                  <div class="att-info" onclick="openStuModal('${s.id}')">
+                    <span class="att-num">${s.num}</span>
+                    <span class="att-name" style="color:${s.note?'var(--danger)':'var(--text)'}">${s.name}</span>
+                    ${s.note?'<span style="font-size:12px">⚠</span>':''}
+                    <span style="font-size:10px;color:var(--muted);margin-left:4px">${s.clsLabel}</span>
+                  </div>
+                  <button class="att-status-btn" onclick="toggleDrop('${dropKey}')" style="background:${stObj.bg}">
+                    <span style="font-size:13px;font-weight:800;color:${stObj.color}">${stObj.icon}</span>
+                    <span style="font-size:11px;font-weight:700;color:${stObj.color};flex:1">${stObj.label}</span>
+                    <span style="font-size:9px;color:${stObj.color}">${openDrop===dropKey?'▲':'▼'}</span>
+                  </button>
+                </div>
+                ${openDrop===dropKey?`
+                <div class="att-dropdown">
+                  ${ATT_STATUS.map(opt=>`
+                    <button class="att-opt" onclick="setAttStatus('${dropKey}',event)"
+                      data-key="${opt.key}"
+                      style="background:${status===opt.key?opt.color:opt.bg};border-color:${opt.color}${status===opt.key?'':'44'};color:${status===opt.key?'#fff':opt.color}">
+                      <span>${opt.icon}</span><span>${opt.label}</span>
+                    </button>`).join('')}
+                </div>`:''}
+              </div>`;
+            }).join('')}
+          </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function toggleDrop(key){
+  openDrop = openDrop===key ? null : key;
+  renderAttendance();
+}
+
+function setAttStatus(dropKey, e){
+  const optKey = e.currentTarget.dataset.key;
+  attData[dropKey] = optKey;
+  saveAtt();
+  openDrop = null;
+  renderAttendance();
+}
+
+function markAllPresent(session, ids){
+  ids.forEach(id=>{ attData[`${session}|${id}`]='present'; });
+  saveAtt();
+  renderAttendance();
+}
+
+function resetAtt(){
+  if(!confirm('이 요일 출석 기록을 초기화할까요?')) return;
+  Object.keys(attData).forEach(k=>{ delete attData[k]; });
+  saveAtt();
+  renderAttendance();
+}
+
+// ── 시간표 ──
+function renderTimetable(){
+  const sc = SCHEDULES[currentTTClass]||{};
+  const grade = parseInt(currentTTClass[0]);
+  const hc = grade===1 ? 'var(--primary)' : 'var(--primary2)';
+
+  document.getElementById('screen-timetable').innerHTML = `
+    <div style="background:${hc};padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
+      <div style="color:#fff;font-size:20px;font-weight:800">반별 시간표</div>
+      <div style="color:#fff;font-size:12px;opacity:0.7">4/6(월) ~ 4/10(금) · 과목 터치 시 강사 확인</div>
+    </div>
+    <div style="display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);padding:10px 12px;gap:6px">
+      ${Object.keys(SCHEDULES).map(k=>`
+        <button onclick="currentTTClass='${k}';renderTimetable()" 
+          style="flex-shrink:0;padding:7px 14px;border-radius:20px;border:2px solid ${currentTTClass===k?hc:'var(--border)'};background:${currentTTClass===k?hc:'#fff'};color:${currentTTClass===k?'#fff':'var(--text)'};font-size:14px;font-weight:700;cursor:pointer">${k}</button>`).join('')}
+    </div>
+    <div style="padding:16px">
+      <div style="font-size:16px;font-weight:800;color:${hc};margin-bottom:12px">${grade}학년 ${currentTTClass[2]}반 주간 시간표</div>
+      <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
+        <table class="tt-table" style="width:100%">
+          <tr style="background:${hc}">
+            <th style="color:#fff;padding:8px 4px;width:60px">시간</th>
+            ${DAYS.map(d=>`<th style="color:#fff;padding:4px 2px"><div>${d}</div><div style="opacity:0.8;font-size:9px;font-weight:400">${DAY_DATES[d]}</div></th>`).join('')}
+          </tr>
+          <tr style="background:#F8F9FD">
+            <td style="padding:6px 4px;background:#ECEEF5;font-size:9px;color:#7B8CB0;font-weight:700">아침<br><span style="font-weight:400">08:50</span></td>
+            ${DAYS.map(()=>`<td style="padding:4px 2px;text-align:center"><div style="background:#E8ECF7;border-radius:6px;padding:4px;font-size:8px;color:#7B8CB0">스포츠클럽</div></td>`).join('')}
+          </tr>
+          ${['1교시','2교시','3교시','4교시'].map(p=>`
+          <tr>
+            <td style="padding:6px 4px;background:#F8F9FD;font-size:9px;color:#7B8CB0;font-weight:700">${p}<br><span style="font-weight:400">정규</span></td>
+            ${DAYS.map(()=>`<td style="padding:4px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:4px;font-size:8px;color:#8892A4">정규수업</div></td>`).join('')}
+          </tr>`).join('')}
+          <tr style="background:#FFFBF0">
+            <td style="padding:6px 4px;background:#FFF5D6;font-size:9px;color:#B8860B;font-weight:700">점심<br><span style="font-weight:400">11:30</span></td>
+            ${DAYS.map(()=>`<td style="padding:4px 2px;text-align:center"><div style="background:#FFF5D6;border-radius:6px;padding:4px;font-size:9px;color:#B8860B">🍱 점심</div></td>`).join('')}
+          </tr>
+          <tr style="border-top:2px solid ${hc}">
+            <td style="padding:6px 4px;background:${hc}18;font-size:9px;color:${hc};font-weight:800">맞춤형<br>1교시</td>
+            ${DAYS.map(d=>{
+              const subjs=sc[d]; if(!subjs) return '<td></td>';
+              const s1=subjs[0];
+              if(!s1||s1==="—") return `<td style="padding:4px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:4px;font-size:8px;color:#CCC">—</div></td>`;
+              const parts=s1.includes("+")?s1.split("+"):[s1];
+              return `<td style="padding:4px 2px;text-align:center">
+                ${parts.map(p=>`<div class="subj-cell" style="background:${gc(p.trim())}25;color:${gc(p.trim())};border:1px solid ${gc(p.trim())}66;margin-bottom:2px" onclick="showInstructor('${p.trim()}')">${p.trim()}</div>`).join('')}
+              </td>`;
+            }).join('')}
+          </tr>
+          <tr>
+            <td style="padding:6px 4px;background:${hc}18;font-size:9px;color:${hc};font-weight:800">맞춤형<br>2교시</td>
+            ${DAYS.map(d=>{
+              const subjs=sc[d]; if(!subjs) return '<td></td>';
+              const s2=subjs[1];
+              if(!s2||s2==="—") return `<td style="padding:4px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:4px;font-size:8px;color:#CCC">—</div></td>`;
+              return `<td style="padding:4px 2px;text-align:center">
+                <div class="subj-cell" style="background:${gc(s2)}25;color:${gc(s2)};border:1px solid ${gc(s2)}66" onclick="showInstructor('${s2}')">${s2}</div>
+              </td>`;
+            }).join('')}
+          </tr>
+          ${grade===2?`<tr>
+            <td style="padding:6px 4px;background:${hc}18;font-size:9px;color:${hc};font-weight:800">맞춤형<br>3교시</td>
+            ${DAYS.map(d=>{
+              const subjs=sc[d]; if(!subjs) return '<td></td>';
+              const s3=subjs[2];
+              if(!s3) return `<td style="padding:4px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:4px;font-size:8px;color:#CCC">—</div></td>`;
+              return `<td style="padding:4px 2px;text-align:center">
+                <div class="subj-cell" style="background:${gc(s3)}25;color:${gc(s3)};border:1px solid ${gc(s3)}66" onclick="showInstructor('${s3}')">${s3}</div>
+              </td>`;
+            }).join('')}
+          </tr>`:''}
+          <tr style="background:#F0FFF4">
+            <td style="padding:6px 4px;background:#D4EDDA;font-size:9px;color:#375623;font-weight:700">하교</td>
+            ${DAYS.map(d=>`<td style="padding:4px 2px;text-align:center"><div style="background:#D4EDDA;border-radius:6px;padding:4px;font-size:8px;color:#375623">🏠 ${(grade===2&&d==='수')||(grade===1&&(d==='월'||d==='수'))?'14:30':'15:20'}</div></td>`).join('')}
+          </tr>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function showInstructor(subj){
+  const instr = INSTRUCTOR_MAP[subj];
+  if(!instr){
+    showPopup(`<div style="padding:20px;text-align:center"><div style="font-size:16px;font-weight:800;margin-bottom:8px">${subj}</div><div style="color:var(--muted);font-size:14px">강사 정보 없음</div><button onclick="closePopup()" style="margin-top:16px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer">닫기</button></div>`);
+    return;
+  }
+  showPopup(`
+    <div style="background:${gc(subj)};padding:16px;border-radius:18px 18px 0 0">
+      <div style="color:#fff;font-size:16px;font-weight:800">${subj}</div>
+    </div>
+    <div style="padding:16px">
+      <div style="background:var(--bg);border-radius:12px;padding:14px;border-left:4px solid ${gc(subj)};margin-bottom:14px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600">👩‍🏫 강사</div>
+        <div style="font-size:16px;font-weight:700">${instr.name} 강사</div>
+      </div>
+      <a href="tel:${instr.phone}" style="display:block;background:${gc(subj)};color:#fff;border-radius:10px;padding:12px;text-align:center;font-size:14px;font-weight:700;margin-bottom:8px">📞 ${instr.phone}</a>
+      <button onclick="closePopup()" style="width:100%;background:#f0f0f0;border:none;border-radius:10px;padding:10px;font-size:14px;font-weight:700;cursor:pointer">닫기</button>
+    </div>
+  `);
+}
+
+// ── 특이사항 ──
+function renderNotes(){
+  const noteStus = STUDENTS.filter(s=>s.note);
+  document.getElementById('screen-notes').innerHTML = `
+    <div style="background:#7B2C00;padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
+      <div style="color:#fff;font-size:20px;font-weight:800">특이사항</div>
+      <div style="color:#fff;font-size:12px;opacity:0.7">${noteStus.length}명 기록됨 · 수업별 ${INCIDENTS.length}건</div>
+    </div>
+    <div style="display:flex;background:#fff;border-bottom:1px solid var(--border)">
+      <button onclick="notesTab='students';renderNotes()" style="flex:1;padding:12px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:700;color:${notesTab==='students'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='students'?'#7B2C00':'transparent'}">학생 특이사항</button>
+      <button onclick="notesTab='incidents';renderNotes()" style="flex:1;padding:12px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:700;color:${notesTab==='incidents'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='incidents'?'#7B2C00':'transparent'}">수업별 특이사항</button>
+    </div>
+    <div style="padding:12px">
+      ${notesTab==='students' ? noteStus.map(s=>{
+        const isW=s.note.includes("⚠");
+        const bc=isW?"#F44336":"#FFB347";
+        return `<div class="incident-card" style="border-color:${bc}">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+            <span style="font-weight:800;font-size:15px">${s.name}</span>
+            <span style="background:${s.grade===1?"#1F386420":"#833C0020"};color:${s.grade===1?"var(--primary)":"var(--primary2)"};border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700">${s.clsLabel}</span>
+            ${isW?`<span style="background:#FFCDD2;color:var(--danger);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">⚠ 민원</span>`:''}
+          </div>
+          <div style="font-size:12px;color:#555;line-height:18px;white-space:pre-line">${s.note}</div>
+          ${s.phone?`<a href="tel:${s.phone}" style="font-size:12px;color:var(--accent);font-weight:600;margin-top:8px;display:block">📞 ${s.phone}</a>`:''}
+        </div>`;
+      }).join('') : INCIDENTS.map(inc=>{
+        const tag=inc.tag||'';
+        let bc="#FFB347";
+        if(tag.includes("처리완료")) bc="#375623";
+        else if(tag.includes("출석관리")) bc="#4472C4";
+        else if(tag.includes("폭행")) bc="#C00000";
+        else if(tag.includes("⚠")) bc="#FF6B35";
+        return `<div class="incident-card" style="border-color:${bc}">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">
+            <span style="background:${bc}22;color:${bc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">${inc.date}</span>
+            <span style="font-weight:800;font-size:13px;color:#7B2C00;flex:1">${inc.subject}</span>
+            <span style="background:${bc}22;color:${bc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">${tag}</span>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#B71C1C;margin-bottom:4px;white-space:pre-line">${inc.student}</div>
+          <div style="font-size:12px;color:#555;line-height:18px;margin-bottom:6px;white-space:pre-line">${inc.content}</div>
+          <div style="font-size:11px;color:${bc};font-weight:600">▶ ${inc.action}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+// ── 학사일정 ──
+function renderCalendar(){
+  const y=currentCalMonth.getFullYear(), m=currentCalMonth.getMonth();
+  const today=new Date();
+  const todayKey=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const monthNames=["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+  const dayNames=["일","월","화","수","목","금","토"];
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const firstDay=new Date(y,m,1).getDay();
+  const cells=[...Array(firstDay).fill(null),...Array.from({length:daysInMonth},(_,i)=>i+1)];
+  while(cells.length%7!==0) cells.push(null);
+
+  document.getElementById('screen-calendar').innerHTML = `
+    <div style="background:var(--green);padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
+      <button class="back-btn" onclick="goTo('home')">← 홈으로</button>
+      <div style="color:#fff;font-size:20px;font-weight:800">학사일정</div>
+      <div style="color:#fff;font-size:12px;opacity:0.7">2026년도 1학기</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:#fff;border-bottom:1px solid var(--border)">
+      <button onclick="prevMonth()" style="background:none;border:none;font-size:24px;color:var(--green);cursor:pointer;padding:4px 8px">‹</button>
+      <span style="font-size:18px;font-weight:800">${y}년 ${monthNames[m]}</span>
+      <button onclick="nextMonth()" style="background:none;border:none;font-size:24px;color:var(--green);cursor:pointer;padding:4px 8px">›</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);background:#F0F4F0;padding:6px 0">
+      ${dayNames.map((d,i)=>`<div style="text-align:center;font-size:11px;font-weight:700;color:${i===0?'#E53935':i===6?'#1565C0':'#555'}">${d}</div>`).join('')}
+    </div>
+    <div class="cal-grid">
+      ${Array.from({length:cells.length/7},(_,row)=>
+        cells.slice(row*7,(row+1)*7).map((d,col)=>{
+          if(!d) return `<div class="cal-cell" style="border-bottom:1px solid #F0F0F0"></div>`;
+          const key=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+          const isToday=key===todayKey;
+          const hasEv=!!CALENDAR[key];
+          const isHol=CALENDAR[key]?.some(e=>e.type==='holiday');
+          const dayColor=col===0?'#E53935':col===6?'#1565C0':isHol?'#E53935':'var(--text)';
+          return `<div class="cal-cell" style="border-bottom:1px solid #F0F0F0" onclick="showCalEvent('${key}')">
+            <div style="${isToday?'background:var(--green);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;margin:0 auto;':''}font-size:13px;font-weight:${isToday?'800':'400'};color:${isToday?'#fff':dayColor}">${d}</div>
+            ${hasEv?`<div style="width:5px;height:5px;border-radius:50%;background:${isHol?'#E53935':'#FF6B35'};margin:2px auto 0"></div>`:''}
+          </div>`;
+        }).join('')
+      ).join('')}
+    </div>
+    <div style="margin:12px;border-radius:12px;overflow:hidden;border:1px solid #C8E6C9">
+      <div style="background:var(--green);padding:10px"><span style="color:#fff;font-weight:800;font-size:13px">${monthNames[m]} 주요 일정</span></div>
+      ${Array.from({length:daysInMonth},(_,i)=>i+1).filter(d=>CALENDAR[`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`]).map(d=>{
+        const key=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const evs=CALENDAR[key];
+        const isHol=evs.some(e=>e.type==='holiday');
+        const dayN=dayNames[new Date(y,m,d).getDay()];
+        return `<div style="padding:10px;border-bottom:1px solid #F0F0F0;display:flex;gap:10px">
+          <div style="width:40px;text-align:center">
+            <div style="font-size:13px;font-weight:700;color:${isHol?'#E53935':'var(--green)'}">${d}일</div>
+            <div style="font-size:10px;color:var(--muted)">${dayN}</div>
+          </div>
+          <div style="flex:1">
+            ${evs.map(ev=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+              <div style="width:6px;height:6px;border-radius:50%;background:${ev.type==='holiday'?'#E53935':ev.type==='vacation'?'#1565C0':'#FF6B35'}"></div>
+              <span style="font-size:12px">${ev.label}</span>
+            </div>`).join('')}
+          </div>
+        </div>`;
+      }).join('') || '<div style="padding:12px;text-align:center;color:var(--muted);font-size:13px">이번 달 등록된 일정 없음</div>'}
+    </div>
+  `;
+}
+
+function showCalEvent(key){
+  const evs = CALENDAR[key];
+  if(!evs) return;
+  const [y,m,d] = key.split('-');
+  showPopup(`
+    <div style="background:var(--green);padding:16px;border-radius:18px 18px 0 0">
+      <div style="color:#fff;font-size:16px;font-weight:800">${parseInt(m)}월 ${parseInt(d)}일</div>
+    </div>
+    <div style="padding:16px">
+      ${evs.map(ev=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="width:8px;height:8px;border-radius:50%;background:${ev.type==='holiday'?'#E53935':ev.type==='vacation'?'#1565C0':'#FF6B35'}"></div>
+        <span style="font-size:14px;font-weight:600">${ev.label}</span>
+      </div>`).join('')}
+      <button onclick="closePopup()" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:14px">닫기</button>
+    </div>
+  `);
+}
+
+function prevMonth(){ currentCalMonth=new Date(currentCalMonth.getFullYear(),currentCalMonth.getMonth()-1,1); renderCalendar(); }
+function nextMonth(){ currentCalMonth=new Date(currentCalMonth.getFullYear(),currentCalMonth.getMonth()+1,1); renderCalendar(); }
+
+// ── 팝업 ──
+function showPopup(html){
+  document.getElementById('popup-content').innerHTML=html;
+  document.getElementById('popup-overlay').classList.remove('hidden');
+}
+function closePopup(){
+  document.getElementById('popup-overlay').classList.add('hidden');
+}
+
+// ── 초기화 ──
+renderHome();
+
+// Service Worker 등록
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
