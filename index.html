@@ -303,7 +303,7 @@ const SCHEDULES = {
   "1-3":{월:["칼라클레이","주산암산"],화:["방송댄스","음악줄넘기"],수:["보드게임","주산암산"],목:["영어회화","토탈공예"],금:["놀이체육","영어야놀자"]},
   "1-4":{월:["종이접기+도자공예","칼라클레이"],화:["음악줄넘기","오카리나"],수:["창의과학","종이접기"],목:["토탈공예","오카리나"],금:["전래놀이","영어야놀자"]},
   "2-1":{월:["—","축구(풋살)","그림책놀이"],화:["뉴스포츠","칼라클레이"],수:["종이접기","우쿨렐레"],목:["뉴스포츠","중국어"],금:["창의미술","놀이체육"]},
-  "2-2":{월:["—","발레","축구(풋살)"],화:["뉴스포츠","칼라클레이"],수:["우쿨렐레","창의과학"],목:["중국어","방송댄스"],금:["그림책놀이","창의미술"]},
+  "2-2":{월:["—","종이접기","축구(풋살)"],화:["뉴스포츠","칼라클레이"],수:["우쿨렐레","창의과학"],목:["중국어","방송댄스"],금:["그림책놀이","창의미술"]},
   "2-3":{월:["—","종이접기","그림책놀이"],화:["칼라클레이","뉴스포츠"],수:["종이접기","우쿨렐레"],목:["방송댄스","뉴스포츠"],금:["영어야놀자","놀이체육"]},
   "2-4":{월:["—","도자공예","종이접기"],화:["칼라클레이","방송댄스"],수:["창의과학","보드게임"],목:["뉴스포츠","중국어"],금:["창의미술","그림책놀이"]}
 };
@@ -356,7 +356,7 @@ const CALENDAR = {
 };
 
 const DAYS = ["월","화","수","목","금"];
-const DAY_DATES = {월:"4/6",화:"4/7",수:"4/8",목:"4/9",금:"4/10"};
+const DAY_DATES = {월:"4/14",화:"4/15",수:"4/16",목:"4/17",금:"4/18"};
 const CLASS_LABELS = ["1학년 1반","1학년 2반","1학년 3반","1학년 4반","2학년 1반","2학년 2반","2학년 3반","2학년 4반"];
 
 // 색상
@@ -458,7 +458,7 @@ function renderHome(){
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
           <div style="color:#fff;font-size:22px;font-weight:800;margin-bottom:2px">늘봄학교 관리</div>
-          <div style="color:#fff;font-size:13px;opacity:0.8">맞춤형 프로그램 · 4/6~4/10주</div>
+          <div style="color:#fff;font-size:13px;opacity:0.8">맞춤형 프로그램 · 4/14~4/18주</div>
         </div>
       </div>
       <div class="stats-row">
@@ -595,7 +595,7 @@ function openStuModal(id){
       <div style="font-size:13px;color:var(--danger);line-height:20px;white-space:pre-line">${s.note}</div>
     </div>`:''}
     <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--border)">
-      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px">📅 이번주 수강 현황 (4/6~4/10)</div>
+      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px">📅 이번주 수강 현황 (4/14~4/18)</div>
       ${DAYS.map(day=>{
         const subjs = sc[day];
         const s1=subjs?.[0], s2=subjs?.[1];
@@ -775,7 +775,7 @@ function renderTimetable(){
   document.getElementById('screen-timetable').innerHTML = `
     <div style="background:${hc};padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
       <div style="color:#fff;font-size:20px;font-weight:800">반별 시간표</div>
-      <div style="color:#fff;font-size:12px;opacity:0.7">4/6(월) ~ 4/10(금) · 과목 터치 시 강사 확인</div>
+      <div style="color:#fff;font-size:12px;opacity:0.7">4/14(월) ~ 4/18(금) · 과목 터치 시 강사 확인</div>
     </div>
     <div style="display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);padding:10px 12px;gap:6px">
       ${Object.keys(SCHEDULES).map(k=>`
