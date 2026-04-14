@@ -242,7 +242,7 @@ const STUDENTS = [
   {id:"14윤하람",name:"윤하람",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:17,phone:"010-7189-7188",note:"월·수 1교시만 (켈스케네디)"},
   {id:"14정나은",name:"정나은",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:18,phone:"010-7583-2326",note:"월 도자공예(1교시) → 칼라클레이(2교시)"},
   {id:"14최아린",name:"최아린",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:19,phone:"010-2794-0397",note:"월 도자공예(1교시) → 칼라클레이(2교시)\n화요일 로봇과학A+오카리나"},
-  {id:"21구도안",name:"구도안",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:1,phone:"010-7475-1359",note:"목 취소 / 화 로봇과학A만"},
+  {id:"21구도안",name:"구도안",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:1,phone:"010-7475-1359",note:"목 맞춤형 취소"},
   {id:"21김재준",name:"김재준",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:2,phone:"010-3435-8715",note:"화 로봇과학A / 목·금 2교시 제외\n⚠ [4/2] 전래놀이 결보강 중 폭행 피해"},
   {id:"21김주안",name:"김주안",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:3,phone:"010-8927-1127",note:""},
   {id:"21고율아",name:"고율아",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:10,phone:"010-9604-8549",note:""},
@@ -303,7 +303,7 @@ const SCHEDULES = {
   "1-3":{월:["칼라클레이","주산암산"],화:["방송댄스","음악줄넘기"],수:["보드게임","주산암산"],목:["영어회화","토탈공예"],금:["놀이체육","영어야놀자"]},
   "1-4":{월:["종이접기+도자공예","칼라클레이"],화:["음악줄넘기","오카리나"],수:["창의과학","종이접기"],목:["토탈공예","오카리나"],금:["전래놀이","영어야놀자"]},
   "2-1":{월:["—","축구(풋살)","그림책놀이"],화:["뉴스포츠","칼라클레이"],수:["종이접기","우쿨렐레"],목:["뉴스포츠","중국어"],금:["창의미술","놀이체육"]},
-  "2-2":{월:["—","종이접기","축구(풋살)"],화:["뉴스포츠","칼라클레이"],수:["우쿨렐레","창의과학"],목:["중국어","방송댄스"],금:["그림책놀이","창의미술"]},
+  "2-2":{월:["—","발레","축구(풋살)"],화:["뉴스포츠","칼라클레이"],수:["우쿨렐레","창의과학"],목:["중국어","방송댄스"],금:["그림책놀이","창의미술"]},
   "2-3":{월:["—","종이접기","그림책놀이"],화:["칼라클레이","뉴스포츠"],수:["종이접기","우쿨렐레"],목:["방송댄스","뉴스포츠"],금:["영어야놀자","놀이체육"]},
   "2-4":{월:["—","도자공예","종이접기"],화:["칼라클레이","방송댄스"],수:["창의과학","보드게임"],목:["뉴스포츠","중국어"],금:["창의미술","그림책놀이"]}
 };
@@ -580,6 +580,61 @@ function openStuModal(id){
   const hc = s.grade===1 ? 'var(--primary)' : 'var(--primary2)';
   const sc = SCHEDULES[s.clsKey]||{};
   const dc = {월:"#4472C4",화:"#70AD47",수:"#ED7D31",목:"#9B59B6",금:"#C00000"};
+  const nm = s.name.trim();
+  const is2 = s.grade===2;
+
+  // 개인 특수 일정 데이터 (출석부와 동일)
+  const SPECIAL_M = {
+    "이소율1": { skipDays:["월"],           skipS2Days:["목","금"] },
+    "양해린":  { skipDays:["화","목","금"],  skipS2Days:["월","수"] },
+    "구도안":  { skipDays:["목"]                                   },
+  };
+  const SKIP_ALL_M   = new Set(["허  산"]);
+  const WED_JUSA_M   = new Set(["이연희"]);
+  const sp = SPECIAL_M[nm];
+
+  // 요일별 수강 현황 계산
+  function getPersonalSubjs(day) {
+    if(SKIP_ALL_M.has(nm)) return null; // 전체 취소
+    if(sp?.skipDays?.includes(day)) return null; // 해당 요일 취소
+    if(WED_JUSA_M.has(nm)) {
+      return day==='수' ? ['주산암산'] : null;
+    }
+
+    const daysc = sc[day]||[];
+    const subjs = [];
+
+    if(!is2) {
+      // 1학년
+      const s1 = daysc[0], s2 = daysc[1];
+      if(day==='월'||day==='수') {
+        if(s1&&s1!=='—') subjs.push(s1);
+        if(s2&&!sp?.skipS2Days?.includes(day)) subjs.push(s2);
+      } else {
+        if(s1&&s1!=='—') subjs.push(s1);
+        if(s2&&!sp?.skipS2Days?.includes(day)) subjs.push(s2);
+      }
+    } else {
+      // 2학년
+      if(day==='월') {
+        // s[0]="—" 건너뜀, s[1]=2교시, s[2]=3교시
+        if(daysc[1]&&daysc[1]!=='—') subjs.push(daysc[1]);
+        if(daysc[2]&&!sp?.skipS2Days?.includes(day)) subjs.push(daysc[2]);
+        // 안건우·최가윤: 3교시(종이접기) 제외
+        if(nm==='안건우'||nm==='최가윤') {
+          const idx = subjs.findIndex(x=>x==='종이접기');
+          if(idx>-1) subjs.splice(idx,1);
+        }
+      } else if(day==='수') {
+        if(daysc[0]&&daysc[0]!=='—') subjs.push(daysc[0]);
+        if(daysc[1]&&!sp?.skipS2Days?.includes(day)) subjs.push(daysc[1]);
+      } else {
+        if(daysc[0]&&daysc[0]!=='—') subjs.push(daysc[0]);
+        if(daysc[1]&&!sp?.skipS2Days?.includes(day)) subjs.push(daysc[1]);
+      }
+    }
+    return subjs.length>0 ? subjs : [];
+  }
 
   document.getElementById('stu-modal-header').style.background = hc;
   document.getElementById('stu-modal-avatar').textContent = s.num||'?';
@@ -597,17 +652,21 @@ function openStuModal(id){
     <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--border)">
       <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px">📅 이번주 수강 현황 (4/14~4/18)</div>
       ${DAYS.map(day=>{
-        const subjs = sc[day];
-        const s1=subjs?.[0], s2=subjs?.[1];
-        const show = s1&&s1!=="—" ? `<span style="background:${gc(s1)}20;color:${gc(s1)};border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;border:1px solid ${gc(s1)}44;margin-right:4px">${s1}</span>` : '';
-        const show2 = s2 ? `<span style="background:${gc(s2)}20;color:${gc(s2)};border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;border:1px solid ${gc(s2)}44">${s2}</span>` : '';
+        const subjs = getPersonalSubjs(day);
+        const isCancelled = subjs===null;
+        const isEmpty = !isCancelled && subjs.length===0;
         return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-          <div style="width:28px;height:28px;border-radius:7px;background:${dc[day]}20;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <span style="font-weight:800;font-size:12px;color:${dc[day]}">${day}</span>
+          <div style="width:28px;height:28px;border-radius:7px;background:${isCancelled?'#EEE':dc[day]+'20'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span style="font-weight:800;font-size:12px;color:${isCancelled?'#AAA':dc[day]}">${day}</span>
           </div>
           <div style="flex:1">
             <div style="font-size:10px;color:var(--muted);margin-bottom:3px">${day}요일 (${DAY_DATES[day]})</div>
-            <div>${show}${show2}</div>
+            ${isCancelled
+              ? `<span style="background:#FFCDD2;color:#B71C1C;border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700">취소</span>`
+              : isEmpty
+                ? `<span style="color:var(--muted);font-size:12px">맞춤형 없음</span>`
+                : subjs.map(subj=>`<span style="background:${gc(subj)}20;color:${gc(subj)};border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;border:1px solid ${gc(subj)}44;margin-right:4px;display:inline-block;margin-bottom:3px">${subj}</span>`).join('')
+            }
           </div>
         </div>`;
       }).join('')}
@@ -622,33 +681,169 @@ function closeStuModal(){
   document.getElementById('stu-modal').classList.add('hidden');
 }
 
+// ── 강사 연락처 팝업 ──
+function showInstrPopup(subj) {
+  const instr = INSTRUCTOR_MAP[subj];
+  if(!instr) return;
+  const color = gc(subj);
+  showPopup(`
+    <div style="background:${color};padding:16px;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="color:#fff;font-size:16px;font-weight:900">${subj}</div>
+        <div style="color:rgba(255,255,255,0.8);font-size:12px;margin-top:2px">담당 강사 연락처</div>
+      </div>
+      <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+      <div style="background:${color}10;border-radius:12px;padding:16px;border-left:4px solid ${color};display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px">👩‍🏫 강사명</div>
+          <div style="font-size:20px;font-weight:900">${instr.name} 강사</div>
+        </div>
+      </div>
+      <a href="tel:${instr.phone}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:${color};color:#fff;border-radius:12px;padding:14px;font-size:16px;font-weight:800;text-decoration:none">
+        📞 ${instr.phone}
+      </a>
+      <button onclick="closePopup()" style="width:100%;background:#f0f0f0;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer">닫기</button>
+    </div>
+  `);
+}
+
 // ── 출석부 ──
 function renderAttendance(){
-  // 세션 계산
+  // ── 세션 계산 (시간표 구조와 동일하게) ──
+  // 1학년 월·수: s[0]=맞춤형1교시(13:10), s[1]=맞춤형2교시(14:00)
+  // 1학년 화·목·금: s[0]=맞춤형1교시(13:50), s[1]=맞춤형2교시(14:40)
+  // 2학년 수: s[0]=맞춤형1교시(13:10), s[1]=맞춤형2교시(14:00)
+  // 2학년 월: s[1]=맞춤형2교시(14:00), s[2]=맞춤형3교시(14:40) — s[0]="—" 건너뜀
+  // 2학년 화·목·금: s[0]=맞춤형1교시(13:50), s[1]=맞춤형2교시(14:40)
+
+  const TIME_LABEL = {
+    's1_1학년_월수': '맞춤형1교시 13:10~13:50',
+    's1_1학년_화목금': '맞춤형1교시 13:50~14:30',
+    's2_1학년_월수': '맞춤형2교시 14:00~14:40',
+    's2_1학년_화목금': '맞춤형2교시 14:40~15:20',
+    's1_2학년_수': '맞춤형1교시 13:10~13:50',
+    's2_2학년_수': '맞춤형2교시 14:00~14:40',
+    's2_2학년_월': '맞춤형2교시 14:00~14:40',
+    's3_2학년_월': '맞춤형3교시 14:40~15:20',
+    's1_2학년_화목금': '맞춤형1교시 13:50~14:30',
+    's2_2학년_화목금': '맞춤형2교시 14:40~15:20',
+  };
+
+  // 세션별 순서 관리
+  const sessionOrder = {};
   const sessions = {};
+
+  function addToSession(subj, timeLabel, order, stu) {
+    if(!subj || subj==='—') return;
+    // 복합과목(+) 분리
+    const parts = subj.includes('+') ? subj.split('+') : [subj];
+    parts.forEach(p => {
+      p = p.trim();
+      const key = `${p}(${timeLabel})`;
+      if(!sessions[key]) { sessions[key]=[]; sessionOrder[key]=order; }
+      sessions[key].push(stu);
+    });
+  }
+
+  // 1-4반 월요일 분반: 도자공예 vs 종이접기
+  const DOZA_ONLY  = new Set(["김민우"]);
+  const DOZA_S1    = new Set(["서가윤","신다혜","양희서","정나은","최아린"]);
+  // 전체 출석부 제외
+  const SKIP_ALL   = new Set(["허  산"]);
+  // 수요일 주산암산만 포함
+  const WED_JUSA_ONLY = new Set(["이연희"]);
+  // 개인별 특수 일정: skipDays=전체취소, skipS2Days=2교시취소
+  const SPECIAL = {
+    "이소율1": { skipDays:["월"],           skipS2Days:["목","금"] },
+    "양해린":  { skipDays:["화","목","금"],  skipS2Days:["월","수"] },
+    "구도안":  { skipDays:["목"]                                   },
+  };
+
+  const d = currentDay;
   for(const [k,sc] of Object.entries(SCHEDULES)){
     const [g,cl] = k.split('-').map(Number);
-    const dj = sc[currentDay]; if(!dj) continue;
-    const [s1,s2,s3] = dj;
+    const dj = sc[d]; if(!dj) continue;
     const roster = STUDENTS.filter(s=>s.grade===g&&s.cls===cl);
+
     for(const stu of roster){
-      if(s1&&s1!=="—"){
-        const key=`${s1}(1교시)`;
-        if(!sessions[key]) sessions[key]=[];
-        sessions[key].push(stu);
+      const nm = stu.name.trim();
+
+      // 허산: 모든 출석부에서 제외
+      if(SKIP_ALL.has(nm)) continue;
+
+      // 이연희: 수요일 주산암산만 포함
+      if(WED_JUSA_ONLY.has(nm)) {
+        if(d==='수') {
+          addToSession('주산암산', TIME_LABEL['s1_2학년_수'], 1, stu);
+        }
+        continue;
       }
-      if(s2&&s2!=="—"){
-        const key=`${s2}(2교시)`;
-        if(!sessions[key]) sessions[key]=[];
-        sessions[key].push(stu);
+
+      // 개인 특수 일정 처리
+      const sp = SPECIAL[nm];
+      if(sp) {
+        if(sp.skipDays && sp.skipDays.includes(d)) continue; // 전체 취소 요일
       }
-      if(s3){
-        const key=`${s3}(3교시)`;
-        if(!sessions[key]) sessions[key]=[];
-        sessions[key].push(stu);
+
+      // 월요일 종이접기 맞춤형3교시: 안건우·최가윤 제외 (도자공예 후 하교)
+      if(d==='월' && (nm==='안건우'||nm==='최가윤')) {
+        // 도자공예(맞춤형2교시, order=2)만 포함, 종이접기(맞춤형3교시) 제외
+        if(g===2) {
+          addToSession(dj[1], TIME_LABEL['s2_2학년_월'], 2, stu);
+          continue; // 3교시 건너뜀
+        }
+      }
+
+      if(g===1) {
+        if(d==='월'||d==='수') {
+          // 1-4반 월요일 특별 처리: 도자공예/종이접기 분반
+          if(cl===4 && d==='월') {
+            if(DOZA_ONLY.has(nm)) {
+              // 김민우: 도자공예만
+              addToSession('도자공예', TIME_LABEL['s1_1학년_월수'], 1, stu);
+            } else if(DOZA_S1.has(nm)) {
+              // 서가윤 등: 도자공예 + 칼라클레이
+              addToSession('도자공예', TIME_LABEL['s1_1학년_월수'], 1, stu);
+              addToSession(dj[1], TIME_LABEL['s2_1학년_월수'], 2, stu);
+            } else {
+              // 나머지: 종이접기 + 칼라클레이
+              addToSession('종이접기', TIME_LABEL['s1_1학년_월수'], 1, stu);
+              addToSession(dj[1], TIME_LABEL['s2_1학년_월수'], 2, stu);
+            }
+          } else {
+            // 일반: s[0]=맞춤형1교시, s[1]=맞춤형2교시
+            addToSession(dj[0], TIME_LABEL['s1_1학년_월수'], 1, stu);
+            if(!sp?.skipS2Days?.includes(d)) addToSession(dj[1], TIME_LABEL['s2_1학년_월수'], 2, stu);
+          }
+        } else {
+          // 화·목·금: s[0]=맞춤형1교시, s[1]=맞춤형2교시
+          addToSession(dj[0], TIME_LABEL['s1_1학년_화목금'], 1, stu);
+          if(!sp?.skipS2Days?.includes(d)) addToSession(dj[1], TIME_LABEL['s2_1학년_화목금'], 2, stu);
+        }
+      } else {
+        if(d==='수') {
+          addToSession(dj[0], TIME_LABEL['s1_2학년_수'], 1, stu);
+          addToSession(dj[1], TIME_LABEL['s2_2학년_수'], 2, stu);
+        } else if(d==='월') {
+          // s[0]="—" 건너뜀, s[1]=맞춤형2교시(order=2), s[2]=맞춤형3교시(order=3)
+          addToSession(dj[1], TIME_LABEL['s2_2학년_월'], 2, stu);
+          addToSession(dj[2], TIME_LABEL['s3_2학년_월'], 3, stu);
+        } else {
+          // 화·목·금: s[0]=맞춤형1교시, s[1]=맞춤형2교시
+          addToSession(dj[0], TIME_LABEL['s1_2학년_화목금'], 1, stu);
+          addToSession(dj[1], TIME_LABEL['s2_2학년_화목금'], 2, stu);
+        }
       }
     }
   }
+
+  // 교시 순서 → 과목명 가나다 순 정렬
+  const sortedSessions = Object.entries(sessions).sort((a,b)=>{
+    const oa = sessionOrder[a[0]]||9, ob = sessionOrder[b[0]]||9;
+    return oa!==ob ? oa-ob : a[0].localeCompare(b[0]);
+  });
   const dc = {월:"#4472C4",화:"#70AD47",수:"#ED7D31",목:"#9B59B6",금:"#C00000"};
 
   document.getElementById('screen-attendance').innerHTML = `
@@ -668,7 +863,8 @@ function renderAttendance(){
         </button>`).join('')}
     </div>
     <div style="padding:12px">
-      ${Object.entries(sessions).map(([session,stus])=>{
+      ${sortedSessions.length===0 ? `<div style="text-align:center;padding:40px;color:var(--muted)">이 날은 맞춤형 수업이 없습니다.</div>` :
+      sortedSessions.map(([session,stus])=>{
         const subj = session.split('(')[0];
         const color = gc(subj);
         const instr = INSTRUCTOR_MAP[subj];
@@ -685,11 +881,11 @@ function renderAttendance(){
           <div class="session-card" style="margin-bottom:10px">
             <div class="session-header" style="background:${color}">
               <div style="display:flex;justify-content:space-between;align-items:center">
-                <div style="display:flex;align-items:center;gap:8px;flex:1">
+                <div style="display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap">
                   <span style="color:#fff;font-weight:800;font-size:14px">${session}</span>
-                  ${instr?`<button onclick="location.href='tel:${instr.phone}'" style="background:rgba(255,255,255,0.2);border:none;border-radius:10px;padding:2px 7px;color:#fff;font-size:10px;font-weight:600;cursor:pointer">👩‍🏫 ${instr.name}</button>`:''}
+                  ${instr?`<button onclick="showInstrPopup('${subj}')" style="background:rgba(255,255,255,0.2);border:none;border-radius:10px;padding:2px 7px;color:#fff;font-size:10px;font-weight:600;cursor:pointer">👩‍🏫 ${instr.name}</button>`:''}
                 </div>
-                <div style="display:flex;gap:6px;align-items:center">
+                <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
                   <button onclick="markAllPresent('${session}',${JSON.stringify(stus.map(s=>s.id))})" 
                     style="background:rgba(255,255,255,0.25);border:none;border-radius:8px;padding:3px 8px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">✓ 전원출석</button>
                   <span style="background:rgba(255,255,255,0.2);border-radius:10px;padding:2px 8px;color:#fff;font-size:12px;font-weight:700">${stus.length}명</span>
@@ -703,7 +899,7 @@ function renderAttendance(){
                 ${stats.early>0?`<span style="background:rgba(100,180,255,0.35);border-radius:6px;padding:2px 6px;color:#fff;font-size:10px">◀ 조기 ${stats.early}</span>`:''}
               </div>`:''}
             </div>
-            ${stus.map((s,i)=>{
+            ${stus.sort((a,b)=>a.grade!==b.grade?a.grade-b.grade:a.cls!==b.cls?a.cls-b.cls:a.num-b.num).map((s,i)=>{
               const dropKey=`${session}|${s.id}`;
               const status=attData[dropKey]||'';
               const stObj=ATT_STATUS.find(a=>a.key===status)||ATT_STATUS[0];
@@ -767,105 +963,342 @@ function resetAtt(){
 }
 
 // ── 시간표 ──
+// ── 수강자 명단 계산 ──
+function getRoster(subj, day, clsKey) {
+  if(!subj || subj==='—') return [];
+  const roster = [];
+  // 현재 반 학생 중 해당 요일 해당 과목 수업인 학생
+  const [g,cl] = clsKey.split('-').map(Number);
+  const sc = SCHEDULES[clsKey]||{};
+  const daySubjs = sc[day]||[];
+  if(!daySubjs.some(s=>s&&s.includes(subj))) return [];
+  return STUDENTS.filter(s=>s.grade===g && s.cls===cl)
+    .sort((a,b)=>a.num-b.num);
+}
+
+function getRosterAllClasses(subj, day, slot) {
+  const DOZA_ONLY = new Set(["김민우"]);
+  const DOZA_S1   = new Set(["서가윤","신다혜","양희서","정나은","최아린"]);
+  const SKIP_ALL  = new Set(["허  산"]);
+  const WED_JUSA_ONLY = new Set(["이연희"]);
+  const result = [];
+
+  // 학년·요일·슬롯 → 시간표상 위치(index) 반환
+  function getExpectedPos(grade, day, slot) {
+    if(grade===1) {
+      // 월·수: s1=pos0, s2=pos1 / 화·목·금: s1=pos0, s2=pos1
+      return slot==='s1'?0:slot==='s2'?1:null;
+    } else {
+      if(day==='수') return slot==='s1'?0:slot==='s2'?1:null;
+      if(day==='월') return slot==='s1'?null:slot==='s2'?1:slot==='s3'?2:null; // s1=정규
+      return slot==='s1'?0:slot==='s2'?1:null; // 화·목·금
+    }
+  }
+
+  for(const [clsKey, sc] of Object.entries(SCHEDULES)){
+    const [g,cl] = clsKey.split('-').map(Number);
+    const daySubjs = sc[day]||[];
+
+    // 해당 슬롯에 이 과목이 있는지 확인
+    const pos = getExpectedPos(g, day, slot);
+    if(pos===null) continue;
+    const subjAtPos = daySubjs[pos]||'';
+    if(!subjAtPos.includes(subj)) continue;
+
+    const stus = STUDENTS.filter(s=>s.grade===g && s.cls===cl);
+    for(const stu of stus){
+      const nm = stu.name.trim();
+      if(SKIP_ALL.has(nm)) continue;
+      if(WED_JUSA_ONLY.has(nm)){
+        if(day==='수'&&subj==='주산암산') result.push(stu);
+        continue;
+      }
+      // 2-2반 월요일 종이접기 맞춤형2교시 제외 → 발레로 변경됨
+      // 월요일 종이접기 맞춤형3교시: 안건우·최가윤 제외 (도자공예 후 하교)
+      if(day==='월'&&subj==='종이접기'&&slot==='s3'&&(nm==='안건우'||nm==='최가윤')) continue;
+      // 1-4반 월요일 분반
+      if(g===1&&cl===4&&day==='월'){
+        if(subj==='도자공예'){
+          if(DOZA_ONLY.has(nm)||DOZA_S1.has(nm)) result.push(stu);
+        } else if(subj==='종이접기'){
+          if(!DOZA_ONLY.has(nm)&&!DOZA_S1.has(nm)) result.push(stu);
+        } else {
+          // 칼라클레이 등: 도자공예만인 김민우 제외
+          if(!DOZA_ONLY.has(nm)) result.push(stu);
+        }
+        continue;
+      }
+      result.push(stu);
+    }
+  }
+  return result.sort((a,b)=>a.grade!==b.grade?a.grade-b.grade:a.cls!==b.cls?a.cls-b.cls:a.num-b.num);
+}
+
+// ── 시간표 셀 렌더 헬퍼 ──
+function ttCell(subj, day, slot) {
+  if(!subj || subj==='—') return `<td style="padding:3px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:6px 3px;font-size:8px;color:#CCC;min-height:32px;display:flex;align-items:center;justify-content:center">—</div></td>`;
+  if(subj==='정규') return `<td style="padding:3px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:6px 3px;font-size:8px;color:#8892A4;min-height:32px;display:flex;align-items:center;justify-content:center">정규수업</div></td>`;
+  const parts = subj.includes('+') ? subj.split('+') : [subj];
+  const cells = parts.map(p=>{
+    p=p.trim();
+    const color=gc(p);
+    const place=getPlace(p);
+    return `<div class="subj-cell" onclick="showSubjDetail('${p}','${day}','${slot}')"
+      style="background:${color}20;color:${color};border:1.5px solid ${color}66;border-radius:7px;padding:5px 3px;margin-bottom:2px;cursor:pointer;min-height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
+      <span style="font-weight:800;font-size:9px;text-align:center;line-height:1.2">${p}</span>
+      ${place?`<span style="font-size:7px;opacity:0.75;text-align:center;line-height:1.2">${place.replace('\n',' ')}</span>`:''}
+    </div>`;
+  }).join('');
+  return `<td style="padding:3px 2px;text-align:center">${cells}</td>`;
+}
+
+const PLACE_MAP_WEB = {
+  "발레":"2동 2층 다목적강당","음악줄넘기":"2동 2층 다목적강당","놀이체육":"2동 2층 다목적강당",
+  "축구(풋살)":"2동 2층 다목적강당","뉴스포츠":"슬기관(체육관) 1층",
+  "오카리나":"2동 1층 전담교실 2","종이접기":"2동 1층 전담교실 2","그림책놀이":"2동 1층 전담교실 2",
+  "주산암산":"2동 1층 전담교실 1","토탈공예":"2동 1층 전담교실 1","창의미술":"2동 1층 전담교실 1",
+  "칼라클레이":"1동 3층 늘봄교실 2","창의과학":"1동 3층 늘봄교실 2","중국어":"1동 3층 늘봄교실 2",
+  "영어회화":"1동 1층 영어체험실","영어야놀자":"1동 1층 영어체험실",
+  "방송댄스":"3동 2층 나리실","전래놀이":"3동 2층 나리실",
+  "보드게임":"3동 2층 영양교육실","우쿨렐레":"본동 3층 다목적실",
+  "도자공예":"3동 1층 과학실 2","로봇과학":"2동 1층 전담교실 1",
+  "책놀이":"2동 1층 전담교실 1",
+};
+function getPlace(subj){
+  for(const [k,v] of Object.entries(PLACE_MAP_WEB)) if(subj&&subj.includes(k)) return v;
+  return '장소 미정';
+}
+
+function showSubjDetail(subj, day, slot){
+  const color = gc(subj);
+  const instr = INSTRUCTOR_MAP[subj];
+  const place = getPlace(subj);
+  const roster = getRosterAllClasses(subj, day, slot);
+  const slotLabel = slot==='s1'?'맞춤형 1교시':slot==='s2'?'맞춤형 2교시':'맞춤형 3교시';
+  const timeMap = {s1:'13:50~14:30', s2:'14:40~15:20', s3:'15:20~16:00'};
+
+  // 출석 세션 키 생성 (출석부와 동일한 키 구조)
+  function getAttKey(stu) {
+    const g = stu.grade, d = day;
+    let tlabel = '';
+    if(g===1) {
+      if(d==='월'||d==='수') tlabel = slot==='s1'?'맞춤형1교시 13:10~13:50':'맞춤형2교시 14:00~14:40';
+      else tlabel = slot==='s1'?'맞춤형1교시 13:50~14:30':'맞춤형2교시 14:40~15:20';
+    } else {
+      if(d==='수') tlabel = slot==='s1'?'맞춤형1교시 13:10~13:50':'맞춤형2교시 14:00~14:40';
+      else if(d==='월') tlabel = slot==='s1'?'맞춤형2교시 14:00~14:40':'맞춤형3교시 14:40~15:20';
+      else tlabel = slot==='s1'?'맞춤형1교시 13:50~14:30':'맞춤형2교시 14:40~15:20';
+    }
+    return `${subj}(${tlabel})|${stu.id}`;
+  }
+
+  // 출석 통계
+  const stats = {present:0,absent:0,late:0,early:0,none:0};
+  roster.forEach(s=>{
+    const st = attData[getAttKey(s)]||'';
+    if(st==='present') stats.present++;
+    else if(st==='absent') stats.absent++;
+    else if(st==='late') stats.late++;
+    else if(st==='early') stats.early++;
+    else stats.none++;
+  });
+
+  const ATT_BADGE = {
+    present: {icon:'✓', color:'#2E7D32', bg:'#E8F5E9', label:'출석'},
+    absent:  {icon:'✗', color:'#C62828', bg:'#FFEBEE', label:'결석'},
+    late:    {icon:'▲', color:'#E65100', bg:'#FFF3E0', label:'지각'},
+    early:   {icon:'◀', color:'#1565C0', bg:'#E3F2FD', label:'조기'},
+    '':      {icon:'○', color:'#CCC',    bg:'#F5F5F5', label:'미체크'},
+  };
+
+  showPopup(`
+    <div style="background:${color};padding:16px 16px 14px;border-radius:18px 18px 0 0">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="color:#fff;font-size:18px;font-weight:900">${subj}</div>
+          <div style="color:rgba(255,255,255,0.85);font-size:12px;margin-top:2px">${day}요일 (${DAY_DATES[day]}) · ${slotLabel}</div>
+        </div>
+        <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer">✕</button>
+      </div>
+      <!-- 출석 통계 -->
+      ${roster.length>0?`<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        ${stats.present>0?`<span style="background:rgba(255,255,255,0.25);border-radius:6px;padding:2px 7px;color:#fff;font-size:10px;font-weight:700">✓ 출석 ${stats.present}</span>`:''}
+        ${stats.absent>0?`<span style="background:rgba(200,50,50,0.4);border-radius:6px;padding:2px 7px;color:#fff;font-size:10px;font-weight:700">✗ 결석 ${stats.absent}</span>`:''}
+        ${stats.late>0?`<span style="background:rgba(255,200,0,0.35);border-radius:6px;padding:2px 7px;color:#fff;font-size:10px;font-weight:700">▲ 지각 ${stats.late}</span>`:''}
+        ${stats.early>0?`<span style="background:rgba(100,180,255,0.35);border-radius:6px;padding:2px 7px;color:#fff;font-size:10px;font-weight:700">◀ 조기 ${stats.early}</span>`:''}
+        ${stats.none>0?`<span style="background:rgba(255,255,255,0.15);border-radius:6px;padding:2px 7px;color:rgba(255,255,255,0.8);font-size:10px">○ 미체크 ${stats.none}</span>`:''}
+      </div>`:''}
+    </div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+      <!-- 장소 -->
+      <div style="background:${color}10;border-radius:12px;padding:12px;border-left:4px solid ${color}">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px">📍 수업 장소</div>
+        <div style="font-size:15px;font-weight:800;color:var(--text)">${place}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">🕐 ${timeMap[slot]||''}</div>
+      </div>
+      <!-- 강사 -->
+      ${instr ? `
+      <div style="background:#fff;border-radius:12px;padding:12px;border:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:8px">👩‍🏫 담당 강사</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:16px;font-weight:800">${instr.name} 강사</span>
+          <a href="tel:${instr.phone}" style="background:${color};color:#fff;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:700;text-decoration:none">📞 ${instr.phone}</a>
+        </div>
+      </div>` : `
+      <div style="background:#F5F5F5;border-radius:12px;padding:12px;text-align:center;color:var(--muted);font-size:13px">강사 정보 없음</div>`}
+      <!-- 수강자 명단 + 출석 현황 -->
+      <div style="background:#fff;border-radius:12px;padding:12px;border:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:11px;color:var(--muted);font-weight:700">👥 수강 학생 · 출석 현황</div>
+          <div style="background:${color};border-radius:10px;padding:2px 8px;font-size:11px;color:#fff;font-weight:700">${roster.length}명</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          ${roster.length>0 ? roster.map(s=>{
+            const status = attData[getAttKey(s)]||'';
+            const badge = ATT_BADGE[status]||ATT_BADGE[''];
+            return `<div onclick="closePopup();setTimeout(()=>openStuModal('${s.id}'),100)"
+              style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:${badge.bg};border:1px solid ${badge.color}22;cursor:pointer">
+              <span style="font-size:9px;color:${s.grade===1?'var(--primary)':'var(--primary2)'};font-weight:700;min-width:20px">${s.grade}-${s.cls}</span>
+              <span style="font-size:13px;font-weight:800;flex:1">${s.name}</span>
+              ${s.note?'<span style="font-size:10px;color:var(--danger)">⚠</span>':''}
+              <span style="background:${badge.color};color:#fff;border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;min-width:36px;text-align:center">${badge.icon} ${badge.label}</span>
+            </div>`;
+          }).join('') : '<div style="color:var(--muted);font-size:13px;width:100%;text-align:center">수강 학생 없음</div>'}
+        </div>
+      </div>
+      <button onclick="closePopup()" style="width:100%;background:#f0f0f0;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer">닫기</button>
+    </div>
+  `);
+}
+
 function renderTimetable(){
   const sc = SCHEDULES[currentTTClass]||{};
   const grade = parseInt(currentTTClass[0]);
-  const hc = grade===1 ? 'var(--primary)' : 'var(--primary2)';
+  const is2 = grade===2;
+  const hc = is2 ? 'var(--primary2)' : 'var(--primary)';
+  const COL_COLORS = {월:"#4472C4",화:"#70AD47",수:"#ED7D31",목:"#9B59B6",금:"#C00000"};
+
+  // 요일별 슬롯 계산 (엑셀과 동일한 구조)
+  function getSlot(day, slotIdx) {
+    const daysc = sc[day]||[];
+    if(!is2) {
+      // 1학년: 월·수=row3시작, 화·목·금=row4시작(row3=정규)
+      if(day==='월'||day==='수') {
+        if(slotIdx===0) return daysc[0]||null;
+        if(slotIdx===1) return daysc[1]||null;
+        return null;
+      } else {
+        if(slotIdx===0) return '정규';
+        if(slotIdx===1) return daysc[0]||null;
+        if(slotIdx===2) return daysc[1]||null;
+        return null;
+      }
+    } else {
+      // 2학년: 수=row3시작, 월=row4시작(s[1]부터), 화·목·금=row4시작
+      if(day==='수') {
+        return daysc[slotIdx]||null;
+      } else if(day==='월') {
+        if(slotIdx===0) return '정규';
+        if(slotIdx===1) return daysc[1]||null;
+        if(slotIdx===2) return daysc[2]||null;
+        return null;
+      } else {
+        if(slotIdx===0) return '정규';
+        if(slotIdx===1) return daysc[0]||null;
+        if(slotIdx===2) return daysc[1]||null;
+        return null;
+      }
+    }
+  }
+
+  const slotKeys = ['s1','s2','s3'];
+  const slotLabels = !is2
+    ? ["월·수 13:10~13:50\n화·목·금 정규수업", "월·수 14:00~14:40\n화·목·금 13:50~14:30", "화·목·금 14:40~15:20"]
+    : ["수 13:10~13:50\n월·화·목·금 정규수업", "수 14:00~14:40\n월·화·목·금 13:50~14:30", "월·수 14:40~15:20\n화·목·금 14:40~15:20"];
+
+  function renderSlotRow(slotIdx) {
+    const tlbl = slotLabels[slotIdx].replace('\n','<br>');
+    const skey = slotKeys[slotIdx];
+    return `<tr style="border-top:${slotIdx===0?'2px solid '+hc:'1px solid #E0E0E0'}">
+      <td style="padding:5px 4px;background:${hc}18;font-size:8px;color:${hc};font-weight:800;text-align:center;line-height:1.4;white-space:pre-line;vertical-align:middle;min-width:52px">${tlbl}</td>
+      ${DAYS.map(d=>{
+        const subj=getSlot(d,slotIdx);
+        if(!subj) return `<td style="padding:3px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:6px 3px;font-size:8px;color:#CCC;min-height:32px;display:flex;align-items:center;justify-content:center">—</div></td>`;
+        if(subj==='정규') return `<td style="padding:3px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:6px 3px;font-size:8px;color:#8892A4;min-height:32px;display:flex;align-items:center;justify-content:center">정규수업</div></td>`;
+        const parts=subj.includes('+')?subj.split('+'):[subj];
+        return `<td style="padding:3px 2px;text-align:center">${parts.map(p=>{
+          p=p.trim();
+          const color=gc(p); const place=getPlace(p);
+          return `<div onclick="showSubjDetail('${p}','${d}','${skey}')"
+            style="background:${color}20;color:${color};border:1.5px solid ${color}66;border-radius:7px;padding:5px 3px;margin-bottom:2px;cursor:pointer;min-height:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
+            <span style="font-weight:800;font-size:9px;text-align:center;line-height:1.2">${p}</span>
+            <span style="font-size:7px;opacity:0.75;text-align:center;line-height:1.2">${place.split(' ').slice(0,2).join(' ')}</span>
+          </div>`;
+        }).join('')}</td>`;
+      }).join('')}
+    </tr>`;
+  }
 
   document.getElementById('screen-timetable').innerHTML = `
     <div style="background:${hc};padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
       <div style="color:#fff;font-size:20px;font-weight:800">반별 시간표</div>
-      <div style="color:#fff;font-size:12px;opacity:0.7">4/14(월) ~ 4/18(금) · 과목 터치 시 강사 확인</div>
+      <div style="color:#fff;font-size:12px;opacity:0.7">4/14(월) ~ 4/18(금) · 과목 터치 시 상세 확인</div>
     </div>
+    <!-- 반 탭 -->
     <div style="display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);padding:10px 12px;gap:6px">
-      ${Object.keys(SCHEDULES).map(k=>`
-        <button onclick="currentTTClass='${k}';renderTimetable()" 
-          style="flex-shrink:0;padding:7px 14px;border-radius:20px;border:2px solid ${currentTTClass===k?hc:'var(--border)'};background:${currentTTClass===k?hc:'#fff'};color:${currentTTClass===k?'#fff':'var(--text)'};font-size:14px;font-weight:700;cursor:pointer">${k}</button>`).join('')}
+      ${Object.keys(SCHEDULES).map(k=>{
+        const g=parseInt(k[0]); const hk=g===1?'var(--primary)':'var(--primary2)';
+        return `<button onclick="currentTTClass='${k}';renderTimetable()"
+          style="flex-shrink:0;padding:7px 14px;border-radius:20px;border:2px solid ${currentTTClass===k?hk:'var(--border)'};background:${currentTTClass===k?hk:'#fff'};color:${currentTTClass===k?'#fff':'var(--text)'};font-size:14px;font-weight:700;cursor:pointer">${k}</button>`;
+      }).join('')}
     </div>
-    <div style="padding:16px">
-      <div style="font-size:16px;font-weight:800;color:${hc};margin-bottom:12px">${grade}학년 ${currentTTClass[2]}반 주간 시간표</div>
-      <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
-        <table class="tt-table" style="width:100%">
-          <tr style="background:${hc}">
-            <th style="color:#fff;padding:8px 4px;width:60px">시간</th>
-            ${DAYS.map(d=>`<th style="color:#fff;padding:4px 2px"><div>${d}</div><div style="opacity:0.8;font-size:9px;font-weight:400">${DAY_DATES[d]}</div></th>`).join('')}
+    <div style="padding:12px">
+      <!-- 제목 -->
+      <div style="background:${hc};border-radius:12px 12px 0 0;padding:10px 14px;text-align:center">
+        <div style="color:#fff;font-size:14px;font-weight:800">4월 14일(월) ~ 4월 18일(금) · 맞춤형 프로그램 시간표 · (${currentTTClass})</div>
+      </div>
+      <!-- 시간표 테이블 -->
+      <div style="background:#fff;border-radius:0 0 12px 12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
+        <table style="width:100%;border-collapse:collapse">
+          <!-- 요일 헤더 -->
+          <tr>
+            <th style="background:#2C3E50;color:#fff;padding:8px 4px;font-size:10px;text-align:center;width:52px">요일/시간</th>
+            ${DAYS.map(d=>`<th style="background:${COL_COLORS[d]};color:#fff;padding:6px 2px;font-size:11px;font-weight:800;text-align:center">
+              <div>${d}</div>
+              <div style="font-size:9px;font-weight:400;opacity:0.9">${DAY_DATES[d]}</div>
+            </th>`).join('')}
           </tr>
+          <!-- 정규수업 표시 행 -->
           <tr style="background:#F8F9FD">
-            <td style="padding:6px 4px;background:#ECEEF5;font-size:9px;color:#7B8CB0;font-weight:700">아침<br><span style="font-weight:400">08:50</span></td>
-            ${DAYS.map(()=>`<td style="padding:4px 2px;text-align:center"><div style="background:#E8ECF7;border-radius:6px;padding:4px;font-size:8px;color:#7B8CB0">스포츠클럽</div></td>`).join('')}
+            <td style="padding:5px 4px;background:#ECEEF5;font-size:8px;color:#7B8CB0;font-weight:700;text-align:center">1~4교시<br><span style="font-weight:400">정규수업</span></td>
+            ${DAYS.map(()=>`<td style="padding:3px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:5px 3px;font-size:8px;color:#8892A4;min-height:28px;display:flex;align-items:center;justify-content:center">정규수업</div></td>`).join('')}
           </tr>
-          ${['1교시','2교시','3교시','4교시'].map(p=>`
-          <tr>
-            <td style="padding:6px 4px;background:#F8F9FD;font-size:9px;color:#7B8CB0;font-weight:700">${p}<br><span style="font-weight:400">정규</span></td>
-            ${DAYS.map(()=>`<td style="padding:4px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:4px;font-size:8px;color:#8892A4">정규수업</div></td>`).join('')}
-          </tr>`).join('')}
+          <!-- 점심 -->
           <tr style="background:#FFFBF0">
-            <td style="padding:6px 4px;background:#FFF5D6;font-size:9px;color:#B8860B;font-weight:700">점심<br><span style="font-weight:400">11:30</span></td>
-            ${DAYS.map(()=>`<td style="padding:4px 2px;text-align:center"><div style="background:#FFF5D6;border-radius:6px;padding:4px;font-size:9px;color:#B8860B">🍱 점심</div></td>`).join('')}
+            <td style="padding:5px 4px;background:#FFF5D6;font-size:8px;color:#B8860B;font-weight:700;text-align:center">점심<br><span style="font-weight:400">11:30</span></td>
+            ${DAYS.map(()=>`<td style="padding:3px 2px;text-align:center"><div style="background:#FFF5D6;border-radius:6px;padding:5px 3px;font-size:9px;color:#B8860B;min-height:28px;display:flex;align-items:center;justify-content:center">🍱 점심</div></td>`).join('')}
           </tr>
-          <tr style="border-top:2px solid ${hc}">
-            <td style="padding:6px 4px;background:${hc}18;font-size:9px;color:${hc};font-weight:800">맞춤형<br>1교시</td>
-            ${DAYS.map(d=>{
-              const subjs=sc[d]; if(!subjs) return '<td></td>';
-              const s1=subjs[0];
-              if(!s1||s1==="—") return `<td style="padding:4px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:4px;font-size:8px;color:#CCC">—</div></td>`;
-              const parts=s1.includes("+")?s1.split("+"):[s1];
-              return `<td style="padding:4px 2px;text-align:center">
-                ${parts.map(p=>`<div class="subj-cell" style="background:${gc(p.trim())}25;color:${gc(p.trim())};border:1px solid ${gc(p.trim())}66;margin-bottom:2px" onclick="showInstructor('${p.trim()}')">${p.trim()}</div>`).join('')}
-              </td>`;
-            }).join('')}
-          </tr>
-          <tr>
-            <td style="padding:6px 4px;background:${hc}18;font-size:9px;color:${hc};font-weight:800">맞춤형<br>2교시</td>
-            ${DAYS.map(d=>{
-              const subjs=sc[d]; if(!subjs) return '<td></td>';
-              const s2=subjs[1];
-              if(!s2||s2==="—") return `<td style="padding:4px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:4px;font-size:8px;color:#CCC">—</div></td>`;
-              return `<td style="padding:4px 2px;text-align:center">
-                <div class="subj-cell" style="background:${gc(s2)}25;color:${gc(s2)};border:1px solid ${gc(s2)}66" onclick="showInstructor('${s2}')">${s2}</div>
-              </td>`;
-            }).join('')}
-          </tr>
-          ${grade===2?`<tr>
-            <td style="padding:6px 4px;background:${hc}18;font-size:9px;color:${hc};font-weight:800">맞춤형<br>3교시</td>
-            ${DAYS.map(d=>{
-              const subjs=sc[d]; if(!subjs) return '<td></td>';
-              const s3=subjs[2];
-              if(!s3) return `<td style="padding:4px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:4px;font-size:8px;color:#CCC">—</div></td>`;
-              return `<td style="padding:4px 2px;text-align:center">
-                <div class="subj-cell" style="background:${gc(s3)}25;color:${gc(s3)};border:1px solid ${gc(s3)}66" onclick="showInstructor('${s3}')">${s3}</div>
-              </td>`;
-            }).join('')}
-          </tr>`:''}
+          <!-- 맞춤형 슬롯 3행 -->
+          ${renderSlotRow(0)}
+          ${renderSlotRow(1)}
+          ${renderSlotRow(2)}
+          <!-- 하교 -->
           <tr style="background:#F0FFF4">
-            <td style="padding:6px 4px;background:#D4EDDA;font-size:9px;color:#375623;font-weight:700">하교</td>
-            ${DAYS.map(d=>`<td style="padding:4px 2px;text-align:center"><div style="background:#D4EDDA;border-radius:6px;padding:4px;font-size:8px;color:#375623">🏠 ${(grade===2&&d==='수')||(grade===1&&(d==='월'||d==='수'))?'14:30':'15:20'}</div></td>`).join('')}
+            <td style="padding:5px 4px;background:#D4EDDA;font-size:8px;color:#375623;font-weight:700;text-align:center">하교</td>
+            ${DAYS.map(d=>`<td style="padding:3px 2px;text-align:center"><div style="background:#D4EDDA;border-radius:6px;padding:5px 3px;font-size:8px;color:#375623;min-height:28px;display:flex;align-items:center;justify-content:center">🏠 ${(!is2&&(d==='월'||d==='수'))||(is2&&d==='수')?'14:40':'15:20'}</div></td>`).join('')}
           </tr>
         </table>
       </div>
+      <!-- 안내 문구 -->
+      <div style="background:#FFFFF2CC;border-radius:8px;padding:8px 12px;margin-top:8px;border:1px solid #E6D800">
+        <div style="font-size:10px;color:#7B2C00">※ 화·목·금요일은 맞춤형 수업 13:50부터 시작합니다.</div>
+        <div style="font-size:10px;color:#C55A11;font-weight:700;margin-top:3px">※ 화요일 로봇과학 수업은 수익자부담 · 2동 1층 전담교실 1 · 1교시 13:50~14:30 / 2교시 14:40~15:20</div>
+      </div>
+      <div style="background:var(--danger);border-radius:8px;padding:8px 12px;margin-top:6px;text-align:center">
+        <div style="font-size:11px;color:#fff;font-weight:700">★ ${!is2?'월·수요일 하교: 14:40  /  화·목·금요일 하교: 15:20':'수요일 하교: 14:40  /  화·목·금요일 하교: 15:20'}</div>
+      </div>
     </div>
   `;
-}
-
-function showInstructor(subj){
-  const instr = INSTRUCTOR_MAP[subj];
-  if(!instr){
-    showPopup(`<div style="padding:20px;text-align:center"><div style="font-size:16px;font-weight:800;margin-bottom:8px">${subj}</div><div style="color:var(--muted);font-size:14px">강사 정보 없음</div><button onclick="closePopup()" style="margin-top:16px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer">닫기</button></div>`);
-    return;
-  }
-  showPopup(`
-    <div style="background:${gc(subj)};padding:16px;border-radius:18px 18px 0 0">
-      <div style="color:#fff;font-size:16px;font-weight:800">${subj}</div>
-    </div>
-    <div style="padding:16px">
-      <div style="background:var(--bg);border-radius:12px;padding:14px;border-left:4px solid ${gc(subj)};margin-bottom:14px">
-        <div style="font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600">👩‍🏫 강사</div>
-        <div style="font-size:16px;font-weight:700">${instr.name} 강사</div>
-      </div>
-      <a href="tel:${instr.phone}" style="display:block;background:${gc(subj)};color:#fff;border-radius:10px;padding:12px;text-align:center;font-size:14px;font-weight:700;margin-bottom:8px">📞 ${instr.phone}</a>
-      <button onclick="closePopup()" style="width:100%;background:#f0f0f0;border:none;border-radius:10px;padding:10px;font-size:14px;font-weight:700;cursor:pointer">닫기</button>
-    </div>
-  `);
 }
 
 // ── 특이사항 ──
