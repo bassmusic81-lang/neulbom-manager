@@ -243,7 +243,7 @@ const STUDENTS = [
   {id:"14정나은",name:"정나은",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:18,phone:"010-7583-2326",note:"월 도자공예(1교시) → 칼라클레이(2교시)"},
   {id:"14최아린",name:"최아린",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:19,phone:"010-2794-0397",note:"월 도자공예(1교시) → 칼라클레이(2교시)\n화요일 로봇과학A+오카리나"},
   {id:"21구도안",name:"구도안",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:1,phone:"010-7475-1359",note:"목 맞춤형 취소"},
-  {id:"21김재준",name:"김재준",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:2,phone:"010-3435-8715",note:"화 로봇과학A / 목·금 2교시 제외\n⚠ [4/2] 전래놀이 결보강 중 폭행 피해"},
+  {id:"21김재준",name:"김재준",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:2,phone:"010-3435-8715",note:"화 로봇과학A(1교시) / 목·금 2교시 제외\n⚠ [4/2] 전래놀이 결보강 중 폭행 피해"},
   {id:"21김주안",name:"김주안",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:3,phone:"010-8927-1127",note:""},
   {id:"21고율아",name:"고율아",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:10,phone:"010-9604-8549",note:""},
   {id:"21문채빈",name:"문채빈",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:12,phone:"010-7174-6106",note:"월 발레(2교시) 수강 / 나머지 요일 1교시만 / 도보 귀가"},
@@ -375,7 +375,86 @@ function gc(s){
   return "#555";
 }
 
-// 출석 데이터
+// ── 노트 자동 파싱 → 수강 특수 일정 ──
+function parseSpecialFromNote(note) {
+  if(!note) return null;
+  const ALL = ["월","화","수","목","금"];
+  const sp = {};
+
+  function daysIn(text) { return ALL.filter(d=>text.includes(d)); }
+  function addTo(key, arr) {
+    if(!arr.length) return;
+    sp[key] = [...new Set([...(sp[key]||[]), ...arr])];
+  }
+
+  // 전체 취소 (월~금)
+  if(/전체\s*취소|월~금.*취소/.test(note)) return { skipDays:[...ALL] };
+
+  // 붙여쓰기 취소: "월취소"
+  ALL.forEach(d => { if(note.includes(d+'취소') && !note.includes(d+'취소 후')) addTo('skipDays',[d]); });
+
+  // "X 맞춤형 취소" / "X 취소" (단, "취소 후" 제외)
+  for(const m of note.matchAll(/([월화수목금·]+)\s*(?:맞춤형\s*)?취소(?!\s*후)/g))
+    addTo('skipDays', daysIn(m[1]));
+
+  // "매일 1교시만"
+  if(/매일.*1교시만/.test(note)) sp.skipS2Days=[...ALL];
+
+  // "X 1교시만"
+  for(const m of note.matchAll(/([월화수목금·]+)\s*1교시만/g))
+    addTo('skipS2Days', daysIn(m[1]));
+
+  // "X 1교시 후 ... 차량/하교" → 1교시 후 하교 = 2교시 취소
+  for(const m of note.matchAll(/([월화수목금·]+)\s*1교시\s*(?:후|이후)[^/\n]*(?:차량|하교|귀가)/g))
+    addTo('skipS2Days', daysIn(m[1]));
+
+  // "X 2교시 제외/취소/결석"
+  for(const m of note.matchAll(/([월화수목금·]+)\s*2교시\s*(?:제외|취소|결석)/g))
+    addTo('skipS2Days', daysIn(m[1]));
+
+  // "X → 1교시 취소" (컴퓨터방과후)
+  for(const m of note.matchAll(/([월화수목금·]+)[^→\n]*→\s*1교시\s*취소/g))
+    addTo('skipS1Days', daysIn(m[1]));
+
+  // "X 1교시 결석"
+  for(const m of note.matchAll(/([월화수목금·]+)\s*1교시\s*결석/g))
+    addTo('skipS1Days', daysIn(m[1]));
+
+  // "X 2교시 결석"
+  for(const m of note.matchAll(/([월화수목금·]+)\s*2교시\s*결석/g))
+    addTo('skipS2Days', daysIn(m[1]));
+
+  // 로봇과학A 대체
+  if(/화.*로봇과학A/.test(note)) sp.replaceS1={...(sp.replaceS1||{}),화:"로봇과학A"};
+
+  return Object.keys(sp).length>0 ? sp : null;
+}
+
+// 파서로 처리 못하는 특수 케이스 (운영상 결정)
+const MANUAL_OVERRIDE = {
+  "문채빈": { skipS2Days:["화","수","목","금"], skipS3Days:["월"] },
+  "유지우":  { skipS3Days:["월"] },
+  "구도안":  { skipS3Days:["월"] },
+  "김재준":  { skipS3Days:["월"] },
+  "안건우":  { skipS2Days:["화","목","금"], skipS3Days:["월"] },
+  "최가윤":  { skipS2Days:["화","목","금"], skipS3Days:["월"] },
+};
+
+// 학생별 특수 일정 계산 (노트 파싱 + 수동 보완 병합)
+function getStudentSpecial(nm, note) {
+  const parsed = parseSpecialFromNote(note) || {};
+  const override = MANUAL_OVERRIDE[nm] || {};
+  const merged = {...parsed};
+  for(const [k,v] of Object.entries(override)){
+    if(Array.isArray(v))
+      merged[k] = [...new Set([...(merged[k]||[]),...v])];
+    else if(v && typeof v==='object')
+      merged[k] = {...(merged[k]||{}), ...v};
+    else merged[k]=v;
+  }
+  return Object.keys(merged).length>0 ? merged : null;
+}
+
 let attData = {};
 try{ attData = JSON.parse(localStorage.getItem('att')||'{}'); }catch(e){}
 function saveAtt(){ try{localStorage.setItem('att',JSON.stringify(attData));}catch(e){} }
@@ -583,54 +662,38 @@ function openStuModal(id){
   const nm = s.name.trim();
   const is2 = s.grade===2;
 
-  // 개인 특수 일정 데이터 (출석부와 동일)
-  const SPECIAL_M = {
-    "이소율1": { skipDays:["월"],           skipS2Days:["목","금"] },
-    "양해린":  { skipDays:["화","목","금"],  skipS2Days:["월","수"] },
-    "구도안":  { skipDays:["목"]                                   },
-  };
+  // 개인 특수 일정: 노트 자동 파싱 + 수동 보완
   const SKIP_ALL_M   = new Set(["허  산"]);
   const WED_JUSA_M   = new Set(["이연희"]);
-  const sp = SPECIAL_M[nm];
+  const sp = getStudentSpecial(nm, s.note);
 
   // 요일별 수강 현황 계산
   function getPersonalSubjs(day) {
-    if(SKIP_ALL_M.has(nm)) return null; // 전체 취소
-    if(sp?.skipDays?.includes(day)) return null; // 해당 요일 취소
-    if(WED_JUSA_M.has(nm)) {
-      return day==='수' ? ['주산암산'] : null;
-    }
+    if(SKIP_ALL_M.has(nm)) return null;
+    if(sp?.skipDays?.includes(day)) return null;
+    if(WED_JUSA_M.has(nm)) return day==='수' ? ['주산암산'] : null;
 
     const daysc = sc[day]||[];
     const subjs = [];
 
     if(!is2) {
-      // 1학년
-      const s1 = daysc[0], s2 = daysc[1];
-      if(day==='월'||day==='수') {
-        if(s1&&s1!=='—') subjs.push(s1);
-        if(s2&&!sp?.skipS2Days?.includes(day)) subjs.push(s2);
-      } else {
-        if(s1&&s1!=='—') subjs.push(s1);
-        if(s2&&!sp?.skipS2Days?.includes(day)) subjs.push(s2);
-      }
+      // 1학년: 월·수 = s[0]+s[1], 화·목·금 = s[0]+s[1]
+      const s1raw = daysc[0], s2 = daysc[1];
+      if(!sp?.skipS1Days?.includes(day) && s1raw && s1raw!=='—') subjs.push(s1raw);
+      if(!sp?.skipS2Days?.includes(day) && s2) subjs.push(s2);
     } else {
-      // 2학년
       if(day==='월') {
         // s[0]="—" 건너뜀, s[1]=2교시, s[2]=3교시
-        if(daysc[1]&&daysc[1]!=='—') subjs.push(daysc[1]);
-        if(daysc[2]&&!sp?.skipS2Days?.includes(day)) subjs.push(daysc[2]);
-        // 안건우·최가윤: 3교시(종이접기) 제외
-        if(nm==='안건우'||nm==='최가윤') {
-          const idx = subjs.findIndex(x=>x==='종이접기');
-          if(idx>-1) subjs.splice(idx,1);
-        }
+        if(!sp?.skipS2Days?.includes(day) && daysc[1] && daysc[1]!=='—') subjs.push(daysc[1]);
+        if(!sp?.skipS3Days?.includes(day) && daysc[2]) subjs.push(daysc[2]);
       } else if(day==='수') {
-        if(daysc[0]&&daysc[0]!=='—') subjs.push(daysc[0]);
-        if(daysc[1]&&!sp?.skipS2Days?.includes(day)) subjs.push(daysc[1]);
+        if(!sp?.skipS1Days?.includes(day) && daysc[0] && daysc[0]!=='—') subjs.push(daysc[0]);
+        if(!sp?.skipS2Days?.includes(day) && daysc[1]) subjs.push(daysc[1]);
       } else {
-        if(daysc[0]&&daysc[0]!=='—') subjs.push(daysc[0]);
-        if(daysc[1]&&!sp?.skipS2Days?.includes(day)) subjs.push(daysc[1]);
+        // 화·목·금
+        const s1 = (sp?.replaceS1?.[day]) || (daysc[0]&&daysc[0]!=='—'?daysc[0]:null);
+        if(!sp?.skipS1Days?.includes(day) && s1) subjs.push(s1);
+        if(!sp?.skipS2Days?.includes(day) && daysc[1]) subjs.push(daysc[1]);
       }
     }
     return subjs.length>0 ? subjs : [];
@@ -655,6 +718,15 @@ function openStuModal(id){
         const subjs = getPersonalSubjs(day);
         const isCancelled = subjs===null;
         const isEmpty = !isCancelled && subjs.length===0;
+
+        // 슬롯 키 계산 (과목 팝업용)
+        function getSlotKey(idx) {
+          if(!is2) return idx===0?'s1':'s2';
+          if(day==='수') return idx===0?'s1':'s2';
+          if(day==='월') return idx===0?'s2':'s3'; // 2학년 월: s[1]=2교시,s[2]=3교시
+          return idx===0?'s1':'s2';
+        }
+
         return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
           <div style="width:28px;height:28px;border-radius:7px;background:${isCancelled?'#EEE':dc[day]+'20'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <span style="font-weight:800;font-size:12px;color:${isCancelled?'#AAA':dc[day]}">${day}</span>
@@ -665,7 +737,11 @@ function openStuModal(id){
               ? `<span style="background:#FFCDD2;color:#B71C1C;border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700">취소</span>`
               : isEmpty
                 ? `<span style="color:var(--muted);font-size:12px">맞춤형 없음</span>`
-                : subjs.map(subj=>`<span style="background:${gc(subj)}20;color:${gc(subj)};border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;border:1px solid ${gc(subj)}44;margin-right:4px;display:inline-block;margin-bottom:3px">${subj}</span>`).join('')
+                : subjs.map((subj,idx)=>`
+                  <span onclick="closeStuModal();setTimeout(()=>showSubjDetail('${subj}','${day}','${getSlotKey(idx)}'),150)"
+                    style="background:${gc(subj)}20;color:${gc(subj)};border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;border:1px solid ${gc(subj)}44;margin-right:4px;display:inline-block;margin-bottom:3px;cursor:pointer">
+                    ${subj} 📍
+                  </span>`).join('')
             }
           </div>
         </div>`;
@@ -750,16 +826,8 @@ function renderAttendance(){
   // 1-4반 월요일 분반: 도자공예 vs 종이접기
   const DOZA_ONLY  = new Set(["김민우"]);
   const DOZA_S1    = new Set(["서가윤","신다혜","양희서","정나은","최아린"]);
-  // 전체 출석부 제외
   const SKIP_ALL   = new Set(["허  산"]);
-  // 수요일 주산암산만 포함
   const WED_JUSA_ONLY = new Set(["이연희"]);
-  // 개인별 특수 일정: skipDays=전체취소, skipS2Days=2교시취소
-  const SPECIAL = {
-    "이소율1": { skipDays:["월"],           skipS2Days:["목","금"] },
-    "양해린":  { skipDays:["화","목","금"],  skipS2Days:["월","수"] },
-    "구도안":  { skipDays:["목"]                                   },
-  };
 
   const d = currentDay;
   for(const [k,sc] of Object.entries(SCHEDULES)){
@@ -770,74 +838,53 @@ function renderAttendance(){
     for(const stu of roster){
       const nm = stu.name.trim();
 
-      // 허산: 모든 출석부에서 제외
       if(SKIP_ALL.has(nm)) continue;
 
-      // 이연희: 수요일 주산암산만 포함
       if(WED_JUSA_ONLY.has(nm)) {
-        if(d==='수') {
-          addToSession('주산암산', TIME_LABEL['s1_2학년_수'], 1, stu);
-        }
+        if(d==='수') addToSession('주산암산', TIME_LABEL['s1_2학년_수'], 1, stu);
         continue;
       }
 
-      // 개인 특수 일정 처리
-      const sp = SPECIAL[nm];
-      if(sp) {
-        if(sp.skipDays && sp.skipDays.includes(d)) continue; // 전체 취소 요일
-      }
-
-      // 월요일 종이접기 맞춤형3교시: 안건우·최가윤 제외 (도자공예 후 하교)
-      if(d==='월' && (nm==='안건우'||nm==='최가윤')) {
-        // 도자공예(맞춤형2교시, order=2)만 포함, 종이접기(맞춤형3교시) 제외
-        if(g===2) {
-          addToSession(dj[1], TIME_LABEL['s2_2학년_월'], 2, stu);
-          continue; // 3교시 건너뜀
-        }
-      }
+      // 노트에서 개인 특수 일정 계산
+      const sp = getStudentSpecial(nm, stu.note);
+      if(sp?.skipDays?.includes(d)) continue;
 
       if(g===1) {
         if(d==='월'||d==='수') {
-          // 1-4반 월요일 특별 처리: 도자공예/종이접기 분반
           if(cl===4 && d==='월') {
             if(DOZA_ONLY.has(nm)) {
-              // 김민우: 도자공예만
               addToSession('도자공예', TIME_LABEL['s1_1학년_월수'], 1, stu);
             } else if(DOZA_S1.has(nm)) {
-              // 서가윤 등: 도자공예 + 칼라클레이
               addToSession('도자공예', TIME_LABEL['s1_1학년_월수'], 1, stu);
-              addToSession(dj[1], TIME_LABEL['s2_1학년_월수'], 2, stu);
+              if(!sp?.skipS2Days?.includes(d)) addToSession(dj[1], TIME_LABEL['s2_1학년_월수'], 2, stu);
             } else {
-              // 나머지: 종이접기 + 칼라클레이
               addToSession('종이접기', TIME_LABEL['s1_1학년_월수'], 1, stu);
-              addToSession(dj[1], TIME_LABEL['s2_1학년_월수'], 2, stu);
+              if(!sp?.skipS2Days?.includes(d)) addToSession(dj[1], TIME_LABEL['s2_1학년_월수'], 2, stu);
             }
           } else {
-            // 일반: s[0]=맞춤형1교시, s[1]=맞춤형2교시
-            addToSession(dj[0], TIME_LABEL['s1_1학년_월수'], 1, stu);
+            if(!sp?.skipS1Days?.includes(d)) addToSession(dj[0], TIME_LABEL['s1_1학년_월수'], 1, stu);
             if(!sp?.skipS2Days?.includes(d)) addToSession(dj[1], TIME_LABEL['s2_1학년_월수'], 2, stu);
           }
         } else {
-          // 화·목·금: s[0]=맞춤형1교시, s[1]=맞춤형2교시
-          addToSession(dj[0], TIME_LABEL['s1_1학년_화목금'], 1, stu);
+          if(!sp?.skipS1Days?.includes(d)) addToSession(dj[0], TIME_LABEL['s1_1학년_화목금'], 1, stu);
           if(!sp?.skipS2Days?.includes(d)) addToSession(dj[1], TIME_LABEL['s2_1학년_화목금'], 2, stu);
         }
       } else {
         if(d==='수') {
-          addToSession(dj[0], TIME_LABEL['s1_2학년_수'], 1, stu);
-          addToSession(dj[1], TIME_LABEL['s2_2학년_수'], 2, stu);
+          if(!sp?.skipS1Days?.includes(d)) addToSession(dj[0], TIME_LABEL['s1_2학년_수'], 1, stu);
+          if(!sp?.skipS2Days?.includes(d)) addToSession(dj[1], TIME_LABEL['s2_2학년_수'], 2, stu);
         } else if(d==='월') {
-          // s[0]="—" 건너뜀, s[1]=맞춤형2교시(order=2), s[2]=맞춤형3교시(order=3)
-          addToSession(dj[1], TIME_LABEL['s2_2학년_월'], 2, stu);
-          addToSession(dj[2], TIME_LABEL['s3_2학년_월'], 3, stu);
+          if(!sp?.skipS2Days?.includes(d)) addToSession(dj[1], TIME_LABEL['s2_2학년_월'], 2, stu);
+          if(!sp?.skipS3Days?.includes(d)) addToSession(dj[2], TIME_LABEL['s3_2학년_월'], 3, stu);
         } else {
-          // 화·목·금: s[0]=맞춤형1교시, s[1]=맞춤형2교시
-          addToSession(dj[0], TIME_LABEL['s1_2학년_화목금'], 1, stu);
-          addToSession(dj[1], TIME_LABEL['s2_2학년_화목금'], 2, stu);
+          const s1subj = (sp?.replaceS1?.[d]) || dj[0];
+          if(!sp?.skipS1Days?.includes(d)) addToSession(s1subj, TIME_LABEL['s1_2학년_화목금'], 1, stu);
+          if(!sp?.skipS2Days?.includes(d)) addToSession(dj[1], TIME_LABEL['s2_2학년_화목금'], 2, stu);
         }
       }
     }
   }
+
 
   // 교시 순서 → 과목명 가나다 순 정렬
   const sortedSessions = Object.entries(sessions).sort((a,b)=>{
