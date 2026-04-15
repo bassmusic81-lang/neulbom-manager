@@ -1,4 +1,4 @@
-const CACHE_NAME = 'neulbom-v3';
+const CACHE_NAME = 'neulbom-v4';
 const ASSETS = ['./index.html', './manifest.json', './icon.png'];
 
 // 설치: 새 캐시 저장 후 즉시 활성화
