@@ -1,4 +1,4 @@
-const CACHE_NAME = 'neulbom-v5';
+const CACHE_NAME = 'neulbom-v6';
 const ASSETS = ['./index.html', './manifest.json', './icon.png'];
 
 self.addEventListener('install', e => {
