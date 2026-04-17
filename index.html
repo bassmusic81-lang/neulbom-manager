@@ -266,7 +266,7 @@ const STUDENTS = [
   {id:"12양우진",name:"양우진",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:5,phone:"010-9028-6567",note:"화 로봇과학A(1교시)"},
   {id:"12황준표",name:"황준표",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:8,phone:"010-2622-9589",note:""},
   {id:"12김단아",name:"김단아",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:11,phone:"010-8728-8125",note:"화 로봇과학B(2교시)"},
-  {id:"12오슬기",name:"오슬기",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:14,phone:"010-3150-8536",note:""},
+  {id:"12오슬기",name:"오슬기",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:15,phone:"010-3150-8536",note:""},
   {id:"12이윤슬1",name:"이윤슬1",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:16,phone:"010-5146-3811",note:"화 로봇과학B(2교시)"},
   {id:"12이지아A",name:"이지아A",grade:1,cls:2,clsKey:"1-2",clsLabel:"1학년 2반",num:17,phone:"010-2907-5379",note:""},
   {id:"13고태규",name:"고태규",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:1,phone:"010-9604-8549",note:"화 로봇과학A(1교시)"},
@@ -598,51 +598,52 @@ function openURL(url){ window.open(url,'_blank'); }
 const DAYCARE = {
   "돌봄1교실": [
     {num:1, cls:"1-2", name:"김라온", gender:"남", phone:"010-6703-0065", guardian:"김하얀", type:"맞벌이"},
-    {num:2, cls:"1-2", name:"변민재", gender:"남", phone:"010-5914-7526", guardian:"유영민", type:"다자녀"},
-    {num:3, cls:"1-2", name:"장우주", gender:"남", phone:"010-8312-5654", guardian:"박선아", type:"맞벌이"},
-    {num:4, cls:"1-2", name:"최정우", gender:"남", phone:"010-3385-8670", guardian:"최창원", type:"맞벌이"},
-    {num:5, cls:"1-2", name:"강희수", gender:"여", phone:"010-6378-1652", guardian:"김재영", type:"맞벌이"},
-    {num:6, cls:"1-2", name:"김다은", gender:"여", phone:"010-5158-9659", guardian:"김성윤", type:"맞벌이"},
-    {num:7, cls:"1-2", name:"김하리", gender:"여", phone:"010-8431-6786", guardian:"김선희", type:"맞벌이"},
-    {num:8, cls:"1-2", name:"박민경", gender:"여", phone:"010-5087-4437", guardian:"박정환", type:"맞벌이"},
-    {num:9, cls:"1-2", name:"박세민", gender:"여", phone:"010-6483-8490", guardian:"김혜지", type:"한부모"},
-    {num:10,cls:"1-2", name:"조이현", gender:"여", phone:"010-2277-9052", guardian:"박미니", type:"맞벌이"},
-    {num:11,cls:"1-2", name:"최유진", gender:"여", phone:"010-3385-8670", guardian:"이다은", type:"맞벌이"},
-    {num:12,cls:"1-2", name:"함소윤", gender:"여", phone:"010-4442-0309", guardian:"최미경", type:"맞벌이"},
-    {num:13,cls:"2-3", name:"최유준", gender:"남", phone:"010-7488-8527", guardian:"배미희", type:"다자녀"},
-    {num:14,cls:"2-4", name:"심도윤", gender:"남", phone:"010-4290-4590", guardian:"이윤정", type:"맞벌이"},
-    {num:15,cls:"2-1", name:"이아린", gender:"여", phone:"010-2120-4814", guardian:"홍수지", type:"맞벌이"},
-    {num:16,cls:"2-3", name:"전아인", gender:"여", phone:"010-4772-1038", guardian:"김윤미", type:"한부모"},
-    {num:17,cls:"2-3", name:"박서아", gender:"여", phone:"010-6483-8490", guardian:"김혜지", type:"한부모"},
-    {num:18,cls:"2-3", name:"유다연", gender:"여", phone:"010-9977-8979", guardian:"김효옥", type:"맞벌이"},
-    {num:19,cls:"2-4", name:"우지민", gender:"여", phone:"010-8295-9367", guardian:"박서윤", type:"한부모"},
-    {num:20,cls:"2-4", name:"한희서", gender:"여", phone:"010-8879-2634", guardian:"장은영", type:"맞벌이"},
+    {num:4, cls:"1-2", name:"변민재", gender:"남", phone:"010-5914-7526", guardian:"유영민", type:"다자녀"},
+    {num:6, cls:"1-2", name:"장우주", gender:"남", phone:"010-8312-5654", guardian:"박선아", type:"맞벌이"},
+    {num:7, cls:"1-2", name:"최정우", gender:"남", phone:"010-3385-8670", guardian:"최창원", type:"맞벌이"},
+    {num:9, cls:"1-2", name:"강희수", gender:"여", phone:"010-6378-1652", guardian:"김재영", type:"맞벌이"},
+    {num:10, cls:"1-2", name:"김다은", gender:"여", phone:"010-5158-9659", guardian:"김성윤", type:"맞벌이"},
+    {num:12, cls:"1-2", name:"김하리", gender:"여", phone:"010-8431-6786", guardian:"김선희", type:"맞벌이"},
+    {num:13, cls:"1-2", name:"박민경", gender:"여", phone:"010-5087-4437", guardian:"박정환", type:"맞벌이"},
+    {num:14, cls:"1-2", name:"박세민", gender:"여", phone:"010-6483-8490", guardian:"김혜지", type:"한부모"},
+    {num:18, cls:"1-2", name:"조이현", gender:"여", phone:"010-2277-9052", guardian:"박미니", type:"맞벌이"},
+    {num:19, cls:"1-2", name:"최유진", gender:"여", phone:"010-3385-8670", guardian:"이다은", type:"맞벌이"},
+    {num:20, cls:"1-2", name:"함소윤", gender:"여", phone:"010-4442-0309", guardian:"최미경", type:"맞벌이"},
+    {num:7, cls:"2-3", name:"최유준", gender:"남", phone:"010-7488-8527", guardian:"배미희", type:"다자녀"},
+    {num:5, cls:"2-4", name:"심도윤", gender:"남", phone:"010-4290-4590", guardian:"이윤정", type:"맞벌이"},
+    {num:17, cls:"2-1", name:"이아린", gender:"여", phone:"010-2120-4814", guardian:"홍수지", type:"맞벌이"},
+    {num:18, cls:"2-3", name:"전아인", gender:"여", phone:"010-4772-1038", guardian:"김윤미", type:"한부모"},
+    {num:15, cls:"2-3", name:"박서아", gender:"여", phone:"010-6483-8490", guardian:"김혜지", type:"한부모"},
+    {num:16, cls:"2-3", name:"유다연", gender:"여", phone:"010-9977-8979", guardian:"김효옥", type:"맞벌이"},
+    {num:12, cls:"2-4", name:"우지민", gender:"여", phone:"010-8295-9367", guardian:"박서윤", type:"한부모"},
+    {num:18, cls:"2-4", name:"한희서", gender:"여", phone:"010-8879-2634", guardian:"장은영", type:"맞벌이"},
   ],
   "돌봄2교실": [
-    {num:1, cls:"1-1", name:"황지오", gender:"남", phone:"010-6847-8211", guardian:"황유진", type:"맞벌이"},
-    {num:2, cls:"1-1", name:"김태린", gender:"여", phone:"010-2468-1643", guardian:"박은수", type:"맞벌이"},
-    {num:3, cls:"1-1", name:"서지민", gender:"여", phone:"010-5181-5370", guardian:"서광석", type:"맞벌이"},
-    {num:4, cls:"1-1", name:"석가은", gender:"여", phone:"010-8665-8593", guardian:"김영주", type:"맞벌이"},
-    {num:5, cls:"1-1", name:"윤지아", gender:"여", phone:"010-3722-8591", guardian:"박가람", type:"맞벌이"},
-    {num:6, cls:"1-1", name:"장하임", gender:"여", phone:"010-3455-8480", guardian:"임은지", type:"맞벌이"},
-    {num:7, cls:"1-3", name:"김경민", gender:"남", phone:"010-9627-8388", guardian:"김병관", type:"맞벌이"},
-    {num:8, cls:"1-3", name:"김민준", gender:"남", phone:"010-2744-9524", guardian:"김철웅", type:"한부모"},
-    {num:9, cls:"1-3", name:"김시후", gender:"남", phone:"010-9545-5125", guardian:"변세영", type:"맞벌이"},
-    {num:10,cls:"1-3", name:"김라율", gender:"여", phone:"010-6790-3882", guardian:"최수민", type:"맞벌이"},
-    {num:11,cls:"1-3", name:"정윤서", gender:"여", phone:"010-2459-9951", guardian:"김선옥", type:"맞벌이"},
-    {num:12,cls:"1-4", name:"주지환", gender:"남", phone:"010-4552-4250", guardian:"이나영", type:"맞벌이"},
-    {num:13,cls:"1-4", name:"김민주", gender:"여", phone:"010-3958-7148", guardian:"김혜림", type:"다자녀"},
-    {num:14,cls:"1-4", name:"박지유", gender:"여", phone:"010-7165-0303", guardian:"이해미", type:"맞벌이"},
-    {num:15,cls:"1-4", name:"심서아", gender:"여", phone:"010-8622-7189", guardian:"조아름", type:"맞벌이"},
-    {num:16,cls:"1-4", name:"안예서", gender:"여", phone:"010-8599-5668", guardian:"김수현", type:"맞벌이"},
-    {num:17,cls:"2-1", name:"이동건", gender:"남", phone:"010-6633-1236", guardian:"유지현", type:"한부모"},
-    {num:18,cls:"2-1", name:"정비오", gender:"남", phone:"010-8692-0321", guardian:"김소영", type:"한부모"},
-    {num:19,cls:"2-2", name:"김도현", gender:"남", phone:"010-8620-4632", guardian:"김보민", type:"한부모"},
-    {num:20,cls:"2-2", name:"박지우", gender:"남", phone:"010-8864-9615", guardian:"진향숙", type:"맞벌이"},
+    {num:8, cls:"1-1", name:"황지오", gender:"남", phone:"010-6847-8211", guardian:"황유진", type:"맞벌이"},
+    {num:10, cls:"1-1", name:"김태린", gender:"여", phone:"010-2468-1643", guardian:"박은수", type:"맞벌이"},
+    {num:11, cls:"1-1", name:"서지민", gender:"여", phone:"010-5181-5370", guardian:"서광석", type:"맞벌이"},
+    {num:12, cls:"1-1", name:"석가은", gender:"여", phone:"010-8665-8593", guardian:"김영주", type:"맞벌이"},
+    {num:14, cls:"1-1", name:"윤지아", gender:"여", phone:"010-3722-8591", guardian:"박가람", type:"맞벌이"},
+    {num:19, cls:"1-1", name:"장하임", gender:"여", phone:"010-3455-8480", guardian:"임은지", type:"맞벌이"},
+    {num:2, cls:"1-3", name:"김경민", gender:"남", phone:"010-9627-8388", guardian:"김병관", type:"맞벌이"},
+    {num:3, cls:"1-3", name:"김민준", gender:"남", phone:"010-2744-9524", guardian:"김철웅", type:"한부모"},
+    {num:4, cls:"1-3", name:"김시후", gender:"남", phone:"010-9545-5125", guardian:"변세영", type:"맞벌이"},
+    {num:8, cls:"1-3", name:"김라율", gender:"여", phone:"010-6790-3882", guardian:"최수민", type:"맞벌이"},
+    {num:17, cls:"1-3", name:"정윤서", gender:"여", phone:"010-2459-9951", guardian:"김선옥", type:"맞벌이"},
+    {num:6, cls:"1-4", name:"주지환", gender:"남", phone:"010-4552-4250", guardian:"이나영", type:"맞벌이"},
+    {num:9, cls:"1-4", name:"김민주", gender:"여", phone:"010-3958-7148", guardian:"김혜림", type:"다자녀"},
+    {num:10, cls:"1-4", name:"박지유", gender:"여", phone:"010-7165-0303", guardian:"이해미", type:"맞벌이"},
+    {num:14, cls:"1-4", name:"심서아", gender:"여", phone:"010-8622-7189", guardian:"조아름", type:"맞벌이"},
+    {num:15, cls:"1-4", name:"안예서", gender:"여", phone:"010-8599-5668", guardian:"김수현", type:"맞벌이"},
+    {num:5, cls:"2-1", name:"이동건", gender:"남", phone:"010-6633-1236", guardian:"유지현", type:"한부모"},
+    {num:8, cls:"2-1", name:"정비오", gender:"남", phone:"010-8692-0321", guardian:"김소영", type:"한부모"},
+    {num:2, cls:"2-2", name:"김도현", gender:"남", phone:"010-8620-4632", guardian:"김보민", type:"한부모"},
+    {num:4, cls:"2-2", name:"박지우", gender:"남", phone:"010-8864-9615", guardian:"진향숙", type:"맞벌이"},
   ]
 };
 
 let daycareTab = '돌봄1교실';
+const DAYCARE_TEACHER = {'돌봄1교실':'심효순', '돌봄2교실':'신문숙'};
 
 function renderDaycare(){
   const rooms = Object.keys(DAYCARE);
@@ -668,6 +669,7 @@ function renderDaycare(){
             border-bottom:2px solid ${daycareTab===r?'#5C3D99':'transparent'};
             margin-bottom:-2px;">
           🏫 ${r}<br>
+          <span style="font-size:10px;font-weight:600;">${DAYCARE_TEACHER[r]} 선생님</span>&nbsp;
           <span style="font-size:10px;font-weight:400;">${DAYCARE[r].length}명</span>
         </button>`).join('')}
     </div>
@@ -750,6 +752,9 @@ function renderHome(){
     return s.note.includes(todayDay) || s.note.includes("매일") || s.note.includes("전체") || s.note.includes("월~금");
   });
 
+  const daycareTotal = Object.values(DAYCARE).reduce((s,r)=>s+r.length,0);
+  const totalAll = STUDENTS.length + daycareTotal;
+
   document.getElementById('screen-home').innerHTML = `
     <div style="background:var(--primary);padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
       <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-bottom:4px">2026 정라초등학교</div>
@@ -763,12 +768,40 @@ function renderHome(){
           <span id="update-icon">🔄</span><span>업데이트</span>
         </button>
       </div>
-      <div class="stats-row">
-        <div class="stat"><div class="val">${STUDENTS.length}</div><div class="lbl">총 학생</div></div>
-        <div class="stat-div"></div>
-        <div class="stat"><div class="val">8</div><div class="lbl">학급</div></div>
-        <div class="stat-div"></div>
-        <div class="stat"><div class="val" style="color:#FFD700">${withNotes}</div><div class="lbl">특이사항</div></div>
+
+      <!-- 통계 칩 -->
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+
+        <!-- 총 학생 -->
+        <div onclick="goTo('students')" style="flex:1;min-width:80px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:10px 12px;cursor:pointer;text-align:center;">
+          <div style="color:#fff;font-size:22px;font-weight:900;">${totalAll}</div>
+          <div style="color:rgba(255,255,255,0.75);font-size:10px;font-weight:600;margin-top:2px;">총 학생</div>
+          <div style="margin-top:5px;display:flex;flex-direction:column;gap:2px;">
+            <div style="background:rgba(255,255,255,0.15);border-radius:6px;padding:2px 6px;font-size:9px;color:rgba(255,255,255,0.85);">맞춤형 ${STUDENTS.length}명</div>
+            <div style="background:rgba(180,130,255,0.3);border-radius:6px;padding:2px 6px;font-size:9px;color:#DDD6FE;">돌봄 ${daycareTotal}명</div>
+          </div>
+        </div>
+
+        <!-- 학급 -->
+        <div onclick="goTo('timetable')" style="flex:1;min-width:80px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:10px 12px;cursor:pointer;text-align:center;">
+          <div style="color:#fff;font-size:22px;font-weight:900;">8</div>
+          <div style="color:rgba(255,255,255,0.75);font-size:10px;font-weight:600;margin-top:2px;">학급</div>
+          <div style="margin-top:5px;display:flex;flex-direction:column;gap:2px;">
+            <div style="background:rgba(255,255,255,0.15);border-radius:6px;padding:2px 6px;font-size:9px;color:rgba(255,255,255,0.85);">1학년 4반</div>
+            <div style="background:rgba(255,255,255,0.15);border-radius:6px;padding:2px 6px;font-size:9px;color:rgba(255,255,255,0.85);">2학년 4반</div>
+          </div>
+        </div>
+
+        <!-- 특이사항 -->
+        <div onclick="goTo('notes')" style="flex:1;min-width:80px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:10px 12px;cursor:pointer;text-align:center;">
+          <div style="color:#FFD700;font-size:22px;font-weight:900;">${withNotes}</div>
+          <div style="color:rgba(255,255,255,0.75);font-size:10px;font-weight:600;margin-top:2px;">특이사항</div>
+          <div style="margin-top:5px;display:flex;flex-direction:column;gap:2px;">
+            <div style="background:rgba(255,80,80,0.3);border-radius:6px;padding:2px 6px;font-size:9px;color:#FFCDD2;">민원 ${STUDENTS.filter(s=>s.note&&s.note.includes('민원')).length}건</div>
+            <div style="background:rgba(255,200,0,0.25);border-radius:6px;padding:2px 6px;font-size:9px;color:#FFF9C4;">출결 ${todayNotes.length}명</div>
+          </div>
+        </div>
+
       </div>
     </div>
     ${DAYS.includes(todayDay) ? `
@@ -804,6 +837,38 @@ function renderHome(){
           </div>`).join('')}
       </div>
     </div>
+
+    <!-- 돌봄교실 배너 -->
+    <div style="padding:8px 16px 0;">
+      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;">🏫 돌봄교실</div>
+      <div onclick="goTo('daycare')" style="background:linear-gradient(135deg,#5C3D99,#7B52C8);
+        border-radius:16px;padding:18px 20px;cursor:pointer;
+        display:flex;align-items:center;gap:16px;
+        box-shadow:0 4px 14px rgba(92,61,153,0.3);">
+        <div style="font-size:44px;flex-shrink:0;line-height:1;">🏫</div>
+        <div style="flex:1;min-width:0;">
+          <div style="color:#fff;font-size:18px;font-weight:900;margin-bottom:4px;">돌봄교실 명단</div>
+          <div style="color:rgba(255,255,255,0.75);font-size:12px;margin-bottom:8px;">
+            돌봄1교실 ${DAYCARE['돌봄1교실'].length}명 &nbsp;·&nbsp; 돌봄2교실 ${DAYCARE['돌봄2교실'].length}명
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${(()=>{
+              const all=[...DAYCARE['돌봄1교실'],...DAYCARE['돌봄2교실']];
+              const mc=all.filter(s=>s.type==='맞벌이').length;
+              const hc=all.filter(s=>s.type==='한부모').length;
+              const dc=all.filter(s=>s.type==='다자녀').length;
+              return [
+                `<span style="background:rgba(255,255,255,0.2);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;">맞벌이 ${mc}</span>`,
+                `<span style="background:rgba(255,80,80,0.3);color:#FFCDD2;font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;">한부모 ${hc}</span>`,
+                `<span style="background:rgba(80,200,80,0.25);color:#C8E6C9;font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;">다자녀 ${dc}</span>`,
+              ].join('');
+            })()}
+          </div>
+        </div>
+        <span style="color:rgba(255,255,255,0.45);font-size:22px;flex-shrink:0;">›</span>
+      </div>
+    </div>
+
     <div style="padding:16px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <div style="font-size:13px;font-weight:700;color:var(--muted)">📋 오늘의 특이사항</div>
@@ -885,10 +950,13 @@ async function forceUpdate(){
 
 // ── 학생 목록 ──
 function renderStudents(){
+  const daycareTotal = Object.values(DAYCARE).reduce((s,r)=>s+r.length,0);
   document.getElementById('screen-students').innerHTML = `
     <div style="background:var(--primary);padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
       <div style="color:#fff;font-size:20px;font-weight:800">학생 목록</div>
-      <div id="stu-count" style="color:#fff;font-size:12px;opacity:0.7">총 ${STUDENTS.length}명</div>
+      <div id="stu-count" style="color:#fff;font-size:12px;opacity:0.7">
+        맞춤형 ${STUDENTS.length}명 · 돌봄 ${daycareTotal}명 · 합계 ${STUDENTS.length+daycareTotal}명
+      </div>
     </div>
     <div class="search-bar">
       <input type="search" id="stu-search" placeholder="이름 또는 전화번호 검색..."
@@ -899,7 +967,7 @@ function renderStudents(){
     <div class="filter-tabs">
       ${['전체',...CLASS_LABELS].map(cl=>`
         <div class="filter-tab ${stuFilter===cl?'active':''}" onclick="stuFilter='${cl}';renderStudentList();document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">
-          ${cl==='전체'?'전체':cl.replace('학년 ','').replace('반','')+'반'}
+          ${cl==='전체'?'전체':cl}
         </div>`).join('')}
     </div>
     <div id="stu-list"></div>
@@ -908,27 +976,113 @@ function renderStudents(){
 }
 
 function renderStudentList(){
-  const filtered = STUDENTS.filter(s=>
-    (stuFilter==='전체'||s.clsLabel===stuFilter) &&
-    (!stuQuery||s.name.replace(/\s/g,'').includes(stuQuery.replace(/\s/g,''))||(s.phone||'').includes(stuQuery))
-  );
   const el = document.getElementById('stu-list');
   const cnt = document.getElementById('stu-count');
   if(!el) return;
-  if(cnt) cnt.textContent = `총 ${filtered.length}명`;
-  el.innerHTML = filtered.map(s=>`
-    <div class="student-item" onclick="openStuModal('${s.id}')">
-      <div class="stu-avatar" style="background:${s.grade===1?"#1F386420":"#833C0020"};color:${s.grade===1?"var(--primary)":"var(--primary2)"}">
-        ${s.num||'?'}
+
+  const roomColor={'돌봄1교실':'#5C3D99','돌봄2교실':'#7B3F00'};
+  const roomBg  ={'돌봄1교실':'#F3E5F5','돌봄2교실':'#FFF3E0'};
+
+  // 검색어 필터
+  const q = stuQuery.replace(/\s/g,'');
+  const matchQuery = s => !q ||
+    s.name.replace(/\s/g,'').includes(q) ||
+    (s.phone||'').includes(q);
+
+  // 돌봄 학생 맵 (이름 → 교실)
+  const daycareMap = {};
+  for(const [room, list] of Object.entries(DAYCARE)){
+    list.forEach(s=>{ daycareMap[s.name] = room; });
+  }
+
+  // 반별로 렌더링
+  const classes = stuFilter==='전체' ? CLASS_LABELS : [stuFilter];
+
+  let totalMain=0, totalDc=0;
+
+  const html = classes.map(clsLabel=>{
+    const grade = parseInt(clsLabel[0]);
+    const cls   = parseInt(clsLabel[4]);
+    const clsKey = `${grade}-${cls}`;
+    const gc = grade===1 ? 'var(--primary)' : 'var(--primary2)';
+    const gcBg = grade===1 ? '#1F386420' : '#833C0020';
+
+    // 맞춤형 학생
+    const mainStudents = STUDENTS.filter(s=>
+      s.clsKey===clsKey && matchQuery(s)
+    );
+
+    // 돌봄 전용 학생 (맞춤형에 없는 학생)
+    const mainNames = new Set(STUDENTS.map(s=>s.name.trim()));
+    const dcStudents = Object.entries(DAYCARE).flatMap(([room,list])=>
+      list.filter(s=> s.cls===clsKey && matchQuery(s) && !mainNames.has(s.name))
+          .map(s=>({...s, room, _daycare:true}))
+    );
+
+    if(mainStudents.length===0 && dcStudents.length===0) return '';
+    totalMain+=mainStudents.length;
+    totalDc+=dcStudents.length;
+
+    // 학번 기준 통합 정렬
+    const allStudents = [
+      ...mainStudents.map(s=>({...s, _daycare:false})),
+      ...dcStudents
+    ].sort((a,b)=>(a.num||99)-(b.num||99));
+
+    return `
+      <!-- ${clsLabel} 섹션 헤더 -->
+      <div style="background:#F0F4FF;border-top:2px solid ${gc};padding:8px 16px;
+        display:flex;align-items:center;justify-content:space-between;
+        position:sticky;top:0;z-index:10;">
+        <div style="font-size:13px;font-weight:900;color:${gc};">${clsLabel}</div>
+        <div style="font-size:11px;color:#888;">
+          맞춤형 ${mainStudents.length}명${dcStudents.length?` · 돌봄 ${dcStudents.length}명`:''}
+        </div>
       </div>
-      <div class="stu-info">
-        <div class="stu-name">${s.name} ${s.note?'<span style="font-size:14px">⚠</span>':''}</div>
-        <span style="background:${s.grade===1?"#1F386420":"#833C0020"};color:${s.grade===1?"var(--primary)":"var(--primary2)"};border-radius:4px;padding:1px 5px;font-size:10px;font-weight:700">${s.clsLabel}</span>
-        ${s.phone?`<div class="stu-phone" onclick="event.stopPropagation();location.href='tel:${s.phone}'">📞 ${s.phone}</div>`:''}
-        ${s.note?`<div class="stu-note">${s.note}</div>`:''}
-      </div>
-      <span style="color:var(--muted);font-size:18px">›</span>
-    </div>`).join('');
+
+      ${allStudents.map(s=>{
+        if(s._daycare){
+          // 돌봄 전용 학생 카드
+          return `
+          <div style="background:#FAF5FF;border-bottom:1px solid #EDE7F6;padding:10px 16px;
+            display:flex;align-items:center;gap:12px;cursor:pointer;"
+            onclick="daycareTab='${s.room}';goTo('daycare')">
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span style="font-size:12px;font-weight:700;color:${roomColor[s.room]};min-width:26px;">${s.num}번</span>
+                <span style="font-size:15px;font-weight:800;">${s.name}</span>
+                <span style="background:${roomBg[s.room]};color:${roomColor[s.room]};
+                  border-radius:5px;padding:1px 6px;font-size:9px;font-weight:800;">${s.room}</span>
+              </div>
+              <div style="font-size:11px;color:#888;margin-top:2px;">보호자: ${s.guardian} · ${s.type}</div>
+              ${s.phone?`<div style="font-size:11px;color:var(--accent);margin-top:1px;cursor:pointer;"
+                onclick="location.href='tel:${s.phone}'">📞 ${s.phone}</div>`:''}
+            </div>
+          </div>`;
+        } else {
+          // 맞춤형 학생 카드
+          const dc = daycareMap[s.name.trim()];
+          return `
+          <div class="student-item" onclick="openStuModal('${s.id}')">
+            <div class="stu-info">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span style="font-size:12px;font-weight:700;color:${gc};min-width:26px;">${s.num||'?'}번</span>
+                <span class="stu-name">${s.name}</span>
+                ${s.note?'<span style="font-size:13px;">⚠</span>':''}
+                ${dc?`<span onclick="event.stopPropagation();daycareTab='${dc}';goTo('daycare')" style="background:${roomBg[dc]};color:${roomColor[dc]};border-radius:5px;padding:1px 6px;font-size:9px;font-weight:800;cursor:pointer;">${dc}</span>`:''}
+              </div>
+              ${s.phone?`<div class="stu-phone" onclick="event.stopPropagation();location.href='tel:${s.phone}'">📞 ${s.phone}</div>`:''}
+              ${s.note?`<div class="stu-note">${s.note}</div>`:''}
+            </div>
+            <span style="color:var(--muted);font-size:18px">›</span>
+          </div>`;
+        }
+      }).join('')}
+    `;
+  }).join('');
+
+  if(cnt) cnt.textContent = `맞춤형 ${totalMain}명 · 돌봄 ${totalDc}명`;
+  el.innerHTML = html || `<div style="text-align:center;padding:40px;color:var(--muted)">검색 결과 없음</div>`;
 }
 
 // ── 학생 모달 ──
