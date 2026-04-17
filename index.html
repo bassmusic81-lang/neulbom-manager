@@ -605,7 +605,7 @@ async function fetchWeather(){
     'https://wttr.in/37.75,128.90?format=j1',
     'https://corsproxy.io/?' + encodeURIComponent('https://wttr.in/Gangneung?format=j1'),
     'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://wttr.in/Gangneung?format=j1'),
-    'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.open-meteo.com/v1/forecast?latitude=37.75&longitude=128.90&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia/Seoul&forecast_days=5&wind_speed_unit=ms'),
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.open-meteo.com/v1/forecast?latitude=37.75&longitude=128.90&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia/Seoul&forecast_days=7&wind_speed_unit=ms'),
   ];
 
   let data = null, source = '';
@@ -651,13 +651,13 @@ async function fetchWeather(){
     icon=WMO_ICON[code]||'🌤'; desc=WMO_DESC[code]||'맑음';
     temp=c.temp_C; feel=c.FeelsLikeC;
     wind=(parseFloat(c.windspeedKmph)/3.6).toFixed(1);
-    forecastHtml=w.slice(0,5).map((d,i)=>{
+    forecastHtml=w.slice(0,7).map((d,i)=>{
       const dt=new Date(d.date);
       const dn=i===0?'오늘':i===1?'내일':dayNames[dt.getDay()]+'요일';
       const fc=parseInt(d.hourly?.[4]?.weatherCode||113);
       const hi=d.maxtempC, lo=d.mintempC;
       const pp=d.hourly?.[4]?.chanceofrain||0;
-      return `<div style="flex:1;text-align:center;padding:6px 2px;min-width:44px;">
+      return `<div style="flex:1;text-align:center;padding:6px 2px;min-width:38px;">
         <div style="font-size:10px;font-weight:700;color:${i===0?'var(--primary)':'var(--muted)'};">${dn}</div>
         <div style="font-size:20px;line-height:1.5;">${WMO_ICON[fc]||'🌤'}</div>
         <div style="font-size:11px;font-weight:800;color:#E53935;">${hi}°</div>
@@ -671,13 +671,13 @@ async function fetchWeather(){
     icon=WMO_ICON[code]||'🌤'; desc=WMO_DESC[code]||'맑음';
     temp=Math.round(c.temperature_2m); feel=Math.round(c.apparent_temperature);
     wind=c.windspeed_10m?.toFixed(1)||'-';
-    forecastHtml=daily.time.slice(0,5).map((date,i)=>{
+    forecastHtml=daily.time.slice(0,7).map((date,i)=>{
       const dt=new Date(date);
       const dn=i===0?'오늘':i===1?'내일':dayNames[dt.getDay()]+'요일';
       const fc=daily.weathercode?.[i]??0;
       const hi=Math.round(daily.temperature_2m_max[i]), lo=Math.round(daily.temperature_2m_min[i]);
       const pp=daily.precipitation_probability_max?.[i]??0;
-      return `<div style="flex:1;text-align:center;padding:6px 2px;min-width:44px;">
+      return `<div style="flex:1;text-align:center;padding:6px 2px;min-width:38px;">
         <div style="font-size:10px;font-weight:700;color:${i===0?'var(--primary)':'var(--muted)'};">${dn}</div>
         <div style="font-size:20px;line-height:1.5;">${WMO_ICON[fc]||'🌤'}</div>
         <div style="font-size:11px;font-weight:800;color:#E53935;">${hi}°</div>
