@@ -1,4 +1,4 @@
-const CACHE_NAME = 'neulbom-v5';
+const CACHE_NAME = 'neulbom-v6';
 const ASSETS = ['./index.html', './manifest.json', './icon.png'];
 
 self.addEventListener('install', e => {
@@ -20,11 +20,20 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // 외부 API 요청은 캐시 없이 바로 통과
+  const url = e.request.url;
+  if(url.startsWith('http') && !url.includes(self.location.origin) &&
+     !url.includes('github.io')) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
   e.respondWith(
     fetch(e.request)
       .then(res => {
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+        if(res && res.status === 200 && res.type === 'basic') {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+        }
         return res;
       })
       .catch(() => caches.match(e.request))
