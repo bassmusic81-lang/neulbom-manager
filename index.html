@@ -208,6 +208,7 @@ button{font-family:inherit;}
   <div id="screen-timetable" class="screen hidden"></div>
   <div id="screen-notes" class="screen hidden"></div>
   <div id="screen-calendar" class="screen hidden"></div>
+  <div id="screen-daycare" class="screen hidden"></div>
   </div>
 
   <!-- 탭바 -->
@@ -216,7 +217,7 @@ button{font-family:inherit;}
     <button class="tab-btn" onclick="goTo('students')"><span class="icon">👨‍🎓</span><span class="label">학생</span></button>
     <button class="tab-btn" onclick="goTo('attendance')"><span class="icon">📋</span><span class="label">출석부</span></button>
     <button class="tab-btn" onclick="goTo('timetable')"><span class="icon">🗓️</span><span class="label">시간표</span></button>
-    <button class="tab-btn" onclick="goTo('notes')"><span class="icon">⚠️</span><span class="label">특이사항</span></button>
+    <button class="tab-btn" onclick="goTo('daycare')"><span class="icon">🏫</span><span class="label">돌봄</span></button>
   </div>
 </div>
 
@@ -289,7 +290,7 @@ const STUDENTS = [
   {id:"14김라움",name:"김라움",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:8,phone:"010-8708-0607",note:""},
   {id:"14서가윤",name:"서가윤",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:11,phone:"010-3246-9003",note:"월 도자공예(1교시) → 칼라클레이(2교시)"},
   {id:"14송다은",name:"송다은",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:12,phone:"010-6303-1249",note:""},
-  {id:"14신다혜",name:"신다혜",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:13,phone:"010-9337-5092",note:"월 도자공예(1교시) → 칼라클레이(2교시)"},
+  {id:"14신다혜",name:"신다혜",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:13,phone:"010-9337-5092",note:"월 도자공예(1교시) → 칼라클레이(2교시)\n🏫 돌봄 대기 1번"},
   {id:"14양희서",name:"양희서",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:16,phone:"010-3263-6669",note:"월 도자공예(1교시) → 칼라클레이(2교시)"},
   {id:"14윤하람",name:"윤하람",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:17,phone:"010-7189-7188",note:"월·수 1교시만 / 화·목·금취소"},
   {id:"14정나은",name:"정나은",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:18,phone:"010-7583-2326",note:"월 도자공예(1교시) → 칼라클레이(2교시)"},
@@ -300,7 +301,7 @@ const STUDENTS = [
   {id:"21고율아",name:"고율아",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:10,phone:"010-9604-8549",note:""},
   {id:"21문채빈",name:"문채빈",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:12,phone:"010-7174-6106",note:"매일 1교시만 / 화취소"},
   {id:"21유지우",name:"유지우",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:14,phone:"010-5432-8107",note:"월 발레(2교시)+책놀이(3교시)\n화 뉴스포츠+칼라클레이 / 목 1교시만"},
-  {id:"21윤효은",name:"윤효은",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:15,phone:"010-4248-8997",note:"월·목·금취소 / 화·수 1교시만"},
+  {id:"21윤효은",name:"윤효은",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:15,phone:"010-4248-8997",note:"월·목·금취소 / 화·수 1교시만\n🏫 돌봄 대기 3번"},
   {id:"21이소율2",name:"이소율2",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:16,phone:"010-2849-3614",note:"맞춤형 전체 취소"},
   {id:"21이하린",name:"이하린",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:18,phone:"010-2848-1331",note:"화 로봇과학B(2교시)"},
   {id:"21한봄",name:"한  봄",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:19,phone:"010-8206-7592",note:"⚠ 민원 6회\n화·목 1교시 컴퓨터(방과후)\n⚠ [4/2] 컴퓨터 첫날 미이동 → 어머니 방문 후 조기하교"},
@@ -334,8 +335,8 @@ const STUDENTS = [
   {id:"23최서우",name:"최서우",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:19,phone:"010-8580-9053",note:""},
   {id:"23최예린",name:"최예린",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:20,phone:"010-2794-0397",note:"화 로봇과학A(1교시)"},
   {id:"24강현우",name:"강현우",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:1,phone:"010-9347-4880",note:""},
-  {id:"24김태범",name:"김태범",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:3,phone:"010-9947-5505",note:"화·목 1교시 컴퓨터(방과후)\n14:50 후 2교시 늦게 도착"},
-  {id:"24안건우",name:"안건우",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:6,phone:"010-5121-0070",note:"월 도자공예(2교시) 후 하교 | 화·목·금 1교시만\n수 주산암산(1교시)+보드게임(2교시)"},
+  {id:"24김태범",name:"김태범",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:3,phone:"010-9947-5505",note:"화·목 1교시 컴퓨터(방과후)\n14:50 후 2교시 늦게 도착\n🏫 돌봄 대기 2번"},
+  {id:"24안건우",name:"안건우",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:6,phone:"010-5121-0070",note:"월 도자공예(2교시) 후 하교 | 화·목·금 1교시만\n수 주산암산(1교시)+보드게임(2교시)\n🏫 돌봄 대기 4번"},
   {id:"24윤재영",name:"윤재영",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:7,phone:"010-9010-6618",note:"화·목 1교시 컴퓨터(방과후)\n14:50 후 2교시 늦게 도착"},
   {id:"24정선우",name:"정선우",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:8,phone:"010-3226-9512",note:"월 2교시 결석(부진학생 지도) / 월 3교시·화·목·금 정상\n수 창의과학(1교시)+보드게임(2교시) 배정 / 7월 복귀 예정"},
   {id:"24허산",name:"허  산",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:9,phone:"010-9154-2398",note:"월~금 전체 취소"},
@@ -570,14 +571,13 @@ function goTo(screen){
   document.getElementById('screen-'+currentScreen).classList.add('hidden');
   document.getElementById('screen-'+screen).classList.remove('hidden');
   document.querySelectorAll('.tab-btn').forEach((b,i)=>{
-    const screens = ['home','students','attendance','timetable','notes'];
+    const screens = ['home','students','attendance','timetable','daycare'];
     b.classList.toggle('active', screens[i]===screen);
   });
   const banner = document.getElementById('banner');
   banner.style.display = screen==='home' ? 'flex' : 'none';
   currentScreen = screen;
   renderScreen(screen);
-  // 최상단으로 스크롤
   const el = document.getElementById('screen-'+screen);
   if(el) el.scrollTop = 0;
   window.scrollTo(0,0);
@@ -589,9 +589,139 @@ function renderScreen(s){
   else if(s==='attendance') renderAttendance();
   else if(s==='timetable') renderTimetable();
   else if(s==='notes') renderNotes();
+  else if(s==='daycare') renderDaycare();
 }
 
 function openURL(url){ window.open(url,'_blank'); }
+
+// ── 돌봄교실 데이터 ──
+const DAYCARE = {
+  "돌봄1교실": [
+    {num:1, cls:"1-2", name:"김라온", gender:"남", phone:"010-6703-0065", guardian:"김하얀", type:"맞벌이"},
+    {num:2, cls:"1-2", name:"변민재", gender:"남", phone:"010-5914-7526", guardian:"유영민", type:"다자녀"},
+    {num:3, cls:"1-2", name:"장우주", gender:"남", phone:"010-8312-5654", guardian:"박선아", type:"맞벌이"},
+    {num:4, cls:"1-2", name:"최정우", gender:"남", phone:"010-3385-8670", guardian:"최창원", type:"맞벌이"},
+    {num:5, cls:"1-2", name:"강희수", gender:"여", phone:"010-6378-1652", guardian:"김재영", type:"맞벌이"},
+    {num:6, cls:"1-2", name:"김다은", gender:"여", phone:"010-5158-9659", guardian:"김성윤", type:"맞벌이"},
+    {num:7, cls:"1-2", name:"김하리", gender:"여", phone:"010-8431-6786", guardian:"김선희", type:"맞벌이"},
+    {num:8, cls:"1-2", name:"박민경", gender:"여", phone:"010-5087-4437", guardian:"박정환", type:"맞벌이"},
+    {num:9, cls:"1-2", name:"박세민", gender:"여", phone:"010-6483-8490", guardian:"김혜지", type:"한부모"},
+    {num:10,cls:"1-2", name:"조이현", gender:"여", phone:"010-2277-9052", guardian:"박미니", type:"맞벌이"},
+    {num:11,cls:"1-2", name:"최유진", gender:"여", phone:"010-3385-8670", guardian:"이다은", type:"맞벌이"},
+    {num:12,cls:"1-2", name:"함소윤", gender:"여", phone:"010-4442-0309", guardian:"최미경", type:"맞벌이"},
+    {num:13,cls:"2-3", name:"최유준", gender:"남", phone:"010-7488-8527", guardian:"배미희", type:"다자녀"},
+    {num:14,cls:"2-4", name:"심도윤", gender:"남", phone:"010-4290-4590", guardian:"이윤정", type:"맞벌이"},
+    {num:15,cls:"2-1", name:"이아린", gender:"여", phone:"010-2120-4814", guardian:"홍수지", type:"맞벌이"},
+    {num:16,cls:"2-3", name:"전아인", gender:"여", phone:"010-4772-1038", guardian:"김윤미", type:"한부모"},
+    {num:17,cls:"2-3", name:"박서아", gender:"여", phone:"010-6483-8490", guardian:"김혜지", type:"한부모"},
+    {num:18,cls:"2-3", name:"유다연", gender:"여", phone:"010-9977-8979", guardian:"김효옥", type:"맞벌이"},
+    {num:19,cls:"2-4", name:"우지민", gender:"여", phone:"010-8295-9367", guardian:"박서윤", type:"한부모"},
+    {num:20,cls:"2-4", name:"한희서", gender:"여", phone:"010-8879-2634", guardian:"장은영", type:"맞벌이"},
+  ],
+  "돌봄2교실": [
+    {num:1, cls:"1-1", name:"황지오", gender:"남", phone:"010-6847-8211", guardian:"황유진", type:"맞벌이"},
+    {num:2, cls:"1-1", name:"김태린", gender:"여", phone:"010-2468-1643", guardian:"박은수", type:"맞벌이"},
+    {num:3, cls:"1-1", name:"서지민", gender:"여", phone:"010-5181-5370", guardian:"서광석", type:"맞벌이"},
+    {num:4, cls:"1-1", name:"석가은", gender:"여", phone:"010-8665-8593", guardian:"김영주", type:"맞벌이"},
+    {num:5, cls:"1-1", name:"윤지아", gender:"여", phone:"010-3722-8591", guardian:"박가람", type:"맞벌이"},
+    {num:6, cls:"1-1", name:"장하임", gender:"여", phone:"010-3455-8480", guardian:"임은지", type:"맞벌이"},
+    {num:7, cls:"1-3", name:"김경민", gender:"남", phone:"010-9627-8388", guardian:"김병관", type:"맞벌이"},
+    {num:8, cls:"1-3", name:"김민준", gender:"남", phone:"010-2744-9524", guardian:"김철웅", type:"한부모"},
+    {num:9, cls:"1-3", name:"김시후", gender:"남", phone:"010-9545-5125", guardian:"변세영", type:"맞벌이"},
+    {num:10,cls:"1-3", name:"김라율", gender:"여", phone:"010-6790-3882", guardian:"최수민", type:"맞벌이"},
+    {num:11,cls:"1-3", name:"정윤서", gender:"여", phone:"010-2459-9951", guardian:"김선옥", type:"맞벌이"},
+    {num:12,cls:"1-4", name:"주지환", gender:"남", phone:"010-4552-4250", guardian:"이나영", type:"맞벌이"},
+    {num:13,cls:"1-4", name:"김민주", gender:"여", phone:"010-3958-7148", guardian:"김혜림", type:"다자녀"},
+    {num:14,cls:"1-4", name:"박지유", gender:"여", phone:"010-7165-0303", guardian:"이해미", type:"맞벌이"},
+    {num:15,cls:"1-4", name:"심서아", gender:"여", phone:"010-8622-7189", guardian:"조아름", type:"맞벌이"},
+    {num:16,cls:"1-4", name:"안예서", gender:"여", phone:"010-8599-5668", guardian:"김수현", type:"맞벌이"},
+    {num:17,cls:"2-1", name:"이동건", gender:"남", phone:"010-6633-1236", guardian:"유지현", type:"한부모"},
+    {num:18,cls:"2-1", name:"정비오", gender:"남", phone:"010-8692-0321", guardian:"김소영", type:"한부모"},
+    {num:19,cls:"2-2", name:"김도현", gender:"남", phone:"010-8620-4632", guardian:"김보민", type:"한부모"},
+    {num:20,cls:"2-2", name:"박지우", gender:"남", phone:"010-8864-9615", guardian:"진향숙", type:"맞벌이"},
+  ]
+};
+
+let daycareTab = '돌봄1교실';
+
+function renderDaycare(){
+  const rooms = Object.keys(DAYCARE);
+  const students = DAYCARE[daycareTab]||[];
+  const typeColor = {맞벌이:"#1565C0", 한부모:"#C00000", 다자녀:"#2E7D32"};
+  const typeBg   = {맞벌이:"#E3F2FD", 한부모:"#FFEBEE", 다자녀:"#E8F5E9"};
+
+  document.getElementById('screen-daycare').innerHTML = `
+    <div style="background:#5C3D99;padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
+      <div style="color:#fff;font-size:20px;font-weight:800">돌봄교실</div>
+      <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-top:2px;">
+        전체 ${rooms.reduce((s,r)=>s+DAYCARE[r].length,0)}명 · 맞춤형 프로그램 미참여
+      </div>
+    </div>
+
+    <!-- 교실 탭 -->
+    <div style="display:flex;background:#fff;border-bottom:2px solid var(--border);">
+      ${rooms.map(r=>`
+        <button onclick="daycareTab='${r}';renderDaycare()"
+          style="flex:1;padding:12px 8px;border:none;background:none;cursor:pointer;
+            font-size:13px;font-weight:700;
+            color:${daycareTab===r?'#5C3D99':'var(--muted)'};
+            border-bottom:2px solid ${daycareTab===r?'#5C3D99':'transparent'};
+            margin-bottom:-2px;">
+          🏫 ${r}<br>
+          <span style="font-size:10px;font-weight:400;">${DAYCARE[r].length}명</span>
+        </button>`).join('')}
+    </div>
+
+    <!-- 통계 칩 -->
+    <div style="padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;background:#F8F5FF;border-bottom:1px solid var(--border);">
+      ${['맞벌이','한부모','다자녀'].map(t=>{
+        const cnt=students.filter(s=>s.type===t).length;
+        return `<div style="background:${typeBg[t]};color:${typeColor[t]};border:1px solid ${typeColor[t]}33;
+          border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;">
+          ${t} ${cnt}명
+        </div>`;
+      }).join('')}
+      <div style="background:#F3E5F5;color:#5C3D99;border:1px solid #5C3D9933;
+        border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;margin-left:auto;">
+        총 ${students.length}명
+      </div>
+    </div>
+
+    <!-- 학생 목록 -->
+    <div style="padding:10px 14px;display:flex;flex-direction:column;gap:8px;">
+      ${students.map(s=>`
+        <div style="background:#fff;border-radius:12px;padding:12px 14px;
+          box-shadow:0 1px 5px rgba(0,0,0,0.07);
+          display:flex;align-items:center;gap:12px;
+          border-left:4px solid ${typeColor[s.type]||'#999'};">
+          <div style="width:36px;height:36px;border-radius:18px;
+            background:${s.gender==='남'?'#E3F2FD':'#FCE4EC'};
+            display:flex;align-items:center;justify-content:center;
+            font-size:13px;font-weight:800;color:${s.gender==='남'?'#1565C0':'#C2185B'};flex-shrink:0;">
+            ${s.num}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;">
+              <span style="font-size:15px;font-weight:800;">${s.name}</span>
+              <span style="font-size:10px;color:var(--muted);background:#F0F2F8;
+                border-radius:4px;padding:1px 6px;">${s.cls}</span>
+              <span style="font-size:10px;font-weight:700;
+                background:${typeBg[s.type]};color:${typeColor[s.type]};
+                border-radius:4px;padding:1px 6px;">${s.type}</span>
+            </div>
+            <div style="font-size:11px;color:var(--muted);">
+              보호자: ${s.guardian}
+            </div>
+          </div>
+          <a href="tel:${s.phone}"
+            style="background:#5C3D99;color:#fff;border-radius:8px;padding:6px 10px;
+              font-size:10px;font-weight:700;text-decoration:none;flex-shrink:0;white-space:nowrap;">
+            📞 전화
+          </a>
+        </div>`).join('')}
+    </div>
+  `;
+}
 
 // ── 홈 ──
 function renderHome(){
