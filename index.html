@@ -626,11 +626,11 @@ async function fetchWeather(){
 
   // 여러 엔드포인트 순서대로 시도
   const TARGETS = [
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.open-meteo.com/v1/forecast?latitude=37.75&longitude=128.90&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia/Seoul&forecast_days=7&wind_speed_unit=ms'),
     'https://wttr.in/Gangneung?format=j1',
     'https://wttr.in/37.75,128.90?format=j1',
     'https://corsproxy.io/?' + encodeURIComponent('https://wttr.in/Gangneung?format=j1'),
     'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://wttr.in/Gangneung?format=j1'),
-    'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.open-meteo.com/v1/forecast?latitude=37.75&longitude=128.90&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia/Seoul&forecast_days=7&wind_speed_unit=ms'),
   ];
 
   let data = null, source = '';
