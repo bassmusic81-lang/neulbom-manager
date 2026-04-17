@@ -409,7 +409,32 @@ const CALENDAR = {
 };
 
 const DAYS = ["월","화","수","목","금"];
-const DAY_DATES = {월:"4/14",화:"4/15",수:"4/16",목:"4/17",금:"4/18"};
+// 이번주 월~금 날짜 동적 계산 (토·일은 다음주 기준)
+function getThisWeekRange(){
+  const today = new Date();
+  const dow = today.getDay();
+  const diff = dow === 6 ? 2 : dow === 0 ? 1 : 1 - dow;
+  const mon = new Date(today); mon.setDate(today.getDate() + diff);
+  const fri = new Date(mon);   fri.setDate(mon.getDate() + 4);
+  const fmt = d => `${d.getMonth()+1}/${d.getDate()}`;
+  return { mon:fmt(mon), fri:fmt(fri), label:`${fmt(mon)}~${fmt(fri)}` };
+}
+
+// 요일별 날짜 맵 (동적)
+function buildDayDates(){
+  const today = new Date();
+  const dow = today.getDay();
+  const diff = dow === 6 ? 2 : dow === 0 ? 1 : 1 - dow;
+  const mon = new Date(today); mon.setDate(today.getDate() + diff);
+  const days = ['월','화','수','목','금'];
+  const map = {};
+  days.forEach((d,i)=>{
+    const dt = new Date(mon); dt.setDate(mon.getDate()+i);
+    map[d] = `${dt.getMonth()+1}/${dt.getDate()}`;
+  });
+  return map;
+}
+const DAY_DATES = buildDayDates();
 const CLASS_LABELS = ["1학년 1반","1학년 2반","1학년 3반","1학년 4반","2학년 1반","2학년 2반","2학년 3반","2학년 4반"];
 
 // 색상
@@ -871,7 +896,7 @@ function renderHome(){
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
           <div style="color:#fff;font-size:22px;font-weight:800;margin-bottom:2px">늘봄학교 관리</div>
-          <div style="color:#fff;font-size:13px;opacity:0.8">4/14~4/18</div>
+          <div style="color:#fff;font-size:13px;opacity:0.8">${getThisWeekRange().label}</div>
         </div>
         <button onclick="forceUpdate()" id="update-btn"
           style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:8px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;margin-top:4px">
@@ -1270,7 +1295,7 @@ function openStuModal(id){
       <div style="font-size:13px;color:var(--danger);line-height:20px;white-space:pre-line">${s.note}</div>
     </div>`:''}
     <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--border)">
-      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px">📅 이번주 수강 현황 (4/14~4/18)</div>
+      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px">📅 이번주 수강 현황 (${getThisWeekRange().label})</div>
       ${DAYS.map(day=>{
         const subjs = getPersonalSubjs(day);
         const isCancelled = subjs===null;
@@ -1922,7 +1947,7 @@ function renderTimetable(){
   document.getElementById('screen-timetable').innerHTML = `
     <div style="background:${hc};padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
       <div style="color:#fff;font-size:20px;font-weight:800">반별 시간표</div>
-      <div style="color:#fff;font-size:12px;opacity:0.7">4/14(월) ~ 4/18(금) · 과목 터치 시 상세 확인</div>
+      <div style="color:#fff;font-size:12px;opacity:0.7">${getThisWeekRange().mon}(월) ~ ${getThisWeekRange().fri}(금) · 과목 터치 시 상세 확인</div>
     </div>
     <!-- 반 탭 -->
     <div style="display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);padding:10px 12px;gap:6px">
