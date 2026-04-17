@@ -584,7 +584,7 @@ function goTo(screen){
 }
 
 function renderScreen(s){
-  if(s==='home') renderHome();
+  if(s==='home'){ renderHome(); fetchWeather(); }
   else if(s==='students') renderStudents();
   else if(s==='attendance') renderAttendance();
   else if(s==='timetable') renderTimetable();
@@ -593,6 +593,91 @@ function renderScreen(s){
 }
 
 function openURL(url){ window.open(url,'_blank'); }
+
+// ── 일기예보 (강릉시) ──
+async function fetchWeather(){
+  const el = document.getElementById('weather-card');
+  if(!el) return;
+  try {
+    // wttr.in - CORS 허용, 키 불필요
+    const res = await fetch('https://wttr.in/Gangneung?format=j1');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const d = await res.json();
+
+    const cur = d.current_condition[0];
+    const weather = d.weather;
+    const dayNames = ['일','월','화','수','목','금','토'];
+
+    const wCode = parseInt(cur.weatherCode);
+    const WMO_ICON = {
+      113:'☀️', 116:'⛅', 119:'☁️', 122:'☁️',
+      143:'🌫', 176:'🌦', 179:'🌨', 182:'🌧', 185:'🌧',
+      200:'⛈', 227:'🌨', 230:'❄️',
+      248:'🌫', 260:'🌫',
+      263:'🌦', 266:'🌦', 281:'🌧', 284:'🌧',
+      293:'🌦', 296:'🌦', 299:'🌧', 302:'🌧', 305:'🌧', 308:'🌧',
+      311:'🌧', 314:'🌧', 317:'🌧', 320:'🌨', 323:'🌨', 326:'🌨',
+      329:'❄️', 332:'❄️', 335:'❄️', 338:'❄️',
+      350:'🌧', 353:'🌦', 356:'🌧', 359:'🌧',
+      362:'🌨', 365:'🌨', 368:'🌨', 371:'❄️', 374:'🌨', 377:'🌨',
+      386:'⛈', 389:'⛈', 392:'⛈', 395:'❄️',
+    };
+    const WMO_DESC = {
+      113:'맑음', 116:'대체로 맑음', 119:'구름 많음', 122:'흐림',
+      143:'안개', 176:'소나기', 179:'눈소나기',
+      200:'뇌우', 227:'눈', 230:'폭설',
+      263:'이슬비', 266:'이슬비',
+      293:'비', 296:'비', 299:'비', 302:'비', 305:'비', 308:'폭우',
+      320:'눈', 323:'눈', 326:'눈', 329:'폭설',
+      353:'소나기', 356:'비', 386:'뇌우',
+    };
+    const icon = WMO_ICON[wCode]||'🌤';
+    const desc = WMO_DESC[wCode]||cur.weatherDesc?.[0]?.value||'맑음';
+    const temp = cur.temp_C;
+    const feel = cur.FeelsLikeC;
+    const wind = (parseFloat(cur.windspeedKmph)/3.6).toFixed(1);
+    const humid= cur.humidity;
+
+    const forecastHtml = weather.slice(0,5).map((w,i)=>{
+      const dt = new Date(w.date);
+      const dn = i===0?'오늘':i===1?'내일':dayNames[dt.getDay()]+'요일';
+      const fc = parseInt(w.hourly?.[4]?.weatherCode||113);
+      const fi = WMO_ICON[fc]||'🌤';
+      const hi = w.maxtempC;
+      const lo = w.mintempC;
+      const pp = w.hourly?.[4]?.chanceofrain||0;
+      return `
+      <div style="flex:1;text-align:center;padding:6px 2px;min-width:48px;">
+        <div style="font-size:10px;font-weight:700;color:${i===0?'var(--primary)':'var(--muted)'};">${dn}</div>
+        <div style="font-size:20px;line-height:1.5;">${fi}</div>
+        <div style="font-size:11px;font-weight:800;color:#E53935;">${hi}°</div>
+        <div style="font-size:10px;color:#1565C0;">${lo}°</div>
+        <div style="font-size:9px;color:${pp>=60?'#1565C0':'#ccc'};margin-top:2px;">💧${pp}%</div>
+      </div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div style="width:100%;">
+        <div style="display:flex;align-items:center;gap:14px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid #f0f0f0;">
+          <div style="font-size:40px;line-height:1;">${icon}</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#333;">${desc}</div>
+            <div style="font-size:28px;font-weight:900;color:#1F3864;line-height:1.1;">${temp}°<span style="font-size:13px;color:#888;font-weight:400;">C</span></div>
+            <div style="font-size:11px;color:#888;margin-top:2px;">체감 ${feel}° · 바람 ${wind}m/s · 습도 ${humid}%</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:10px;color:#aaa;">강릉시</div>
+            <div style="font-size:10px;color:#aaa;margin-top:2px;">${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} 기준</div>
+          </div>
+        </div>
+        <div style="display:flex;">${forecastHtml}</div>
+      </div>
+    `;
+  } catch(e) {
+    console.error('날씨 오류:', e);
+    if(el) el.innerHTML = `<div style="color:#aaa;font-size:12px;text-align:center;width:100%;padding:8px 0;">날씨 정보를 불러올 수 없습니다 (${e.message})</div>`;
+  }
+}
 
 // ── 돌봄교실 데이터 ──
 const DAYCARE = {
@@ -804,6 +889,16 @@ function renderHome(){
 
       </div>
     </div>
+
+    <!-- 일기예보 -->
+    <div style="padding:12px 16px 0;">
+      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px;">🌤 오늘의 날씨 · 강릉시</div>
+      <div id="weather-card" style="background:#fff;border-radius:14px;padding:14px 16px;
+        box-shadow:0 1px 5px rgba(0,0,0,0.07);display:flex;align-items:center;gap:12px;">
+        <div style="color:#aaa;font-size:13px;">날씨 불러오는 중…</div>
+      </div>
+    </div>
+
     ${DAYS.includes(todayDay) ? `
     <div style="padding:16px 16px 0">
       <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px">오늘 수업 · ${todayDay}요일 (${todayDate})</div>
@@ -2006,6 +2101,7 @@ function closePopup(){
 
 // ── 초기화 ──
 renderHome();
+fetchWeather();
 
 // Service Worker 등록
 if('serviceWorker' in navigator){
