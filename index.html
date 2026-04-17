@@ -295,7 +295,7 @@ const STUDENTS = [
   {id:"14윤하람",name:"윤하람",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:17,phone:"010-7189-7188",note:"월·수 1교시만 / 화·목·금취소"},
   {id:"14정나은",name:"정나은",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:18,phone:"010-7583-2326",note:"월 도자공예(1교시) → 칼라클레이(2교시)"},
   {id:"14최아린",name:"최아린",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:19,phone:"010-2794-0397",note:"월 도자공예(1교시) → 칼라클레이(2교시)\n화요일 로봇과학A+오카리나"},
-  {id:"21구도안",name:"구도안",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:1,phone:"010-7475-1359",note:"목 맞춤형 취소"},
+  {id:"21구도안",name:"구도안",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:1,phone:"010-7475-1359",note:"목 맞춤형 취소\n⚠ 4/20부터 학원수강으로 수업 불참 예정"},
   {id:"21김재준",name:"김재준",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:2,phone:"010-3435-8715",note:"화 로봇과학A(1교시) / 목·금 2교시 제외\n⚠ [4/2] 전래놀이 결보강 중 폭행 피해"},
   {id:"21김주안",name:"김주안",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:3,phone:"010-8927-1127",note:""},
   {id:"21고율아",name:"고율아",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:10,phone:"010-9604-8549",note:""},
@@ -512,7 +512,7 @@ function parseSpecialFromNote(note) {
 const MANUAL_OVERRIDE = {
   "문채빈": { skipS2Days:["화","수","목","금"], skipS3Days:["월"] },
   "유지우":  { skipS3Days:["월"] },
-  "구도안":  { skipS3Days:["월"] },
+  "구도안":  (()=>{ const t=new Date(),tk=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`; return tk>='2026-04-20' ? {skipDays:["월","화","수","목","금"]} : {skipS3Days:["월"]}; })(),
   "김재준":  { skipS3Days:["월"] },
   "안건우":  { skipS2Days:["화","목","금"], skipS3Days:["월"], replaceS1:{수:"주산암산"} },
   "최가윤":  { skipS2Days:["화","수","목","금"], skipS3Days:["월"] },
@@ -1898,6 +1898,30 @@ function renderTimetable(){
     }
   }
 
+  // 슬롯인덱스 → 실제 skey 변환 (정규수업 슬롯 때문에 offset 발생)
+  function getSlotKey(day, slotIdx) {
+    if(!is2) {
+      if(day==='월'||day==='수') {
+        // 1학년 월·수: 슬롯0=s1, 슬롯1=s2
+        return slotIdx===0?'s1':slotIdx===1?'s2':null;
+      } else {
+        // 1학년 화·목·금: 슬롯0=정규, 슬롯1=s1, 슬롯2=s2
+        return slotIdx===1?'s1':slotIdx===2?'s2':null;
+      }
+    } else {
+      if(day==='수') {
+        // 2학년 수: 슬롯0=s1, 슬롯1=s2
+        return slotIdx===0?'s1':slotIdx===1?'s2':null;
+      } else if(day==='월') {
+        // 2학년 월: 슬롯0=정규, 슬롯1=s2, 슬롯2=s3
+        return slotIdx===1?'s2':slotIdx===2?'s3':null;
+      } else {
+        // 2학년 화·목·금: 슬롯0=정규, 슬롯1=s1, 슬롯2=s2
+        return slotIdx===1?'s1':slotIdx===2?'s2':null;
+      }
+    }
+  }
+
   const slotKeys = ['s1','s2','s3'];
   const slotLabels = !is2
     ? ["월·수 13:10~13:50\n화·목·금 정규수업", "월·수 14:00~14:40\n화·목·금 13:50~14:30", "화·목·금 14:40~15:20"]
@@ -1910,6 +1934,7 @@ function renderTimetable(){
       <td style="padding:5px 4px;background:${hc}18;font-size:8px;color:${hc};font-weight:800;text-align:center;line-height:1.4;white-space:pre-line;vertical-align:middle;min-width:52px">${tlbl}</td>
       ${DAYS.map(d=>{
         const subj=getSlot(d,slotIdx);
+        const realKey=getSlotKey(d,slotIdx);
         if(!subj) return `<td style="padding:3px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:6px 3px;font-size:8px;color:#CCC;min-height:32px;display:flex;align-items:center;justify-content:center">—</div></td>`;
         if(subj==='정규') return `<td style="padding:3px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:6px 3px;font-size:8px;color:#8892A4;min-height:32px;display:flex;align-items:center;justify-content:center">정규수업</div></td>`;
 
@@ -1917,12 +1942,12 @@ function renderTimetable(){
         if(currentTTClass==='2-4' && d==='수' && skey==='s1') {
           const c1=gc('창의과학'), c2=gc('주산암산');
           return `<td style="padding:3px 2px;text-align:center">
-            <div onclick="showSubjDetail('창의과학','${d}','${skey}')"
+            <div onclick="showSubjDetail('창의과학','${d}','${realKey||skey}')"
               style="background:${c1}20;color:${c1};border:1.5px solid ${c1}66;border-radius:7px;padding:4px 3px;margin-bottom:2px;cursor:pointer;min-height:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
               <span style="font-weight:800;font-size:8px;line-height:1.2">창의과학</span>
               <span style="font-size:6px;opacity:0.7">일반</span>
             </div>
-            <div onclick="showSubjDetail('주산암산','${d}','${skey}')"
+            <div onclick="showSubjDetail('주산암산','${d}','${realKey||skey}')"
               style="background:${c2}20;color:${c2};border:1.5px solid ${c2}66;border-radius:7px;padding:4px 3px;cursor:pointer;min-height:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
               <span style="font-weight:800;font-size:8px;line-height:1.2">주산암산</span>
               <span style="font-size:6px;opacity:0.7">특별수강</span>
@@ -1934,7 +1959,7 @@ function renderTimetable(){
         return `<td style="padding:3px 2px;text-align:center">${parts.map(p=>{
           p=p.trim();
           const color=gc(p); const place=getPlace(p);
-          return `<div onclick="showSubjDetail('${p}','${d}','${skey}')"
+          return `<div onclick="showSubjDetail('${p}','${d}','${realKey||skey}')"
             style="background:${color}20;color:${color};border:1.5px solid ${color}66;border-radius:7px;padding:5px 3px;margin-bottom:2px;cursor:pointer;min-height:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
             <span style="font-weight:800;font-size:9px;text-align:center;line-height:1.2">${p}</span>
             <span style="font-size:7px;opacity:0.75;text-align:center;line-height:1.2">${place.split(' ').slice(0,2).join(' ')}</span>
@@ -1960,7 +1985,7 @@ function renderTimetable(){
     <div style="padding:12px">
       <!-- 제목 -->
       <div style="background:${hc};border-radius:12px 12px 0 0;padding:10px 14px;text-align:center">
-        <div style="color:#fff;font-size:14px;font-weight:800">4월 14일(월) ~ 4월 18일(금) · 맞춤형 프로그램 시간표 · (${currentTTClass})</div>
+        <div style="color:#fff;font-size:14px;font-weight:800">${getThisWeekRange().mon}(월) ~ ${getThisWeekRange().fri}(금) · 맞춤형 프로그램 시간표 · (${currentTTClass})</div>
       </div>
       <!-- 시간표 테이블 -->
       <div style="background:#fff;border-radius:0 0 12px 12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
