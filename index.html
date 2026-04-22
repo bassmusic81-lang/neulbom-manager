@@ -386,7 +386,8 @@ const INCIDENTS = [
   {seq:6,date:"4/2(목)",subject:"뉴스포츠→전래놀이 결보강",student:"피해: 2-1 김재준\n가해: 2-1 문채빈·이하린 / 2-4 박하윤",content:"수업 중 폭행 사건 발생 / 강사 지도 소홀",action:"강사 주의 / 담임 통보 / 재발 방지",tag:"⚠ 폭행사건"},
   {seq:7,date:"4/6~",subject:"맞춤형(정선우)",student:"2-4 정선우",content:"부진학생 보충수업으로 월·수 일부 결석",action:"출석부 비고란 결석 사유 기재 완료",tag:"📋 출석관리"},
   {seq:8,date:"4/2(목)",subject:"컴퓨터→중국어",student:"2-1 한봄",content:"컴퓨터 방과후 첫날 교실 이동 몰라 맞춤형으로 이동\n어머니 방문 후 조기하교",action:"이동 경로 재안내 필요",tag:"⚠ 조기하교"},
-  {seq:9,date:"4/3(금)",subject:"전래놀이(2교시)",student:"1-1 정윤솔",content:"1-2 남학생 3명 불쾌 행동으로 조기하교",action:"신원 확인 / 담임 통보",tag:"⚠ 조기하교"}
+  {seq:9,date:"4/3(금)",subject:"전래놀이(2교시)",student:"1-1 정윤솔",content:"1-2 남학생 3명 불쾌 행동으로 조기하교",action:"신원 확인 / 담임 통보",tag:"⚠ 조기하교"},
+  {seq:10,date:"4/21(화)",subject:"방송댄스",student:"1-3 최우찬 / 1-3 조경준",content:"수업 시작 전 복도에서 잡기 놀이 중 최우찬이 백태클 → 조경준 넘어짐\n강사 화장실 지도 중 부재 상황에서 발생\n최우찬·조경준·이산 3명은 평소 장난 수위 높아 매 수업 주의 지도 중\n서로 부딪히거나 타격하는 행위 빈번 → 신체 접촉 금지 강력 훈육",action:"강사 직접 훈육 완료 / 담임 통보 필요 / 3명 집중 관찰 지속",tag:"⚠ 안전사고"}
 ];
 
 const CALENDAR = {
@@ -1363,7 +1364,30 @@ function openStuModal(id){
       <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px">⚠ 특이사항</div>
       <div style="font-size:13px;color:var(--danger);line-height:20px;white-space:pre-line">${s.note}</div>
     </div>`:''}
-    <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--border)">
+    ${(()=>{
+      // 이 학생이 관련된 사건 목록 (student 필드에 이름 포함)
+      const related = INCIDENTS.filter(inc=>inc.student&&inc.student.includes(s.name.trim()));
+      if(!related.length) return '';
+      const tagColor={
+        '⚠ 요주의':'#E65100','⚠ 민원':'#C62828','민원 1회':'#E65100',
+        '⚠ 폭행사건':'#B71C1C','⚠ 안전사고':'#B71C1C','⚠ 조기하교':'#1565C0',
+        '📋 출석관리':'#2E7D32','✅ 처리완료':'#388E3C','분실물 확인필요':'#6A1B9A'
+      };
+      return `<div style="background:#FFF8E1;border-radius:12px;padding:14px;border:1.5px solid #FFE082;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:700;color:#F57F17;margin-bottom:8px">📋 관련 특이사항 기록 (${related.length}건)</div>
+        ${related.map(inc=>{
+          const tc=tagColor[inc.tag]||'#555';
+          return `<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:6px;border-left:3px solid ${tc};">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+              <span style="font-size:10px;font-weight:800;color:${tc};background:${tc}15;border-radius:4px;padding:1px 6px;">${inc.tag}</span>
+              <span style="font-size:10px;color:var(--muted);">${inc.date} · ${inc.subject}</span>
+            </div>
+            <div style="font-size:12px;color:var(--text);line-height:1.6;white-space:pre-line;">${inc.content}</div>
+            ${inc.action?`<div style="font-size:11px;color:#1565C0;margin-top:5px;font-weight:600;">→ ${inc.action}</div>`:''}
+          </div>`;
+        }).join('')}
+      </div>`;
+    })()}    <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--border)">
       <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px">📅 이번주 수강 현황 (${getThisWeekRange().label})</div>
       ${DAYS.map(day=>{
         const subjs = getPersonalSubjs(day);
