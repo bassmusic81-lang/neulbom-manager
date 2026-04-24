@@ -388,7 +388,7 @@ const INCIDENTS = [
   {seq:8,date:"4/2(목)",subject:"컴퓨터→중국어",student:"2-1 한봄",content:"컴퓨터 방과후 첫날 교실 이동 몰라 맞춤형으로 이동\n어머니 방문 후 조기하교",action:"이동 경로 재안내 필요",tag:"⚠ 조기하교"},
   {seq:9,date:"4/3(금)",subject:"전래놀이(2교시)",student:"1-1 정윤솔",content:"1-2 남학생 3명 불쾌 행동으로 조기하교",action:"신원 확인 / 담임 통보",tag:"⚠ 조기하교"},
   {seq:10,date:"4/21(화)",subject:"방송댄스",student:"1-3 최우찬 / 1-3 조경준",content:"수업 시작 전 복도에서 잡기 놀이 중 최우찬이 백태클 → 조경준 넘어짐\n강사 화장실 지도 중 부재 상황에서 발생\n최우찬·조경준·이산 3명은 평소 장난 수위 높아 매 수업 주의 지도 중\n서로 부딪히거나 타격하는 행위 빈번 → 신체 접촉 금지 강력 훈육",action:"강사 직접 훈육 완료 / 담임 통보 필요 / 3명 집중 관찰 지속",tag:"⚠ 안전사고"},
-  {seq:11,date:"4/24(목)",subject:"놀이체육(맞춤형 2교시)",student:"2-4 최지훈",content:"맞춤형 2교시 놀이체육 수업 중 눈에 공을 맞음 → 보건실 다녀옴",action:"보건실 처치 완료",tag:"⚠ 안전사고"}
+  {seq:11,date:"4/24(목)",subject:"놀이체육(맞춤형 2교시)",student:"2-3 최지훈",content:"맞춤형 2교시 놀이체육 수업 중 눈에 공을 맞음 → 보건실 다녀옴",action:"보건실 처치 완료",tag:"⚠ 안전사고"}
 ];
 
 // ── 출석 DB (구글폼 신청 데이터) ──
@@ -2328,12 +2328,21 @@ function showRoomSearch(){
   function buildRoomContent(room){
     const subjs = roomMap[room]||[];
     if(!subjs.length) return '<div style="padding:20px;text-align:center;color:#aaa;">수업 없음</div>';
-    return subjs.map(subj=>{
+    const dayOrder = {월:0,화:1,수:2,목:3,금:4};
+
+    // 수업 카드를 첫 번째 요일·시간 기준으로 정렬
+    const subjsWithSlots = subjs.map(subj=>{
+      const slots = getSubjSchedule(subj);
+      slots.sort((a,b)=>(dayOrder[a.day]||0)-(dayOrder[b.day]||0)||(a.time<b.time?-1:1));
+      const firstSlot = slots[0];
+      return { subj, slots, firstDay: firstSlot?dayOrder[firstSlot.day]??99:99, firstTime: firstSlot?.time||'zzz' };
+    });
+    subjsWithSlots.sort((a,b)=>a.firstDay-b.firstDay||(a.firstTime<b.firstTime?-1:1));
+
+    return subjsWithSlots.map(({subj, slots})=>{
       const realSubj = subj.replace(/\(맞춤형\)|\(방과후\)$/,'');
       const color = gc(realSubj);
       const instr = INSTRUCTOR_MAP[realSubj];
-      const slots = getSubjSchedule(subj);
-      const dayOrder = {월:0,화:1,수:2,목:3,금:4};
       slots.sort((a,b)=>(dayOrder[a.day]||0)-(dayOrder[b.day]||0)||(a.time<b.time?-1:1));
       const dayGroups = {};
       slots.forEach(s=>{ if(!dayGroups[s.day]) dayGroups[s.day]=[]; dayGroups[s.day].push(s.cls+' '+s.time); });
@@ -2438,7 +2447,15 @@ function showRoomSearch(){
       document.getElementById('room-body').innerHTML='<div style="text-align:center;padding:30px;color:#aaa;font-size:13px;">검색 결과 없음</div>';
       return;
     }
-    document.getElementById('room-body').innerHTML = matched.map(({subj,room})=>{
+    document.getElementById('room-body').innerHTML = matched.sort((a,b)=>{
+      const dayOrder2={월:0,화:1,수:2,목:3,금:4};
+      const sa=getSubjSchedule(a.subj); const sb=getSubjSchedule(b.subj);
+      sa.sort((x,y)=>(dayOrder2[x.day]||0)-(dayOrder2[y.day]||0)||(x.time<y.time?-1:1));
+      sb.sort((x,y)=>(dayOrder2[x.day]||0)-(dayOrder2[y.day]||0)||(x.time<y.time?-1:1));
+      const da=sa[0]?dayOrder2[sa[0].day]??99:99, db=sb[0]?dayOrder2[sb[0].day]??99:99;
+      const ta=sa[0]?.time||'zzz', tb=sb[0]?.time||'zzz';
+      return da-db||(ta<tb?-1:1);
+    }).map(({subj,room})=>{
       const color=gc(subj);
       const instr=INSTRUCTOR_MAP[subj];
       const slots=getSubjSchedule(subj);
