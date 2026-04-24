@@ -188,8 +188,8 @@ button{font-family:inherit;}
   .screen { height: auto; min-height: 100%; }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
-<body>
 <div id="app">
   <!-- 배너 -->
   <div id="banner" class="banner" onclick="openURL('https://docs.google.com/spreadsheets/d/1MyVaKkPrHjszfRBFaMoagYGBE-K14YX7dIEFiihDGh4/edit?resourcekey=&gid=1491309601#gid=1491309601')">
@@ -409,7 +409,47 @@ const CALENDAR = {
   "2026-07-25":[{type:"vacation",label:"여름방학 시작(~8/18)"}]
 };
 
-const DAYS = ["월","화","수","목","금"];
+const LUNCH = {
+  "2026-04-01":["잡곡밥","옹심이들깨미역국","물미역/초장","한우안심잡채","에그타르트","배추김치"],
+  "2026-04-02":["칼슘강화찹쌀밥","부대찌개","호박느타리볶음","달걀맛살말이","깍두기","베리요거트펀치"],
+  "2026-04-03":["찰옥수수밥","콩나물무채국","모듬봄나물무침","오삼불고기","배추김치","브로콜리두부무침"],
+  "2026-04-06":["친환경쌀발아현미밥","꽃게탕","미역콩나물무침","분모자찜닭","사각어묵볶음","배추김치"],
+  "2026-04-07":["강황쌀밥","쇠고기무국","도토리묵참나물무침","낙지볶음","명엽채볶음","열무김치"],
+  "2026-04-08":["인델리카레/공룡치킨","떡과일샐러드","오이도라지진미채무침","메밀전병/양념간장","배추김치"],
+  "2026-04-09":["전복톳영양밥","팽이버섯된장국","코다리무조림","봄동겉절이","회오리감자","딸기"],
+  "2026-04-10":["친환경쌀차조밥","황기닭곰탕/당면","유채나물","김치전","섞박지","바나나"],
+  "2026-04-13":["찰보리감자밥","바지락시금치된장국","수육","보쌈김치","봄쌈&저염쌈장","오렌지"],
+  "2026-04-14":["친환경쌀기장밥","만두육개장","어묵감자조림","돌미나리나물","가자미카레튀김","배추김치"],
+  "2026-04-15":["미니밥/돌자반","미소된장국","슬림단무지","쫄면야채무침","돈까스/과일소스"],
+  "2026-04-16":["친환경쌀차조밥","삼색감자옹심이국","아귀간장찜","취나물두부들깨무침","소시지채소볶음","배추김치","씨없는포도"],
+  "2026-04-17":["한우볶음밥","근대된장국","닭봉튀김/간장소스","깍두기","골드파인애플"],
+  "2026-04-20":["강낭콩밥","돈목살김치찜","순두부백탕","두릅무침/초장","숙주미나리무침","깍두기","아츄"],
+  "2026-04-21":["라이코펜쌀밥","떡만두국","배추겉절이","열대과일샐러드","떡갈비/양파채간장"],
+  "2026-04-22":["우동","꼬들오이지무침","떡볶이","오사카군만두","배추김치","골드키위"],
+  "2026-04-23":["클로렐라기장밥","감자탕","오이된장무침","씨앗멸치볶음","호박새우살전","섞박지"],
+  "2026-04-24":["곤드레밥/달래양념간장","누룽지탕","묵은지들기름볶음","김구이","치즈볼"],
+  "2026-04-27":["찰옥수수밥","참치김치찌개","계란장조림","어수리나물","코다리순살강","열무김치"],
+  "2026-04-28":["오색찹쌀밥","오징어무국","물미역콩나물무침","춘천닭갈비","옥수수콘치즈","배추김치"],
+  "2026-04-29":["과일양상추샐러드/오렌지D","명란버섯로제스파게티","고구마품은미니함박","깍두기","오이피클","사과즙100%"],
+  "2026-04-30":["흑미밥","장터쇠고기국","두부조림","고등어카레구이","브로콜리무침","섞박지"],
+  "2026-05-06":["기장팥찰밥","전복미역국","LA돼지갈비구이","근대장무침","탕평채","배추김치","두쫀쿠"],
+  "2026-05-07":["차수수밥","아욱된장국","임연수무조림","감자채햄볶음","건파래볶음","배추김치","납작복숭아곤약젤리"],
+  "2026-05-08":["후리카케밥","단호박크림스프","돈까스/브라운소스","배추김치","모닝빵","건강샐러드"],
+  "2026-05-11":["클로렐라밥","쇠고기무국","어수리나물","닭볶음탕","고구마연근맛탕","깍두기"],
+  "2026-05-12":["친환경쌀기장밥","대구맑은탕","갈배제육볶음","미역줄기팽이볶음","배추김치","메론"],
+  "2026-05-13":["자장면","단무지부추무침","꿔바로우 탕수육","사과쥬스","찐만두"],
+  "2026-05-14":["친환경쌀발아현미밥","돈육김치찌개","쇠고기메추리알장조림","무생채","어묵채곤약볶음","라구콘치즈빠네"],
+  "2026-05-15":["칼슘강화찹쌀밥","병천순대국","부추겉절이","감자전","깍두기","야채스틱/쌈장"],
+  "2026-05-18":["누룽지향찹쌀밥","감자탕","달걀찜","숙주꼬들무채장아찌무침","오징어김치볶음","섞박지"],
+  "2026-05-19":["친환경쌀차조밥","김치콩나물국","두부조림","순살치킨&감자튀김","총각김치","참외"],
+  "2026-05-20":["연잎떡갈비소보로덮밥","누룽지탕","깍두기","요아정(초코)"],
+  "2026-05-21":["감자보리밥","배추된장국","수육","꼬막양념무침","상추쌈/깻잎/쌈장","배추김치","만다린"],
+  "2026-05-22":["내가만들어먹는 유부초밥","어묵국","떡볶이","순대/소금","김말이","단무지"],
+  "2026-05-26":["아미노강화쌀밥","사골우거지국","열무호박무침","마늘쫑엿장조림","적어구이","배추김치","짜먹는 요구르트"],
+  "2026-05-27":["잔치국수","후렌치토스트","지중해식샐러드","양념배추김치"],
+  "2026-05-28":["흑미차조밥","꽃게탕","취나물무침","건새우멸치볶음","떡갈비강정","배추김치"],
+  "2026-05-29":["한우안심하이라이스","오이목이버섯무침","대만식치파이","깍두기","청사과 아이스티"],
+};
 // 이번주 월~금 날짜 동적 계산 (토·일은 다음주 기준)
 function getThisWeekRange(){
   const today = new Date();
@@ -436,6 +476,7 @@ function buildDayDates(){
   return map;
 }
 const DAY_DATES = buildDayDates();
+const DAYS = ["월","화","수","목","금"];
 const CLASS_LABELS = ["1학년 1반","1학년 2반","1학년 3반","1학년 4반","2학년 1반","2학년 2반","2학년 3반","2학년 4반"];
 
 // 색상
@@ -1850,6 +1891,119 @@ function getPlace(subj){
   return '장소 미정';
 }
 
+// ── 시간표 엑셀 다운로드 ──
+function downloadTimetableXlsx(clsOnly){
+  const wr = getThisWeekRange();
+  const clsList = clsOnly
+    ? [currentTTClass]
+    : CLASS_LABELS.map(cl=>`${cl[0]}-${cl[4]}`);
+
+  const wb = XLSX.utils.book_new();
+
+  const SUBJ_COLORS = {
+    발레:'1F3864',음악줄넘기:'1F3864',놀이체육:'1F3864','축구(풋살)':'1F3864',뉴스포츠:'215868',
+    오카리나:'7030A0',종이접기:'7030A0',그림책놀이:'7030A0',책놀이:'7030A0',우쿨렐레:'7030A0',
+    방송댄스:'C00000',주산암산:'833C00',토탈공예:'833C00',창의미술:'843C0C',칼라클레이:'843C0C',
+    도자공예:'7B2C00',창의과학:'17375E',중국어:'17375E',보드게임:'4B2A94',
+    영어회화:'375623',영어야놀자:'375623',전래놀이:'C00000',
+    로봇과학:'FF6B35',로봇과학A:'FF6B35',로봇과학B:'E55A00',컴퓨터:'2C6BB5',
+  };
+  function getColor(subj){ if(!subj) return '555555'; for(const[k,v] of Object.entries(SUBJ_COLORS)) if(subj.includes(k)) return v; return '555555'; }
+  function getPlace(subj){ return PLACE_MAP_WEB?.[subj]||''; }
+
+  for(const cls of clsList){
+    const sc=SCHEDULES[cls]||{};
+    const grade=parseInt(cls[0]);
+    const is2=grade===2;
+    const gradeLabel=`${grade}학년 ${cls[2]}반`;
+
+    function getSubj(day, slotIdx){
+      const dj=sc[day]||[];
+      if(!is2){ if(day==='월'||day==='수') return dj[slotIdx]; else return slotIdx===0?null:dj[slotIdx-1]; }
+      else { if(day==='수') return dj[slotIdx]; else if(day==='월') return slotIdx===0?null:dj[slotIdx]; else return slotIdx===0?null:dj[slotIdx-1]; }
+    }
+
+    const slotLabels = !is2
+      ?['맞춤형 1교시\n(월·수 13:10~13:50 / 화·목·금 13:50~14:30)','맞춤형 2교시\n(월·수 14:00~14:40 / 화·목·금 14:40~15:20)']
+      :['맞춤형 1교시\n(수 13:10~13:50 / 화·목·금 13:50~14:30)','맞춤형 2교시\n(월·수 14:00~14:40 / 화·목·금 14:40~15:20)','맞춤형 3교시\n(월 14:40~15:20)'];
+
+    // 행 구성
+    const rows=[];
+    // 헤더
+    rows.push([gradeLabel+' 맞춤형 시간표','월 '+DAY_DATES['월'],'화 '+DAY_DATES['화'],'수 '+DAY_DATES['수'],'목 '+DAY_DATES['목'],'금 '+DAY_DATES['금']]);
+    rows.push(['기간: '+wr.mon+'(월) ~ '+wr.fri+'(금)','','','','','']);
+    rows.push(['정규수업 (1~4교시)','정규수업','정규수업','정규수업','정규수업','정규수업']);
+    rows.push(['점심 🍱 11:30','점심','점심','점심','점심','점심']);
+    for(let i=0;i<slotLabels.length;i++){
+      const row=[slotLabels[i]];
+      for(const day of DAYS){
+        const subj=getSubj(day,i);
+        if(!subj||subj==='—'){ row.push((!is2&&(day!=='월'&&day!=='수')&&i===0)||(is2&&day!=='수'&&i===0)?'정규수업':'—'); }
+        else { const pl=getPlace(subj); row.push(subj+(pl?' ('+pl+')':'')); }
+      }
+      rows.push(row);
+    }
+    rows.push(['하교',...DAYS.map(d=>(!is2&&(d==='월'||d==='수'))||(is2&&d==='수')?'14:40 하교':'15:20 하교')]);
+
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+
+    // 열 너비
+    ws['!cols']=[{wch:32},{wch:18},{wch:18},{wch:18},{wch:18},{wch:18}];
+    // 행 높이
+    ws['!rows']=rows.map((_,i)=>({hpt: i<2?20:i>=4&&i<4+slotLabels.length?48:20}));
+
+    XLSX.utils.book_append_sheet(wb, ws, gradeLabel);
+  }
+
+  const fname=clsOnly
+    ? `정라초_${currentTTClass}반_시간표_${wr.mon.replace('/','')}-${wr.fri.replace('/','')}.xlsx`
+    : `정라초_전체반_시간표_${wr.mon.replace('/','')}-${wr.fri.replace('/','')}.xlsx`;
+  XLSX.writeFile(wb, fname);
+}
+
+function showLunchPopup(dateLabel, key){
+  const menu = LUNCH&&LUNCH[key]||[];
+  const lunchEmoji = m=>{
+    if(/밥|보|덮밥|볶음밥|국수|면|우동|스파게티/.test(m)) return '🍚';
+    if(/국|찌개|탕|스프|뚝배기/.test(m)) return '🍲';
+    if(/김치|깍두기|나물|무침|겉절이|장아찌|섞박지/.test(m)) return '🥬';
+    if(/구이|볶음|조림|찜|전|튀김|까스|강정|떡갈비/.test(m)) return '🍳';
+    if(/과일|딸기|바나나|사과|메론|키위|참외|귤|포도|망고/.test(m)) return '🍎';
+    if(/케이크|쿠키|타르트|빵|토스트|모닝빵|젤리|요거트|요구르트|펀치|아이스|주스/.test(m)) return '🍰';
+    if(/샐러드/.test(m)) return '🥗';
+    return '🍽';
+  };
+
+  showPopup(`
+    <div style="background:linear-gradient(135deg,#F6A623,#B8860B);padding:16px 18px 14px;border-radius:18px 18px 0 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="color:#fff;font-size:17px;font-weight:900;">🍱 ${dateLabel} 급식</div>
+          <div style="color:rgba(255,255,255,0.8);font-size:11px;margin-top:2px;">정라초등학교 오늘의 급식</div>
+        </div>
+        <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer;">✕</button>
+      </div>
+    </div>
+    <div style="padding:14px 16px;max-height:55vh;overflow-y:auto;">
+      ${menu.length ? menu.map((m,i)=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;
+          border-bottom:${i<menu.length-1?'1px solid #F5F0E8':'none'};">
+          <span style="font-size:20px;flex-shrink:0;">${lunchEmoji(m)}</span>
+          <span style="font-size:14px;font-weight:${i===0?'800':'600'};color:${i===0?'#B8860B':'#333'};">${m}</span>
+          ${i===0?'<span style="background:#FFF3CD;color:#B8860B;font-size:9px;font-weight:800;border-radius:4px;padding:1px 6px;flex-shrink:0;">주식</span>':''}
+        </div>`).join('')
+      : `<div style="text-align:center;padding:30px;color:#aaa;">
+          <div style="font-size:36px;margin-bottom:8px;">🚫</div>
+          <div style="font-size:14px;">급식 정보가 없습니다</div>
+          <div style="font-size:11px;margin-top:4px;">(공휴일 또는 주말)</div>
+        </div>`}
+    </div>
+    <div style="padding:0 16px 14px;">
+      <button onclick="closePopup()" style="width:100%;background:#FFF5D6;border:1.5px solid #F0C040;border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:#B8860B;cursor:pointer;">닫기</button>
+    </div>
+  `);
+}
+
 function showSubjDetail(subj, day, slot){
   const color = gc(subj);
   const instr = INSTRUCTOR_MAP[subj];
@@ -2065,8 +2219,13 @@ function renderTimetable(){
 
   document.getElementById('screen-timetable').innerHTML = `
     <div style="background:${hc};padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
-      <div style="color:#fff;font-size:20px;font-weight:800">반별 시간표</div>
-      <div style="color:#fff;font-size:12px;opacity:0.7">${getThisWeekRange().mon}(월) ~ ${getThisWeekRange().fri}(금) · 과목 터치 시 상세 확인</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="color:#fff;font-size:20px;font-weight:800">반별 시간표</div>
+          <div style="color:#fff;font-size:12px;opacity:0.7">${getThisWeekRange().mon}(월) ~ ${getThisWeekRange().fri}(금) · 과목 터치 시 상세 확인</div>
+        </div>
+        
+      </div>
     </div>
     <!-- 반 탭 -->
     <div style="display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);padding:10px 12px;gap:6px">
@@ -2100,7 +2259,21 @@ function renderTimetable(){
           <!-- 점심 -->
           <tr style="background:#FFFBF0">
             <td style="padding:5px 4px;background:#FFF5D6;font-size:8px;color:#B8860B;font-weight:700;text-align:center">점심<br><span style="font-weight:400">11:30</span></td>
-            ${DAYS.map(()=>`<td style="padding:3px 2px;text-align:center"><div style="background:#FFF5D6;border-radius:6px;padding:5px 3px;font-size:9px;color:#B8860B;min-height:28px;display:flex;align-items:center;justify-content:center">🍱 점심</div></td>`).join('')}
+            ${DAYS.map(d=>{
+              const [m,dy]=DAY_DATES[d].split('/');
+              const yr=new Date().getFullYear();
+              const key=`${yr}-${String(m).padStart(2,'0')}-${String(dy).padStart(2,'0')}`;
+              const menu=LUNCH&&LUNCH[key]||[];
+              return `<td style="padding:3px 2px;text-align:center">
+                <div onclick="showLunchPopup('${d} ${DAY_DATES[d]}','${key}')"
+                  style="background:#FFF5D6;border-radius:6px;padding:5px 3px;font-size:9px;color:#B8860B;
+                  min-height:28px;display:flex;align-items:center;justify-content:center;
+                  cursor:pointer;border:1px solid ${menu.length?'#F0C040':'transparent'};
+                  transition:background .1s;" onmouseover="this.style.background='#FDEEA0'" onmouseout="this.style.background='#FFF5D6'">
+                  🍱
+                </div>
+              </td>`;
+            }).join('')}
           </tr>
           <!-- 맞춤형 슬롯 3행 -->
           ${renderSlotRow(0)}
