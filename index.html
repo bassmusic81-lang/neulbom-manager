@@ -1061,15 +1061,21 @@ function renderHome(){
       </div>
     </div>
 
-    <!-- 일일시정표 -->
-    <div style="padding:10px 16px 0;">
-      <button onclick="showSchedulePopup()" style="width:100%;background:#fff;border:1.5px solid #E0E7FF;border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,0.06);">
-        <span style="font-size:24px;">📅</span>
+    <!-- 일일시정표 + 교실 검색 -->
+    <div style="padding:10px 16px 0;display:flex;gap:8px;">
+      <button onclick="showSchedulePopup()" style="flex:1;background:#fff;border:1.5px solid #E0E7FF;border-radius:14px;padding:13px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,0.06);">
+        <span style="font-size:22px;">📅</span>
         <div style="flex:1;text-align:left;">
-          <div style="font-size:13px;font-weight:800;color:#1F3864;">일일시정표</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">교시별 수업시간 확인</div>
+          <div style="font-size:12px;font-weight:800;color:#1F3864;">일일시정표</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:1px;">교시별 수업시간</div>
         </div>
-        <span style="color:var(--muted);font-size:18px;">›</span>
+      </button>
+      <button onclick="showRoomSearch()" style="flex:1;background:#fff;border:1.5px solid #E0F2E9;border-radius:14px;padding:13px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,0.06);">
+        <span style="font-size:22px;">🏫</span>
+        <div style="flex:1;text-align:left;">
+          <div style="font-size:12px;font-weight:800;color:#2E7D32;">교실별 수업</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:1px;">교실 수업 검색</div>
+        </div>
       </button>
     </div>
 
@@ -1903,7 +1909,176 @@ function getPlace(subj){
   return '장소 미정';
 }
 
-// ── 시간표 엑셀 다운로드 ──
+function showRoomSearch(){
+  // 교실 → 수업 역방향 맵 생성
+  const roomMap = {};
+  for(const [subj, place] of Object.entries(PLACE_MAP_WEB)){
+    if(!roomMap[place]) roomMap[place]=[];
+    roomMap[place].push(subj);
+  }
+  const rooms = Object.keys(roomMap).sort();
+
+  // 각 수업의 시간표 정보 수집
+  function getSubjSchedule(subj){
+    const slots = [];
+    for(const day of DAYS){
+      for(const cls of Object.keys(SCHEDULES)){
+        const dj = SCHEDULES[cls][day]||[];
+        dj.forEach((s,i)=>{
+          if(s && s.includes(subj)){
+            const grade = parseInt(cls[0]);
+            const is2 = grade===2;
+            let time='';
+            if(!is2){
+              if(day==='월'||day==='수') time=i===0?'13:10~13:50':'14:00~14:40';
+              else time=i===0?'13:50~14:30':'14:40~15:20';
+            } else {
+              if(day==='수') time=i===0?'13:10~13:50':'14:00~14:40';
+              else if(day==='월') time=i===1?'14:00~14:40':'14:40~15:20';
+              else time=i===0?'13:50~14:30':'14:40~15:20';
+            }
+            slots.push({day, cls, time});
+          }
+        });
+      }
+    }
+    return slots;
+  }
+
+  const EMOJI_MAP={발레:'🩰','축구(풋살)':'⚽',종이접기:'📄',도자공예:'🏺',그림책놀이:'📖',칼라클레이:'🎨',음악줄넘기:'🎵',오카리나:'🎶',방송댄스:'💃',뉴스포츠:'🏃',로봇과학:'🤖',컴퓨터:'💻',주산암산:'🧮',우쿨렐레:'🎸',창의과학:'🔬',보드게임:'🎲',영어회화:'🗣️',토탈공예:'✂️',중국어:'🇨🇳',놀이체육:'🏅',전래놀이:'🪀',영어야놀자:'🗣️',창의미술:'🖌️',책놀이:'📚'};
+  function getEmoji(s){ return EMOJI_MAP[s]||'📚'; }
+  const SUB_COLORS = {음악줄넘기:'#1F3864',놀이체육:'#1F3864','축구(풋살)':'#1F3864',
+    뉴스포츠:'#215868',오카리나:'#7030A0',종이접기:'#7030A0',그림책놀이:'#7030A0',
+    책놀이:'#7030A0',우쿨렐레:'#7030A0',방송댄스:'#C00000',주산암산:'#833C00',
+    토탈공예:'#833C00',창의미술:'#843C0C',칼라클레이:'#843C0C',도자공예:'#7B2C00',
+    창의과학:'#17375E',중국어:'#17375E',보드게임:'#4B2A94',영어회화:'#375623',
+    영어야놀자:'#375623',전래놀이:'#C00000',로봇과학:'#FF6B35',컴퓨터:'#2C6BB5',
+  };
+  function gc(subj){ for(const[k,v] of Object.entries(SUB_COLORS)) if(subj.includes(k)) return v; return '#555'; }
+
+  function buildRoomContent(room){
+    const subjs = roomMap[room]||[];
+    if(!subjs.length) return '<div style="padding:20px;text-align:center;color:#aaa;">수업 없음</div>';
+    return subjs.map(subj=>{
+      const color = gc(subj);
+      const instr = INSTRUCTOR_MAP[subj];
+      const slots = getSubjSchedule(subj);
+      const dayGroups = {};
+      slots.forEach(s=>{ if(!dayGroups[s.day]) dayGroups[s.day]=[]; dayGroups[s.day].push(s.cls+' '+s.time); });
+      return `
+      <div style="background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;
+        border-left:4px solid ${color};box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:16px;">${getEmoji(subj)}</span>
+          <span style="font-size:15px;font-weight:900;color:${color};">${subj}</span>
+          ${instr?`<span style="font-size:11px;color:#888;margin-left:auto;">👤 ${instr.name}</span>`:''}
+        </div>
+        ${Object.keys(dayGroups).length?`
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          ${Object.entries(dayGroups).map(([day,times])=>`
+          <div style="background:${color}0F;border:1px solid ${color}33;border-radius:8px;padding:4px 10px;">
+            <span style="font-size:11px;font-weight:800;color:${color};">${day}요일</span>
+            <div style="font-size:10px;color:#666;margin-top:1px;">${[...new Set(times.map(t=>t.split(' ')[1]))].join(' / ')}</div>
+          </div>`).join('')}
+        </div>`:'<div style="font-size:11px;color:#aaa;">시간표 미배정</div>'}
+      </div>`;
+    }).join('');
+  }
+
+  function roomTabsHTML(room){
+    return rooms.map(r=>`
+      <button onclick="switchRoom('${r.replace(/'/g,"\\'")}')"
+        style="white-space:nowrap;padding:6px 10px;border:1.5px solid ${r===room?'#1F3864':'#e0e0e0'};
+          border-radius:20px;background:${r===room?'#1F3864':'#fff'};
+          color:${r===room?'#fff':'#555'};font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">
+        ${r}
+      </button>`).join('');
+  }
+
+  const initRoom = rooms[0]||'';
+  showPopup(`
+    <div style="background:linear-gradient(135deg,#1F3864,#2C5282);padding:16px 18px 14px;border-radius:18px 18px 0 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div>
+          <div style="color:#fff;font-size:17px;font-weight:900;">🏫 교실별 수업 검색</div>
+          <div style="color:rgba(255,255,255,0.75);font-size:11px;margin-top:2px;">수업명 또는 교실명으로 검색</div>
+        </div>
+        <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer;">✕</button>
+      </div>
+      <!-- 검색창 -->
+      <div style="position:relative;margin-bottom:10px;">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;">🔍</span>
+        <input id="room-search-input" type="text" placeholder="수업명 또는 교실 검색…"
+          oninput="filterRoomSearch(this.value)"
+          autocomplete="off" autocorrect="off" autocapitalize="off"
+          style="width:100%;box-sizing:border-box;padding:9px 12px 9px 32px;border:none;border-radius:10px;
+            font-size:13px;outline:none;background:rgba(255,255,255,0.95);">
+      </div>
+      <!-- 교실 칩 스크롤 -->
+      <div id="room-tabs" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;">
+        ${roomTabsHTML(initRoom)}
+      </div>
+    </div>
+    <div id="room-body" style="padding:12px;max-height:52vh;overflow-y:auto;background:#F8F9FA;">
+      ${buildRoomContent(initRoom)}
+    </div>
+  `);
+
+  window.switchRoom=(room)=>{
+    document.getElementById('room-tabs').innerHTML=roomTabsHTML(room);
+    document.getElementById('room-body').innerHTML=buildRoomContent(room);
+  };
+
+  // 수업명/교실명 통합 검색
+  window.filterRoomSearch=(q)=>{
+    q = q.trim();
+    if(!q){
+      // 검색어 없으면 교실 탭 모드 복원
+      document.getElementById('room-tabs').style.display='flex';
+      document.getElementById('room-tabs').innerHTML=roomTabsHTML(initRoom);
+      document.getElementById('room-body').innerHTML=buildRoomContent(initRoom);
+      return;
+    }
+    document.getElementById('room-tabs').style.display='none';
+    // 수업명 or 교실명 검색
+    const matched = [];
+    for(const [room, subjs] of Object.entries(roomMap)){
+      for(const subj of subjs){
+        if(subj.includes(q) || room.includes(q)){
+          if(!matched.find(m=>m.subj===subj)) matched.push({subj,room});
+        }
+      }
+    }
+    // 강사명 검색
+    for(const [subj, info] of Object.entries(INSTRUCTOR_MAP)){
+      if(info.name && info.name.includes(q)){
+        const room = PLACE_MAP_WEB[subj]||'장소 미정';
+        if(!matched.find(m=>m.subj===subj)) matched.push({subj,room});
+      }
+    }
+    if(!matched.length){
+      document.getElementById('room-body').innerHTML='<div style="text-align:center;padding:30px;color:#aaa;font-size:13px;">검색 결과 없음</div>';
+      return;
+    }
+    document.getElementById('room-body').innerHTML = matched.map(({subj,room})=>{
+      const color=gc(subj);
+      const instr=INSTRUCTOR_MAP[subj];
+      const slots=getSubjSchedule(subj);
+      const dayGroups={};
+      slots.forEach(s=>{if(!dayGroups[s.day])dayGroups[s.day]=[];dayGroups[s.day].push(s.cls+' '+s.time);});
+      return `<div style="background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:4px solid ${color};box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+        <div style="font-size:10px;color:#aaa;margin-bottom:6px;">📍 ${room}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:16px;">${getEmoji(subj)}</span>
+          <span style="font-size:15px;font-weight:900;color:${color};">${subj}</span>
+          ${instr?`<span style="font-size:11px;color:#888;margin-left:auto;">👤 ${instr.name}</span>`:''}
+        </div>
+        ${Object.keys(dayGroups).length?`<div style="display:flex;flex-wrap:wrap;gap:5px;">${Object.entries(dayGroups).map(([day,times])=>`<div style="background:${color}0F;border:1px solid ${color}33;border-radius:8px;padding:4px 10px;"><span style="font-size:11px;font-weight:800;color:${color};">${day}요일</span><div style="font-size:10px;color:#666;margin-top:1px;">${[...new Set(times.map(t=>t.split(' ')[1]))].join(' / ')}</div></div>`).join('')}</div>`:'<div style="font-size:11px;color:#aaa;">시간표 미배정</div>'}
+      </div>`;
+    }).join('');
+  };
+}
+
 function downloadTimetableXlsx(clsOnly){
   const wr = getThisWeekRange();
   const clsList = clsOnly
@@ -1974,153 +2149,87 @@ function downloadTimetableXlsx(clsOnly){
 }
 
 function showSchedulePopup(){
-  const today = new Date();
-  const dow = today.getDay(); // 0=일,1=월,...,6=토
-  // 요일별 시정표 데이터
-  const SCHEDULE_TABLE = {
-    월: {
-      grade: "1~2학년",
-      rows: [
-        {time:"08:50~09:10", label:"아침활동"},
-        {time:"09:10~09:50", label:"1교시"},
-        {time:"09:50~10:00", label:"휴식"},
-        {time:"10:00~10:40", label:"2교시"},
-        {time:"10:40~10:50", label:"휴식"},
-        {time:"10:50~11:30", label:"3교시"},
-        {time:"11:30~12:20", label:"점심시간", color:"#B8860B"},
-        {time:"12:20~13:00", label:"4교시"},
-        {time:"13:00~13:40", label:"5교시"},
-        {time:"13:40~15:00", label:"방과후 교육활동", color:"#1F3864"},
-      ]
-    },
-    화: {
-      grade: "1~2학년",
-      rows: [
-        {time:"08:50~09:10", label:"아침활동"},
-        {time:"09:10~09:50", label:"1교시"},
-        {time:"09:50~10:00", label:"휴식"},
-        {time:"10:00~10:40", label:"2교시"},
-        {time:"10:40~10:50", label:"휴식"},
-        {time:"10:50~11:30", label:"3교시"},
-        {time:"11:30~12:20", label:"점심시간", color:"#B8860B"},
-        {time:"12:20~13:00", label:"4교시"},
-        {time:"13:00~13:10", label:"휴식"},
-        {time:"13:10~13:50", label:"5교시"},
-        {time:"13:50~14:30", label:"맞춤형 1교시", color:"#1F3864", highlight:true},
-        {time:"14:30~16:00", label:"맞춤형 2교시 / 방과후", color:"#1F3864", highlight:true},
-      ]
-    },
-    수: {
-      grade: "1~2학년",
-      rows: [
-        {time:"08:50~09:10", label:"아침활동"},
-        {time:"09:10~09:50", label:"1교시"},
-        {time:"09:50~10:00", label:"휴식"},
-        {time:"10:00~10:40", label:"2교시"},
-        {time:"10:40~10:50", label:"휴식"},
-        {time:"10:50~11:30", label:"3교시"},
-        {time:"11:30~12:20", label:"점심시간", color:"#B8860B"},
-        {time:"12:20~13:00", label:"4교시"},
-        {time:"13:00~13:10", label:"휴식"},
-        {time:"13:10~13:50", label:"맞춤형 1교시 (1학년)", color:"#1F3864", highlight:true},
-        {time:"14:00~14:40", label:"맞춤형 1·2교시 (2학년)", color:"#833C00", highlight:true},
-        {time:"14:30~16:00", label:"맞춤형 2교시 / 방과후", color:"#1F3864", highlight:true},
-      ]
-    },
-    목: {
-      grade: "1~2학년",
-      rows: [
-        {time:"08:50~09:10", label:"아침활동"},
-        {time:"09:10~09:50", label:"1교시"},
-        {time:"09:50~10:00", label:"휴식"},
-        {time:"10:00~10:40", label:"2교시"},
-        {time:"10:40~10:50", label:"휴식"},
-        {time:"10:50~11:30", label:"3교시"},
-        {time:"11:30~12:20", label:"점심시간", color:"#B8860B"},
-        {time:"12:20~13:00", label:"4교시"},
-        {time:"13:00~13:10", label:"휴식"},
-        {time:"13:10~13:50", label:"5교시"},
-        {time:"13:50~14:30", label:"맞춤형 1교시", color:"#1F3864", highlight:true},
-        {time:"14:30~16:00", label:"맞춤형 2교시 / 방과후", color:"#1F3864", highlight:true},
-      ]
-    },
-    금: {
-      grade: "1~2학년",
-      rows: [
-        {time:"08:50~09:10", label:"아침활동"},
-        {time:"09:10~09:50", label:"1교시"},
-        {time:"09:50~10:00", label:"휴식"},
-        {time:"10:00~10:40", label:"2교시"},
-        {time:"10:40~10:50", label:"휴식"},
-        {time:"10:50~11:30", label:"3교시"},
-        {time:"11:30~12:20", label:"점심시간", color:"#B8860B"},
-        {time:"12:20~13:00", label:"4교시"},
-        {time:"13:00~13:10", label:"휴식"},
-        {time:"13:10~13:50", label:"5교시"},
-        {time:"13:50~14:30", label:"맞춤형 1교시", color:"#1F3864", highlight:true},
-        {time:"14:30~16:00", label:"맞춤형 2교시 / 방과후", color:"#1F3864", highlight:true},
-      ]
-    },
-  };
-  const dayNames = ["일","월","화","수","목","금","토"];
-  const todayName = dayNames[dow];
-  const tabs = ["월","화","수","목","금"];
+  const gradeTabs=["1~2학년","3학년","4~6학년"];
+  const gradeColors={"1~2학년":"#1F3864","3학년":"#2E7D32","4~6학년":"#6A1B9A"};
 
-  function buildTable(day){
-    const data = SCHEDULE_TABLE[day];
-    if(!data) return `<div style="text-align:center;padding:30px;color:#aaa;">주말</div>`;
-    return data.rows.map(row=>`
-      <div style="display:flex;align-items:center;gap:0;border-bottom:1px solid #F3F4F6;
-        background:${row.highlight?row.color+'0D':'#fff'};">
-        <div style="min-width:120px;padding:10px 12px;font-size:11px;color:#888;font-weight:600;flex-shrink:0;
-          border-right:2px solid ${row.highlight?row.color+'55':'#F3F4F6'};
-          background:${row.highlight?row.color+'08':'#FAFAFA'};">
-          ${row.time}
-        </div>
-        <div style="padding:10px 14px;font-size:13px;font-weight:${row.highlight?'800':'600'};
-          color:${row.color||'#374151'};">
-          ${row.highlight?`<span style="display:inline-block;width:6px;height:6px;background:${row.color};border-radius:3px;margin-right:6px;vertical-align:middle;"></span>`:''}${row.label}
-        </div>
+  const SCHED={
+    "1~2학년":[
+      {t:"08:50~09:10",l:"아침활동 (학급 아침활동·안전교육·스포츠클럽)"},
+      {t:"09:10~09:50",l:"1교시"},{t:"09:50~10:00",l:"휴식 (10분)"},
+      {t:"10:00~10:40",l:"2교시"},{t:"10:40~10:50",l:"휴식 (10분)"},
+      {t:"10:50~11:30",l:"3교시"},
+      {t:"11:30~12:20",l:"점심시간",c:"#B8860B"},
+      {t:"12:20~13:00",l:"4교시"},
+      {t:"13:00~13:40",l:"5교시"},
+      {t:"13:40~15:00",l:"방과후 교육활동",c:"#1F3864",h:true},
+      {t:"~16:40",     l:"교직원 연수 및 협의",c:"#888"},
+    ],
+    "3학년":[
+      {t:"08:50~09:10",l:"아침활동 (학급 아침활동·안전교육·스포츠클럽)"},
+      {t:"09:10~09:50",l:"1교시"},{t:"09:50~10:00",l:"휴식 (10분)"},
+      {t:"10:00~10:40",l:"2교시"},{t:"10:40~10:50",l:"휴식 (10분)"},
+      {t:"10:50~11:30",l:"3교시"},
+      {t:"11:30~12:20",l:"점심시간",c:"#B8860B"},
+      {t:"12:20~13:00",l:"4교시"},
+      {t:"13:00~13:10",l:"휴식 (10분)"},
+      {t:"13:10~13:50",l:"5교시"},
+      {t:"13:50~14:30",l:"6교시"},
+      {t:"14:30~16:00",l:"방과후 교육활동",c:"#2E7D32",h:true},
+      {t:"~16:40",     l:"교직원 연수 및 협의",c:"#888"},
+    ],
+    "4~6학년":[
+      {t:"08:50~09:10",l:"아침활동 (학급 아침활동·안전교육·스포츠클럽)"},
+      {t:"09:10~09:50",l:"1교시"},{t:"09:50~10:00",l:"휴식 (10분)"},
+      {t:"10:00~10:40",l:"2교시"},{t:"10:40~10:50",l:"휴식 (10분)"},
+      {t:"10:50~11:30",l:"3교시"},{t:"11:30~11:40",l:"휴식 (10분)"},
+      {t:"11:40~12:20",l:"4교시"},
+      {t:"12:20~13:10",l:"점심시간 (50분)",c:"#B8860B"},
+      {t:"13:10~13:50",l:"5교시"},
+      {t:"13:50~14:30",l:"6교시"},
+      {t:"14:30~16:00",l:"방과후 교육활동",c:"#6A1B9A",h:true},
+      {t:"~16:40",     l:"교직원 연수 및 협의",c:"#888"},
+    ],
+  };
+
+  function buildRows(grade){
+    const gc=gradeColors[grade];
+    const rows=SCHED[grade];
+    return rows.map((row,i)=>`
+      <div style="display:flex;align-items:center;border-bottom:1px solid #F3F4F6;background:${row.h?row.c+'0D':'#fff'};">
+        <div style="min-width:110px;padding:9px 12px;font-size:11px;color:#888;font-weight:600;flex-shrink:0;border-right:2px solid ${row.h?row.c+'55':'#F3F4F6'};background:${row.h?row.c+'08':'#FAFAFA'};">${row.t}</div>
+        <div style="padding:9px 13px;font-size:13px;font-weight:${row.h?800:row.c&&row.c!=='#888'?700:500};color:${row.c||'#374151'};">${row.h?'<span style="display:inline-block;width:6px;height:6px;background:'+row.c+';border-radius:3px;margin-right:6px;vertical-align:middle;"></span>':''}<span>${row.l}</span></div>
       </div>`).join('');
   }
 
-  const initDay = (dow>=1&&dow<=5) ? todayName : "월";
+  function gradeTabsHTML(grade){
+    return gradeTabs.map(g=>{
+      const gc=gradeColors[g];
+      const on=g===grade;
+      return `<button id="sched-g-${g.replace(/[~학년]/g,'_')}" onclick="switchSchedGrade('${g}')"
+        style="flex:1;padding:8px 4px;border:none;border-radius:9px;cursor:pointer;font-size:12px;font-weight:800;
+          background:${on?'#fff':'rgba(255,255,255,0.15)'};color:${on?gc:'rgba(255,255,255,0.85)'};
+          box-shadow:${on?'0 1px 4px rgba(0,0,0,0.15)':'none'};">${g}</button>`;
+    }).join('');
+  }
 
+  let curGrade="1~2학년";
   showPopup(`
     <div style="background:linear-gradient(135deg,#1F3864,#2C5282);padding:16px 18px 14px;border-radius:18px 18px 0 0;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div>
           <div style="color:#fff;font-size:17px;font-weight:900;">📅 일일시정표</div>
-          <div style="color:rgba(255,255,255,0.75);font-size:11px;margin-top:2px;">정라초등학교 1~2학년</div>
+          <div style="color:rgba(255,255,255,0.75);font-size:11px;margin-top:2px;">정라초등학교</div>
         </div>
         <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer;">✕</button>
       </div>
-      <!-- 요일 탭 -->
-      <div style="display:flex;gap:5px;margin-top:12px;">
-        ${tabs.map(d=>`
-          <button id="sched-tab-${d}" onclick="switchSchedTab('${d}')"
-            style="flex:1;padding:6px 2px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;
-              background:${d===initDay?'#fff':'rgba(255,255,255,0.15)'};
-              color:${d===initDay?'#1F3864':'rgba(255,255,255,0.85)'};">
-            ${d}
-          </button>`).join('')}
-      </div>
+      <div id="sched-grade-tabs" style="display:flex;gap:6px;">${gradeTabsHTML("1~2학년")}</div>
     </div>
-    <div id="sched-body" style="max-height:58vh;overflow-y:auto;">
-      ${buildTable(initDay)}
-    </div>
-    <div style="padding:10px 16px 14px;">
-      <div style="font-size:10px;color:#aaa;text-align:center;">※ 16:40까지 교직원 연수 및 협의</div>
-    </div>
+    <div id="sched-body" style="max-height:58vh;overflow-y:auto;">${buildRows("1~2학년")}</div>
   `);
-
-  // 탭 전환 함수 (팝업 내부용)
-  window.switchSchedTab = (day)=>{
-    tabs.forEach(d=>{
-      const btn=document.getElementById('sched-tab-'+d);
-      if(btn){ btn.style.background=d===day?'#fff':'rgba(255,255,255,0.15)'; btn.style.color=d===day?'#1F3864':'rgba(255,255,255,0.85)'; }
-    });
-    document.getElementById('sched-body').innerHTML = buildTable(day);
+  window.switchSchedGrade=(grade)=>{
+    curGrade=grade;
+    document.getElementById('sched-grade-tabs').innerHTML=gradeTabsHTML(grade);
+    document.getElementById('sched-body').innerHTML=buildRows(grade);
   };
 }
 
