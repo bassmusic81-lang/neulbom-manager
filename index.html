@@ -390,6 +390,78 @@ const INCIDENTS = [
   {seq:10,date:"4/21(화)",subject:"방송댄스",student:"1-3 최우찬 / 1-3 조경준",content:"수업 시작 전 복도에서 잡기 놀이 중 최우찬이 백태클 → 조경준 넘어짐\n강사 화장실 지도 중 부재 상황에서 발생\n최우찬·조경준·이산 3명은 평소 장난 수위 높아 매 수업 주의 지도 중\n서로 부딪히거나 타격하는 행위 빈번 → 신체 접촉 금지 강력 훈육",action:"강사 직접 훈육 완료 / 담임 통보 필요 / 3명 집중 관찰 지속",tag:"⚠ 안전사고"}
 ];
 
+// ── 출석 DB (구글폼 신청 데이터) ──
+const ATTEND_DB = [
+{"d":"2026-03-15","g":"1","c":"4","n":"김민우","t":"1교시만 참여 후 학원 이동","e":"학원 차량","note":"렛플주니어학원","cd":""},
+{"d":"2026-03-15","g":"2","c":"1","n":"문채빈","t":"1교시만 참여 후 학원 이동","e":"도보 귀가","note":"웅진싱크빅","cd":""},
+{"d":"2026-03-15","g":"1","c":"3","n":"이다은 단축수업이후19일부터요","t":"1교시만 참여 후 학원 이동","e":"보호자 동행","note":"비욘드.이경미피아노","cd":""},
+{"d":"2026-03-15","g":"1","c":"3","n":"이다은","t":"1교시만 참여 후 학원 이동","e":"보호자 동행","note":"비욘드잉글리쉬,단축수업이훚19일부터2시40분에1교시만하겠습니다","cd":""},
+{"d":"2026-03-15","g":"1","c":"3","n":"이산","t":"1교시만 참여 후 학원 이동","e":"학원 차량","note":"엘리트태권도 월,수는2교시까지 합니다.","cd":""},
+{"d":"2026-03-15","g":"2","c":"1","n":"구도안","t":"1교시만 참여 후 학원 이동","e":"도보 귀가","note":"수영학원, 웅진학원, 논술학원","cd":""},
+{"d":"2026-03-15","g":"2","c":"1","n":"유지우","t":"1교시만 참여 후 학원 이동","e":"도보 귀가","note":"2시40분 하교 원합니다.","cd":""},
+{"d":"2026-03-16","g":"1","c":"4","n":"배준원","t":"1교시만 참여 후 귀가","e":"보호자 동행","note":"","cd":""},
+{"d":"2026-03-16","g":"1","c":"3","n":"양해린","t":"1교시만 참여 후 학원 이동","e":"보호자 동행","note":"켈스케네디어학원","cd":""},
+{"d":"2026-03-16","g":"2","c":"1","n":"윤효은","t":"1교시만 참여 후 학원 이동","e":"학원 차량","note":"수요일만 맞춤형 1교시 참여합니다","cd":""},
+{"d":"2026-03-16","g":"2","c":"1","n":"김재준","t":"1교시만 참여 후 귀가","e":"학원 차량","note":"수요일은 두 과목 다 하고 월 화 목 금은 1교시만 하고 엘리트태권도학원차량 탑니다","cd":""},
+{"d":"2026-03-16","g":"2","c":"4","n":"최가윤","t":"1교시만 참여 후 귀가","e":"도보와 학원차량 귀가 요일마다 다릅니다.","note":"깐스뮤직 월 수 금 학교후문에서 차량 탑승하고, 그외에는 도보로 늘푸른 지역아동센터 갑니다.","cd":""},
+{"d":"2026-03-17","g":"2","c":"1","n":"문채빈","t":"1교시만 참여 후 귀가","e":"도보 귀가","note":"웅진씽크빅","cd":""},
+{"d":"2026-03-18","g":"2","c":"3","n":"김지유","t":"1교시만 참여 후 학원 이동","e":"도보 귀가","note":"웅진센터","cd":"2026-03-19"},
+{"d":"2026-03-20","g":"1","c":"1","n":"이소율","t":"1교시만 참여 후 귀가","e":"보호자 동행","note":"정문","cd":"2026-03-20"},
+{"d":"2026-03-22","g":"1","c":"3","n":"이산","t":"1교시만 참여 후 학원 이동","e":"학원 차량","note":"화,목,금1교시만하고 태권도 학원 가요","cd":""},
+{"d":"2026-03-22","g":"1","c":"4","n":"윤하람","t":"1교시만 참여 후 학원 이동","e":"학원 차량","note":"켈스케네디","cd":"2026-03-23"},
+{"d":"2026-03-22","g":"2","c":"1","n":"문채빈","t":"1교시만 참여 후 귀가","e":"도보 귀가","note":"웅진씽크빅","cd":""},
+{"d":"2026-03-22","g":"2","c":"2","n":"이서ㆍ우","t":"1교시만 참여 후 학원 이동","e":"학원 차량","note":"깐스뮤직","cd":"2026-03-27"},
+{"d":"2026-03-22","g":"2","c":"4","n":"박하윤","t":"1교시만 참여 후 학원 이동","e":"학원 차량","note":"기탄학원","cd":""},
+{"d":"2026-03-22","g":"1","c":"3","n":"양해린","t":"1교시만 참여 후 귀가","e":"보호자 동행","note":"월,수만 맞춤형 1교시 듣고 하교하겠습니다.","cd":""},
+{"d":"2026-03-22","g":"1","c":"1","n":"유하연","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"감기로 병원진료","cd":"2026-03-23"},
+{"d":"2026-03-23","g":"1","c":"3","n":"이산","t":"1교시만 참여 후 학원 이동","e":"학원 차량","note":"화,목,금,1교시만 진행하구요 월,수는 2교시 진행중 14시 30분에 하교해야합니다.","cd":""},
+{"d":"2026-03-23","g":"1","c":"1","n":"이소율","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"정문","cd":"2026-03-23"},
+{"d":"2026-03-24","g":"2","c":"3","n":"김지유","t":"1교시만 참여 후 학원 이동","e":"도보 귀가","note":"웅진","cd":"2026-03-24"},
+{"d":"2026-03-26","g":"2","c":"3","n":"김지유","t":"1교시만 참여 후 학원 이동","e":"도보 귀가","note":"웅진","cd":"2026-03-26"},
+{"d":"2026-03-26","g":"1","c":"1","n":"이소율","t":"1교시만 참여 후 귀가","e":"보호자 동행","note":"정문","cd":"2026-03-26"},
+{"d":"2026-03-26","g":"1","c":"1","n":"이연우","t":"1교시만 참여 후 귀가","e":"보호자 동행","note":"금요일에 1교시 끝나는 시간에 맞춰서 정문에 엄마가 기다리고 있겠습니다.","cd":"2026-03-27"},
+{"d":"2026-03-27","g":"1","c":"1","n":"이연우","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"늘봄 참여하지않고 정문으로 나오면 엄마가 기다리고 있음","cd":"2026-03-27"},
+{"d":"2026-03-29","g":"1","c":"3","n":"이산","t":"1교시만 참여 후 학원 이동","e":"학원 차량","note":"월,수는 2교시까지합니다. 수요일은 14시 30분에 나와야해요.","cd":""},
+{"d":"2026-03-30","g":"1","c":"1","n":"최예준","t":"1교시만 참여 후 귀가","e":"보호자 동행","note":"","cd":"2026-03-30"},
+{"d":"2026-04-05","g":"2","c":"1","n":"김민재","t":"1교시만 참여 후 학원 이동","e":"학원 차량","note":"이지향피아노학원","cd":"2026-04-06"},
+{"d":"2026-04-05","g":"2","c":"2","n":"김민재","t":"1교시만 참여 후 학원 이동","e":"학원 차량","note":"이지향피아노학원","cd":""},
+{"d":"2026-04-05","g":"1","c":"4","n":"양준열","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"","cd":"2026-04-10"},
+{"d":"2026-04-05","g":"2","c":"1","n":"문채빈","t":"맞춤형 프로그램 참여하지 않음","e":"학원 차량","note":"웅진씽크빅","cd":"2026-04-06"},
+{"d":"2026-04-05","g":"2","c":"3","n":"최지훈","t":"맞춤형 프로그램 참여하지 않음","e":"도보 귀가","note":"치과진료","cd":"2026-04-08"},
+{"d":"2026-04-05","g":"2","c":"3","n":"김서율","t":"맞춤형 프로그램 참여하지 않음","e":"","note":"학교 결석","cd":"2026-04-06"},
+{"d":"2026-04-06","g":"2","c":"3","n":"김서율","t":"맞춤형 프로그램 참여하지 않음","e":"","note":"학교 결석","cd":"2026-04-06"},
+{"d":"2026-04-07","g":"2","c":"1","n":"구도안","t":"맞춤형 프로그램 참여하지 않음","e":"도보 귀가","note":"","cd":"2026-04-07"},
+{"d":"2026-04-08","g":"2","c":"1","n":"문채빈","t":"맞춤형 프로그램 참여하지 않음","e":"도보 귀가","note":"","cd":"2026-04-08"},
+{"d":"2026-04-09","g":"1","c":"1","n":"박민재","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"","cd":""},
+{"d":"2026-04-10","g":"2","c":"1","n":"문채빈","t":"맞춤형 프로그램 참여하지 않음","e":"학원도보","note":"웅진씽크빅","cd":"2026-04-10"},
+{"d":"2026-04-10","g":"1","c":"1","n":"박민재","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"","cd":""},
+{"d":"2026-04-13","g":"2","c":"3","n":"정래은","t":"맞춤형 프로그램 참여하지 않음","e":"도보 귀가","note":"","cd":"2026-04-13"},
+{"d":"2026-04-13","g":"2","c":"3","n":"김지유","t":"1교시만 참여 후 학원 이동","e":"도보 귀가","note":"","cd":"2026-04-13"},
+{"d":"2026-04-14","g":"1","c":"1","n":"박민재","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"","cd":""},
+{"d":"2026-04-14","g":"1","c":"1","n":"박민재","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"알레르기 병원진료","cd":""},
+{"d":"2026-04-14","g":"1","c":"1","n":"정윤솔","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"건강검진","cd":"2026-04-15"},
+{"d":"2026-04-16","g":"1","c":"1","n":"박민재","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"","cd":""},
+{"d":"2026-04-16","g":"1","c":"3","n":"박하나","t":"맞춤형 프로그램 참여하지 않음","e":"차량 귀가","note":"치과방문","cd":"2026-04-17"},
+{"d":"2026-04-17","g":"2","c":"1","n":"문채빈","t":"맞춤형 프로그램 참여하지 않음","e":"도보학원","note":"웅진씽크빅","cd":"2026-04-17"},
+{"d":"2026-04-17","g":"1","c":"1","n":"박민재","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"","cd":""},
+{"d":"2026-04-17","g":"2","c":"1","n":"구도안","t":"맞춤형 프로그램 참여하지 않음","e":"도보 귀가","note":"학원을 다니게되어 20일부터 계속 맞춤형수업에 참여하지않습니다.","cd":"2026-04-20"},
+{"d":"2026-04-17","g":"2","c":"3","n":"정래은","t":"맞춤형 프로그램 참여하지 않음","e":"도보 귀가","note":"","cd":"2026-04-17"},
+{"d":"2026-04-19","g":"2","c":"1","n":"문채빈","t":"맞춤형 프로그램 참여하지 않음","e":"도보 귀가","note":"","cd":"2026-04-20"},
+{"d":"2026-04-20","g":"1","c":"2","n":"황준표","t":"맞춤형 프로그램 참여하지 않음","e":"출석하지 않음","note":"여행","cd":"2026-04-20"},
+{"d":"2026-04-20","g":"1","c":"2","n":"황준표","t":"맞춤형 프로그램 참여하지 않음","e":"출석하지 않음","note":"여행","cd":"2026-04-21"},
+{"d":"2026-04-20","g":"1","c":"2","n":"황준표","t":"맞춤형 프로그램 참여하지 않음","e":"출석하지않음","note":"여행","cd":"2026-04-22"},
+{"d":"2026-04-20","g":"1","c":"2","n":"황준표","t":"맞춤형 프로그램 참여하지 않음","e":"출석하지않음","note":"여행","cd":"2026-04-23"},
+{"d":"2026-04-20","g":"1","c":"2","n":"황준표","t":"맞춤형 프로그램 참여하지 않음","e":"출석하지않음","note":"여행","cd":"2026-04-24"},
+{"d":"2026-04-20","g":"2","c":"3","n":"정래은","t":"맞춤형 프로그램 참여하지 않음","e":"도보 귀가","note":"봄철피부알러지로 인해 당분간 결석해야할것같아요","cd":"2026-04-20"},
+{"d":"2026-04-21","g":"1","c":"1","n":"박민재","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"알레르기","cd":"2026-04-21"},
+{"d":"2026-04-22","g":"1","c":"1","n":"박민재","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"알레르기","cd":"2026-04-22"},
+{"d":"2026-04-23","g":"1","c":"1","n":"박민재","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"알레르기","cd":"2026-04-23"},
+{"d":"2026-04-23","g":"2","c":"1","n":"문채빈","t":"맞춤형 프로그램 참여하지 않음","e":"도보학원","note":"웅진씽크빅","cd":"2026-04-23"},
+{"d":"2026-04-23","g":"1","c":"2","n":"박무율","t":"1교시만 참여 후 귀가","e":"보호자 동행","note":"","cd":"2026-04-24"},
+{"d":"2026-04-24","g":"1","c":"1","n":"박민재","t":"1교시만 참여 후 귀가","e":"보호자 동행","note":"","cd":"2026-04-24"},
+{"d":"2026-04-24","g":"2","c":"1","n":"문채빈","t":"맞춤형 프로그램 참여하지 않음","e":"도보학원","note":"웅진씽크빅","cd":"2026-04-24"},
+];
+
 const CALENDAR = {
   "2026-03-01":[{type:"holiday",label:"삼일절"}],
   "2026-03-02":[{type:"holiday",label:"대체공휴일"}],
@@ -2577,20 +2649,154 @@ function renderTimetable(){
   `;
 }
 
+function showAttendDetail(encodedKey){
+  const [grade,cls,...nameParts]=decodeURIComponent(encodedKey).split('_');
+  const name=nameParts.join('_');
+  const recs=ATTEND_DB.filter(r=>r.g===grade&&r.c===cls&&r.n===name)
+    .sort((a,b)=>a.d<b.d?-1:1);
+
+  const TYPE_COLOR={"맞춤형 프로그램 참여하지 않음":"#DC2626","1교시만 참여 후 학원 이동":"#D97706","1교시만 참여 후 귀가":"#2563EB"};
+  const TYPE_ICON={"맞춤형 프로그램 참여하지 않음":"✗","1교시만 참여 후 학원 이동":"🏫","1교시만 참여 후 귀가":"🏠"};
+  const DAYS_KO=["일","월","화","수","목","금","토"];
+  const gc=parseInt(grade)===1?"#1F3864":"#833C00";
+
+  showPopup(`
+    <div style="background:linear-gradient(135deg,${gc},${gc}CC);padding:16px 18px 14px;border-radius:18px 18px 0 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="color:#fff;font-size:17px;font-weight:900;">${name}</div>
+          <div style="color:rgba(255,255,255,0.8);font-size:12px;margin-top:2px;">${grade}학년 ${cls}반 · 총 ${recs.length}회 신청</div>
+        </div>
+        <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer;">✕</button>
+      </div>
+    </div>
+    <div style="padding:14px;max-height:60vh;overflow-y:auto;">
+      ${recs.map((r,i)=>{
+        const dt=new Date(r.d);
+        const dow=DAYS_KO[dt.getDay()]||"?";
+        const tc=TYPE_COLOR[r.t]||"#555";
+        const icon=TYPE_ICON[r.t]||"•";
+        const applyDate=r.cd&&r.cd!==r.d?r.cd:"";
+        return `<div style="display:flex;gap:10px;padding:10px 0;border-bottom:${i<recs.length-1?"1px solid #F3F4F6":"none"};">
+          <div style="flex-shrink:0;width:60px;text-align:center;">
+            <div style="background:${tc}15;border-radius:8px;padding:6px 4px;">
+              <div style="font-size:10px;color:${tc};font-weight:800;">${dow}요일</div>
+              <div style="font-size:12px;font-weight:900;color:#374151;">${r.d.slice(5)}</div>
+            </div>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="margin-bottom:4px;">
+              <span style="background:${tc}15;color:${tc};font-size:11px;font-weight:800;border-radius:5px;padding:2px 7px;">${icon} ${r.t.replace("맞춤형 프로그램 참여하지 않음","미참여").replace("1교시만 참여 후 학원 이동","1교시 후 학원").replace("1교시만 참여 후 귀가","1교시 후 귀가")}</span>
+            </div>
+            ${r.e&&r.e!=="nan"?`<div style="font-size:11px;color:#6B7280;">🚶 ${r.e}</div>`:""}
+            ${r.note&&r.note!=="nan"&&r.note?`<div style="font-size:11px;color:#374151;margin-top:2px;">📝 ${r.note}</div>`:""}
+            ${applyDate?`<div style="font-size:10px;color:#9CA3AF;margin-top:2px;">적용일: ${applyDate.slice(0,10)}</div>`:""}
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+  `);
+}
+
+function renderAttendDB(){
+  // 학생별 집계
+  const byStudent = {};
+  ATTEND_DB.forEach(r=>{
+    const key = `${r.g}학년 ${r.c}반 ${r.n}`;
+    if(!byStudent[key]) byStudent[key]={name:r.n,grade:r.g,cls:r.c,total:0,types:{},records:[]};
+    byStudent[key].total++;
+    byStudent[key].types[r.t]=(byStudent[key].types[r.t]||0)+1;
+    byStudent[key].records.push(r);
+  });
+
+  // 유형별 색상
+  const TYPE_COLOR={'맞춤형 프로그램 참여하지 않음':'#DC2626','1교시만 참여 후 학원 이동':'#D97706','1교시만 참여 후 귀가':'#2563EB'};
+  const TYPE_LABEL={'맞춤형 프로그램 참여하지 않음':'미참여','1교시만 참여 후 학원 이동':'1교시 후 학원','1교시만 참여 후 귀가':'1교시 후 귀가'};
+  const TYPE_ICON={'맞춤형 프로그램 참여하지 않음':'✗','1교시만 참여 후 학원 이동':'🏫','1교시만 참여 후 귀가':'🏠'};
+
+  // 유형별 총계
+  const typeTotals={};
+  ATTEND_DB.forEach(r=>{ typeTotals[r.t]=(typeTotals[r.t]||0)+1; });
+
+  const sorted = Object.values(byStudent).sort((a,b)=>b.total-a.total);
+  const uniqStudents = sorted.length;
+
+  return `
+    <!-- 요약 통계 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="background:#FEE2E2;border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:22px;font-weight:900;color:#DC2626;">${ATTEND_DB.length}</div>
+        <div style="font-size:11px;color:#DC2626;font-weight:700;">총 신청 건수</div>
+      </div>
+      <div style="background:#DBEAFE;border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:22px;font-weight:900;color:#1D4ED8;">${uniqStudents}</div>
+        <div style="font-size:11px;color:#1D4ED8;font-weight:700;">신청 학생 수</div>
+      </div>
+    </div>
+    <!-- 유형별 분포 -->
+    <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+      <div style="font-size:12px;font-weight:800;color:#374151;margin-bottom:10px;">📊 신청 유형별 현황</div>
+      ${Object.entries(typeTotals).map(([type,cnt])=>{
+        const c=TYPE_COLOR[type]||'#555';
+        const lbl=TYPE_LABEL[type]||type;
+        const icon=TYPE_ICON[type]||'•';
+        const pct=Math.round(cnt/ATTEND_DB.length*100);
+        return `<div style="margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+            <span style="font-size:12px;font-weight:700;color:${c};">${icon} ${lbl}</span>
+            <span style="font-size:12px;font-weight:800;color:${c};">${cnt}건 (${pct}%)</span>
+          </div>
+          <div style="background:#F3F4F6;border-radius:4px;height:6px;">
+            <div style="background:${c};width:${pct}%;height:6px;border-radius:4px;"></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <!-- 학생별 상세 (다회 신청자 우선) -->
+    <div style="font-size:12px;font-weight:800;color:#374151;margin-bottom:8px;">👤 학생별 신청 내역</div>
+    ${sorted.map(stu=>{
+      const gc=parseInt(stu.grade)===1?'#1F3864':'#833C00';
+      const topType=Object.entries(stu.types).sort((a,b)=>b[1]-a[1])[0];
+      const tc=TYPE_COLOR[topType?.[0]]||'#555';
+      const lastRec=stu.records[stu.records.length-1];
+      const key=encodeURIComponent(stu.grade+'_'+stu.cls+'_'+stu.name);
+      return `<div onclick="showAttendDetail('${key}')" style="background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;
+        border-left:4px solid ${tc};box-shadow:0 1px 4px rgba(0,0,0,0.07);cursor:pointer;active:opacity:0.8;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:14px;font-weight:900;color:#111;">${stu.name}</span>
+          <span style="background:${gc}18;color:${gc};font-size:10px;font-weight:800;border-radius:4px;padding:1px 6px;">${stu.grade}학년 ${stu.cls}반</span>
+          <span style="margin-left:auto;background:${tc}15;color:${tc};font-size:11px;font-weight:900;border-radius:6px;padding:2px 8px;">${stu.total}회</span>
+          <span style="color:#D1D5DB;font-size:14px;">›</span>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px;">
+          ${Object.entries(stu.types).map(([t,n])=>`
+          <span style="background:${TYPE_COLOR[t]||'#555'}15;color:${TYPE_COLOR[t]||'#555'};font-size:10px;font-weight:700;border-radius:5px;padding:2px 7px;">
+            ${TYPE_ICON[t]||'•'} ${TYPE_LABEL[t]||t} ${n}회
+          </span>`).join('')}
+        </div>
+        <div style="font-size:10px;color:#9CA3AF;">최근: ${lastRec?.cd||lastRec?.d||'-'} · 탭하면 상세보기</div>
+      </div>`;
+    }).join('')}
+    <div style="text-align:center;padding:12px;font-size:11px;color:#9CA3AF;">
+      데이터 기준: 구글폼 DB (${ATTEND_DB[0]?.d||'-'} ~ ${ATTEND_DB[ATTEND_DB.length-1]?.d||'-'})
+    </div>`;
+}
+
 // ── 특이사항 ──
 function renderNotes(){
   const noteStus = STUDENTS.filter(s=>s.note);
   document.getElementById('screen-notes').innerHTML = `
     <div style="background:#7B2C00;padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
       <div style="color:#fff;font-size:20px;font-weight:800">특이사항</div>
-      <div style="color:#fff;font-size:12px;opacity:0.7">${noteStus.length}명 기록됨 · 수업별 ${INCIDENTS.length}건</div>
+      <div style="color:#fff;font-size:12px;opacity:0.7">${noteStus.length}명 기록됨 · 수업별 ${INCIDENTS.length}건 · DB ${ATTEND_DB.length}건</div>
     </div>
     <div style="display:flex;background:#fff;border-bottom:1px solid var(--border)">
-      <button onclick="notesTab='students';renderNotes()" style="flex:1;padding:12px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:700;color:${notesTab==='students'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='students'?'#7B2C00':'transparent'}">학생 특이사항</button>
-      <button onclick="notesTab='incidents';renderNotes()" style="flex:1;padding:12px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:700;color:${notesTab==='incidents'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='incidents'?'#7B2C00':'transparent'}">수업별 특이사항</button>
+      <button onclick="notesTab='students';renderNotes()" style="flex:1;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:700;color:${notesTab==='students'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='students'?'#7B2C00':'transparent'}">학생 특이사항</button>
+      <button onclick="notesTab='incidents';renderNotes()" style="flex:1;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:700;color:${notesTab==='incidents'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='incidents'?'#7B2C00':'transparent'}">수업별 특이사항</button>
+      <button onclick="notesTab='attenddb';renderNotes()" style="flex:1;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:700;color:${notesTab==='attenddb'?'#1565C0':'var(--muted)'};border-bottom:3px solid ${notesTab==='attenddb'?'#1565C0':'transparent'}">📋 출석DB</button>
     </div>
     <div style="padding:12px">
-      ${notesTab==='students' ? noteStus.map(s=>{
+      ${notesTab==='attenddb' ? renderAttendDB() : notesTab==='students' ? noteStus.map(s=>{
         const isW=s.note.includes("⚠");
         const bc=isW?"#F44336":"#FFB347";
         return `<div class="incident-card" style="border-color:${bc}">
