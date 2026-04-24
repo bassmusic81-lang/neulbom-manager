@@ -284,7 +284,7 @@ const STUDENTS = [
   {id:"13최연서",name:"최연서",grade:1,cls:3,clsKey:"1-3",clsLabel:"1학년 3반",num:18,phone:"010-7125-1507",note:""},
   {id:"14김민우",name:"김민우",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:1,phone:"010-9304-7804",note:"월 도자공예(1교시)만 / 화·수·목·금 1교시만\n후문 학원차량"},
   {id:"14박시율",name:"박시율",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:2,phone:"010-4567-0940",note:""},
-  {id:"14배준원",name:"배준원",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:3,phone:"010-2920-3865",note:"매일 1교시만 / 보호자 동행 귀가 / 화 로봇과학A(1교시)"},
+  {id:"14배준원",name:"배준원",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:3,phone:"010-2920-3865",note:"매일 1교시만 / 보호자 동행 귀가 / 화 로봇과학A(1교시)\n🏫 돌봄 대기 5번"},
   {id:"14백창훈",name:"백창훈",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:4,phone:"010-2581-4937",note:"화 로봇과학A(1교시) / 화 로봇과학B(2교시)"},
   {id:"14양준열",name:"양준열",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:5,phone:"010-7658-7536",note:"월·화·수·금 1·2교시 / 목 취소"},
   {id:"14김라움",name:"김라움",grade:1,cls:4,clsKey:"1-4",clsLabel:"1학년 4반",num:8,phone:"010-8708-0607",note:""},
@@ -387,7 +387,8 @@ const INCIDENTS = [
   {seq:7,date:"4/6~",subject:"맞춤형(정선우)",student:"2-4 정선우",content:"부진학생 보충수업으로 월·수 일부 결석",action:"출석부 비고란 결석 사유 기재 완료",tag:"📋 출석관리"},
   {seq:8,date:"4/2(목)",subject:"컴퓨터→중국어",student:"2-1 한봄",content:"컴퓨터 방과후 첫날 교실 이동 몰라 맞춤형으로 이동\n어머니 방문 후 조기하교",action:"이동 경로 재안내 필요",tag:"⚠ 조기하교"},
   {seq:9,date:"4/3(금)",subject:"전래놀이(2교시)",student:"1-1 정윤솔",content:"1-2 남학생 3명 불쾌 행동으로 조기하교",action:"신원 확인 / 담임 통보",tag:"⚠ 조기하교"},
-  {seq:10,date:"4/21(화)",subject:"방송댄스",student:"1-3 최우찬 / 1-3 조경준",content:"수업 시작 전 복도에서 잡기 놀이 중 최우찬이 백태클 → 조경준 넘어짐\n강사 화장실 지도 중 부재 상황에서 발생\n최우찬·조경준·이산 3명은 평소 장난 수위 높아 매 수업 주의 지도 중\n서로 부딪히거나 타격하는 행위 빈번 → 신체 접촉 금지 강력 훈육",action:"강사 직접 훈육 완료 / 담임 통보 필요 / 3명 집중 관찰 지속",tag:"⚠ 안전사고"}
+  {seq:10,date:"4/21(화)",subject:"방송댄스",student:"1-3 최우찬 / 1-3 조경준",content:"수업 시작 전 복도에서 잡기 놀이 중 최우찬이 백태클 → 조경준 넘어짐\n강사 화장실 지도 중 부재 상황에서 발생\n최우찬·조경준·이산 3명은 평소 장난 수위 높아 매 수업 주의 지도 중\n서로 부딪히거나 타격하는 행위 빈번 → 신체 접촉 금지 강력 훈육",action:"강사 직접 훈육 완료 / 담임 통보 필요 / 3명 집중 관찰 지속",tag:"⚠ 안전사고"},
+  {seq:11,date:"4/24(목)",subject:"놀이체육(맞춤형 2교시)",student:"2-4 최지훈",content:"맞춤형 2교시 놀이체육 수업 중 눈에 공을 맞음 → 보건실 다녀옴",action:"보건실 처치 완료",tag:"⚠ 안전사고"}
 ];
 
 // ── 출석 DB (구글폼 신청 데이터) ──
@@ -922,8 +923,54 @@ function renderDaycare(){
           <span style="font-size:10px;font-weight:600;">${DAYCARE_TEACHER[r]} 선생님</span>&nbsp;
           <span style="font-size:10px;font-weight:400;">${DAYCARE[r].length}명</span>
         </button>`).join('')}
+      <button onclick="daycareTab='__waitlist__';renderDaycare()"
+        style="flex:1;padding:12px 8px;border:none;background:none;cursor:pointer;
+          font-size:13px;font-weight:700;
+          color:${daycareTab==='__waitlist__'?'#C62828':'var(--muted)'};
+          border-bottom:2px solid ${daycareTab==='__waitlist__'?'#C62828':'transparent'};
+          margin-bottom:-2px;">
+        ⏳ 대기<br>
+        <span style="font-size:10px;font-weight:400;">${STUDENTS.filter(s=>s.note&&s.note.includes('돌봄 대기')).length}명</span>
+      </button>
     </div>
 
+    ${daycareTab==='__waitlist__' ? (()=>{
+      const waitList = STUDENTS
+        .filter(s=>s.note&&s.note.includes('돌봄 대기'))
+        .map(s=>{
+          const m=s.note.match(/돌봄 대기 (.+?)번/);
+          return {...s, waitNo: m?m[1]:'?'};
+        })
+        .sort((a,b)=>{ const na=parseFloat(a.waitNo)||99, nb=parseFloat(b.waitNo)||99; return na-nb; });
+      return `
+      <div style="padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;background:#FFF5F5;border-bottom:1px solid var(--border);">
+        <div style="background:#FFEBEE;color:#C62828;border:1px solid #C6282833;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;">
+          ⏳ 대기자 총 ${waitList.length}명
+        </div>
+      </div>
+      <div style="padding:10px 14px;display:flex;flex-direction:column;gap:8px;">
+        ${waitList.map(s=>{
+          const gc=s.grade===1?'#1F3864':'#833C00';
+          const gbg=s.grade===1?'#E3F2FD':'#FFF3E0';
+          return `<div style="background:#fff;border-radius:12px;padding:12px 14px;
+            box-shadow:0 1px 5px rgba(0,0,0,0.07);
+            display:flex;align-items:center;gap:12px;
+            border-left:4px solid #C62828;">
+            <div style="width:38px;height:38px;border-radius:19px;background:#FFEBEE;
+              display:flex;align-items:center;justify-content:center;
+              font-size:14px;font-weight:900;color:#C62828;flex-shrink:0;">${s.waitNo}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span style="font-size:15px;font-weight:900;color:#111;">${s.name}</span>
+                <span style="background:${gbg};color:${gc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;">${s.clsLabel}</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;white-space:pre-line;">${s.note.replace(/🏫 돌봄 대기 .+번/,'').trim()}</div>
+            </div>
+            ${s.phone?`<a href="tel:${s.phone}" style="background:#5C3D99;color:#fff;border-radius:8px;padding:6px 10px;font-size:10px;font-weight:700;text-decoration:none;flex-shrink:0;">📞 전화</a>`:''}
+          </div>`;
+        }).join('')}
+      </div>`;
+    })() : `
     <!-- 통계 칩 -->
     <div style="padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;background:#F8F5FF;border-bottom:1px solid var(--border);">
       ${['맞벌이','한부모','다자녀'].map(t=>{
@@ -973,6 +1020,7 @@ function renderDaycare(){
           </a>
         </div>`).join('')}
     </div>
+  `}
   `;
 }
 
@@ -1133,7 +1181,7 @@ function renderHome(){
       </div>
     </div>
 
-    <!-- 일일시정표 + 교실 검색 -->
+    <!-- 일일시정표 + 교실 검색 + 유휴교실 -->
     <div style="padding:10px 16px 0;display:flex;gap:8px;">
       <button onclick="showSchedulePopup()" style="flex:1;background:#fff;border:1.5px solid #E0E7FF;border-radius:14px;padding:13px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,0.06);">
         <span style="font-size:22px;">📅</span>
@@ -1147,6 +1195,13 @@ function renderHome(){
         <div style="flex:1;text-align:left;">
           <div style="font-size:12px;font-weight:800;color:#2E7D32;">교실별 수업</div>
           <div style="font-size:10px;color:var(--muted);margin-top:1px;">교실 수업 검색</div>
+        </div>
+      </button>
+      <button onclick="showIdleRoomWizard()" style="flex:1;background:#fff;border:1.5px solid #FDE8D8;border-radius:14px;padding:13px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,0.06);">
+        <span style="font-size:22px;">🔍</span>
+        <div style="flex:1;text-align:left;">
+          <div style="font-size:12px;font-weight:800;color:#C2410C;">유휴교실</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:1px;">빈 교실 찾기</div>
         </div>
       </button>
     </div>
@@ -1966,8 +2021,41 @@ function ttCell(subj, day, slot) {
 
 // 수업 유형 (방과후/맞춤형) — 컴퓨터만 방과후, 나머지 전부 맞춤형
 const PROGRAM_TYPE = {
-  "컴퓨터": "방과후",
+  // 방과후 수업 목록 (나머지는 모두 맞춤형)
+  "컴퓨터":"방과후", "컴퓨터(몬스터 타자왕)":"방과후", "컴퓨터(파워컴스타/SW코딩)":"방과후",
+  "컴퓨터(로블록스PPT)":"방과후", "컴퓨터(융합코딩)":"방과후", "컴퓨터(OA자격증반)":"방과후", "영어회화":"방과후", "창의과학":"방과후", "주산암산":"방과후",
+  "중국어회화":"방과후", "바이올린":"방과후", "칼라클레이":"방과후", "도자공예":"방과후",
+  "방송댄스":"방과후", "음악줄넘기":"방과후", "배드민턴":"방과후", "로봇과학":"방과후",
+  "보드게임":"방과후", "창의미술":"방과후", "토탈공예":"방과후", "사물놀이":"방과후",
+  "창의책놀이":"방과후",
 };
+
+// 방과후 프로그램 시간표 (사진 기준)
+const AFTER_SCHOOL = [
+  {no:1,  name:"영어회화",   days:["월","수"],      timeA:"14:00~14:40", timeB:"14:50~15:30", material:"필기도구, 영어노트",      place:"1동 3층 늘봄교실 1"},
+  {no:2,  name:"창의과학",   days:["화"],           timeA:"14:40~15:20", timeB:"15:30~16:10", material:"1회 재료비 5,000원",        place:"1동 3층 늘봄교실 1"},
+  {no:3,  name:"주산암산",   days:["금"],           timeA:"14:00~14:40", timeB:"14:50~15:30", material:"교재비 10,000~12,000원",   place:"1동 3층 늘봄교실 2"},
+  {no:4,  name:"중국어회화", days:["목"],           timeA:"15:20~16:00", timeB:"",            material:"필기도구",                  place:"1동 3층 늘봄교실 2"},
+  {no:5,  name:"바이올린",   days:["금"],           timeA:"14:00~14:40", timeB:"14:50~15:30", material:"교재비 12,000원",           place:"1동 3층 늘봄교실 1"},
+  {no:6,  name:"칼라클레이", days:["목"],           timeA:"14:00~14:40", timeB:"14:50~15:30", material:"1회 재료비 4,000원",        place:"3동 1층 과학실 2"},
+  {no:7,  name:"도자공예",   days:["금"],           timeA:"14:00~14:40", timeB:"14:50~15:30", material:"1회 재료비 6,000원",        place:"3동 1층 과학실 2"},
+  {no:8,  name:"방송댄스",   days:["화","목"],      timeA:"15:30~16:10", timeB:"16:20~17:00", material:"실내화, 편안한 복장",       place:"3동 2층 나리실"},
+  {no:9,  name:"음악줄넘기", days:["월","목","금"], timeA:"14:00~14:40", timeB:"14:50~15:30", material:"줄넘기, 운동화",            place:"슬기관 2"},
+  {no:10, name:"배드민턴",   days:["수","목","금"], timeA:"14:00~14:40", timeB:"14:50~15:30", material:"라켓, 운동화",              place:"슬기관 1"},
+  {no:11, name:"로봇과학",   days:["월"],           timeA:"14:00~14:40", timeB:"14:50~15:30", material:"재료비 99,000원",           place:"1동 1층 영어체험실"},
+  {no:12, name:"보드게임",   days:["화"],           timeA:"14:40~15:20", timeB:"15:30~16:10", material:"필기도구",                  place:"1동 1층 영어체험실"},
+  {no:13, name:"창의미술",   days:["수"],           timeA:"14:00~14:40", timeB:"14:50~15:30", material:"미술도구 개별안내",          place:"1동 1층 영어체험실", note:"80분 수업 (A·B 연속)"},
+  {no:14, name:"토탈공예",   days:["수"],           timeA:"14:00~14:40", timeB:"14:50~15:30", material:"1회 재료비 4,000원",        place:"3동 1층 과학실 2"},
+  {no:15, name:"사물놀이",   days:["화"],           timeA:"14:40~15:20", timeB:"15:30~16:10", material:"학교악기 사용",             place:"슬기관 2"},
+  {no:16, name:"창의책놀이", days:["월"],           timeA:"14:00~14:40", timeB:"",            material:"",                          place:"본동 3층 다목적실"},
+  // 컴퓨터(방과후) 세부 프로그램
+  {no:17, name:"컴퓨터(몬스터 타자왕)",      days:["화","목"],      timeA:"13:50~14:50", timeB:"",            material:"", grade:"1~2학년", place:"1동 1층 컴퓨터실"},
+  {no:18, name:"컴퓨터(파워컴스타/SW코딩)", days:["월","금"],      timeA:"13:50~14:50", timeB:"",            material:"", grade:"3~4학년", place:"1동 1층 컴퓨터실"},
+  {no:19, name:"컴퓨터(로블록스PPT)",        days:["수"],           timeA:"13:50~15:50", timeB:"",            material:"", grade:"3~6학년 (4학년특강)", place:"1동 1층 컴퓨터실", note:"2시간 수업"},
+  {no:20, name:"컴퓨터(융합코딩)",           days:["화","목"],      timeA:"15:00~16:00", timeB:"",            material:"", grade:"4~6학년", place:"1동 1층 컴퓨터실"},
+  {no:21, name:"컴퓨터(OA자격증반)",         days:["월","수"],      timeA:"15:00~16:00", timeB:"",            material:"", grade:"4~6학년 (6명)", place:"1동 1층 컴퓨터실"},
+];
+
 function getProgramType(subj){
   return PROGRAM_TYPE[subj] || "맞춤형";
 }
@@ -1979,7 +2067,7 @@ function programBadge(subj){
 
 const PLACE_MAP_WEB = {
   "발레":"2동 2층 다목적강당","음악줄넘기":"2동 2층 다목적강당","놀이체육":"2동 2층 다목적강당",
-  "축구(풋살)":"2동 2층 다목적강당","뉴스포츠":"슬기관(체육관) 1층",
+  "축구(풋살)":"운동장","뉴스포츠":"슬기관 1",
   "오카리나":"2동 1층 전담교실 2","종이접기":"2동 1층 전담교실 2","그림책놀이":"2동 1층 전담교실 1",
   "주산암산":"2동 1층 전담교실 1","토탈공예":"2동 1층 전담교실 1","창의미술":"2동 1층 전담교실 1",
   "칼라클레이":"1동 3층 늘봄교실 2","창의과학":"1동 3층 늘봄교실 2","중국어":"1동 3층 늘봄교실 2",
@@ -1994,43 +2082,239 @@ function getPlace(subj){
   return '장소 미정';
 }
 
+function showRoomSearchFor(room){
+  showRoomSearch();
+  // 팝업이 열린 후 해당 교실로 전환
+  setTimeout(()=>{
+    if(typeof window.switchRoom==='function') window.switchRoom(room);
+  }, 50);
+}
+
+function showIdleRoomWizard(){
+  // 전체 교실 목록
+  const allRooms = new Set([
+    ...Object.values(PLACE_MAP_WEB),
+    ...AFTER_SCHOOL.flatMap(p=>p.place.split('/').map(x=>x.trim())),
+  ]);
+  allRooms.delete('장소 미정');
+
+  // 외부 사용으로 사용불가인 교실
+  const RESTRICTED = {
+    월: [{ room:"3동 2층 나리실", reason:"13:00 이후 유치원 사용" }],
+    화: [
+      { room:"2동 1층 전담교실 1", reason:"로봇과학 맞춤형 1교시", time:"13:50~14:30" },
+      { room:"2동 1층 전담교실 1", reason:"로봇과학 맞춤형 2교시", time:"14:40~15:20" },
+    ],
+    목: [{ room:"본동 3층 다목적실", reason:"~13:50 6학년 영어수업 · 13:50 이후 사용 가능", partial:true }],
+  };
+
+  // 요일별 수업장소 오버라이드 (PLACE_MAP_WEB의 기본값과 다른 경우)
+  const DAY_ROOM_OVERRIDE = {
+    금: { "그림책놀이": "2동 1층 전담교실 2" },
+    목: { "뉴스포츠": "2동 2층 다목적강당" },
+  };
+
+  function getBusyRooms(day){
+    const busy = {};
+    // 제한된 교실 먼저 추가
+    (RESTRICTED[day]||[]).forEach(({room, reason, partial, time})=>{
+      if(!busy[room]) busy[room]=[];
+      busy[room].push({subj:(partial?'🟡 ':'🚫 ')+reason, time:time||(partial?'일부':'13:00~'), type:partial?'부분가능':'사용불가', partial});
+    });
+    // 맞춤형
+    for(const [cls, sc] of Object.entries(SCHEDULES)){
+      const grade=parseInt(cls[0]); const is2=grade===2;
+      (sc[day]||[]).forEach((subj,i)=>{
+        if(!subj||subj==='—') return;
+        subj.split('+').forEach(s=>{
+          s=s.trim();
+          const place=(DAY_ROOM_OVERRIDE[day]&&DAY_ROOM_OVERRIDE[day][s]) || getPlace(s);
+          if(place==='장소 미정') return;
+          if(!busy[place]) busy[place]=[];
+          let time='';
+          if(!is2) time=(day==='월'||day==='수')?(i===0?'13:10~13:50':'14:00~14:40'):(i===0?'13:50~14:30':'14:40~15:20');
+          else time=day==='수'?(i===0?'13:10~13:50':'14:00~14:40'):day==='월'?(i===1?'14:00~14:40':'14:40~15:20'):(i===0?'13:50~14:30':'14:40~15:20');
+          busy[place].push({subj:s, time, type:'맞춤형'});
+        });
+      });
+    }
+    // 방과후
+    AFTER_SCHOOL.filter(p=>p.days.includes(day)).forEach(p=>{
+      p.place.split('/').map(x=>x.trim()).forEach(place=>{
+        if(!busy[place]) busy[place]=[];
+        if(p.timeA) busy[place].push({subj:p.name.replace('컴퓨터(','').replace(')',''), time:p.timeA, type:'방과후 A반'});
+        if(p.timeB) busy[place].push({subj:p.name.replace('컴퓨터(','').replace(')',''), time:p.timeB, type:'방과후 B반'});
+      });
+    });
+    return busy;
+  }
+
+  const dayNames=["일","월","화","수","목","금","토"];
+  const todayDow=new Date().getDay();
+  const initDay=DAYS.includes(dayNames[todayDow])?dayNames[todayDow]:"월";
+
+  function buildContent(day){
+    const busy=getBusyRooms(day);
+    const partialRooms=[...allRooms].filter(r=>busy[r]&&busy[r].some(e=>e.partial)).sort();
+    const idleRooms=[...allRooms].filter(r=>!busy[r]).sort();
+    const busyRooms=[...allRooms].filter(r=>busy[r]&&!busy[r].some(e=>e.partial)).sort();
+    return `
+      <!-- 유휴 교실 -->
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+          <span style="background:#D1FAE5;color:#065F46;border-radius:6px;padding:2px 10px;font-size:11px;font-weight:800;">✅ 유휴교실 ${idleRooms.length}개</span>
+        </div>
+        ${idleRooms.length?idleRooms.map(r=>`
+          <div onclick="closePopup();setTimeout(()=>showRoomSearchFor('${r}'),200)"
+            style="background:#fff;border:1.5px solid #6EE7B7;border-radius:10px;padding:11px 14px;margin-bottom:6px;
+            display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <span style="font-size:18px;">🏫</span>
+            <span style="font-size:13px;font-weight:800;color:#065F46;flex:1;">${r}</span>
+            <span style="font-size:11px;color:#aaa;">탭 → 수업검색</span>
+          </div>`).join('')
+        :`<div style="text-align:center;padding:16px;background:#fff;border-radius:10px;color:#9CA3AF;font-size:12px;">모든 교실 사용 중입니다</div>`}
+      </div>
+      <!-- 부분 가능 교실 -->
+      ${partialRooms.length?`<div style="margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+          <span style="background:#FEF3C7;color:#92400E;border-radius:6px;padding:2px 10px;font-size:11px;font-weight:800;">🟡 부분 사용 가능 ${partialRooms.length}개</span>
+        </div>
+        ${partialRooms.map(r=>{
+          const info = busy[r].find(e=>e.partial);
+          return `<div onclick="closePopup();setTimeout(()=>showRoomSearchFor('${r}'),200)"
+            style="background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:10px;padding:11px 14px;margin-bottom:6px;cursor:pointer;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:18px;">🟡</span>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:800;color:#92400E;">${r}</div>
+                <div style="font-size:11px;color:#B45309;margin-top:2px;">${info?.subj||''}</div>
+              </div>
+              <span style="font-size:11px;color:#aaa;">탭 → 수업검색</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`:''}
+      <!-- 사용 중 교실 -->
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+          <span style="background:#FEE2E2;color:#991B1B;border-radius:6px;padding:2px 10px;font-size:11px;font-weight:800;">🔴 사용 중 ${busyRooms.length}개</span>
+        </div>
+        ${busyRooms.map(r=>{
+          const entries=[...new Map(busy[r].map(e=>[e.time+e.subj,e])).values()].sort((a,b)=>a.time.localeCompare(b.time));
+          const isRestricted = entries.some(e=>e.type==='사용불가');
+          const borderColor = isRestricted ? '#FCD34D' : '#FECACA';
+          const bgColor = isRestricted ? '#FFFBEB' : '#fff';
+          const titleColor = isRestricted ? '#92400E' : '#991B1B';
+          return `<div style="background:${bgColor};border:1.5px solid ${borderColor};border-radius:10px;padding:11px 14px;margin-bottom:6px;">
+            <div style="font-size:12px;font-weight:800;color:${titleColor};margin-bottom:5px;">${isRestricted?'⚠️':'📍'} ${r}</div>
+            ${entries.map(e=>`
+              <div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid ${isRestricted?'#FEF3C7':'#FEF2F2'};">
+                <span style="font-size:10px;color:#6B7280;min-width:86px;">${e.time}</span>
+                <span style="font-size:11px;font-weight:700;color:#374151;">${e.subj}</span>
+                <span style="font-size:9px;background:${e.type==='사용불가'?'#FEF3C7':e.type.includes('방과후')?'#DBEAFE':'#EDE9FE'};color:${e.type==='사용불가'?'#92400E':e.type.includes('방과후')?'#1E40AF':'#5B21B6'};border-radius:4px;padding:1px 5px;">${e.type}</span>
+              </div>`).join('')}
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  function dayTabsHTML(day){
+    return DAYS.map(d=>`
+      <button onclick="switchIdleDay('${d}')"
+        style="flex:1;padding:6px 2px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;
+          background:${d===day?'#fff':'rgba(255,255,255,0.15)'};
+          color:${d===day?'#C2410C':'rgba(255,255,255,0.85)'};">${d}</button>`).join('');
+  }
+
+  showPopup(`
+    <div style="background:linear-gradient(135deg,#C2410C,#EA580C);padding:16px 18px 14px;border-radius:18px 18px 0 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div>
+          <div style="color:#fff;font-size:17px;font-weight:900;">🔍 유휴교실 찾기 마법사</div>
+          <div style="color:rgba(255,255,255,0.75);font-size:11px;margin-top:2px;">빈 교실과 사용 중인 교실을 확인합니다</div>
+        </div>
+        <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer;">✕</button>
+      </div>
+      <div id="idle-day-tabs" style="display:flex;gap:5px;">${dayTabsHTML(initDay)}</div>
+    </div>
+    <div id="idle-body" style="padding:12px;max-height:60vh;overflow-y:auto;background:#F8F9FA;">
+      ${buildContent(initDay)}
+    </div>
+  `);
+
+  window.switchIdleDay=(day)=>{
+    document.getElementById('idle-day-tabs').innerHTML=dayTabsHTML(day);
+    document.getElementById('idle-body').innerHTML=buildContent(day);
+  };
+}
+
 function showRoomSearch(){
-  // 교실 → 수업 역방향 맵 생성
+  // 맞춤형: PLACE_MAP_WEB 기반
   const roomMap = {};
+  const afterSchoolNames = new Set(AFTER_SCHOOL.map(p=>p.name));
   for(const [subj, place] of Object.entries(PLACE_MAP_WEB)){
     if(!roomMap[place]) roomMap[place]=[];
-    roomMap[place].push(subj);
+    // 방과후에도 같은 수업명이 있으면 항상 "(맞춤형)" 구분
+    const label = afterSchoolNames.has(subj) ? subj+'(맞춤형)' : subj;
+    if(!roomMap[place].includes(label)) roomMap[place].push(label);
   }
+  // 방과후: AFTER_SCHOOL 기반
+  AFTER_SCHOOL.forEach(p=>{
+    const places = p.place.split('/').map(x=>x.trim());
+    places.forEach(place=>{
+      if(!roomMap[place]) roomMap[place]=[];
+      // 맞춤형에도 같은 수업명이 있으면 항상 "(방과후)" 구분
+      const label = PLACE_MAP_WEB[p.name] ? p.name+'(방과후)' : p.name;
+      if(!roomMap[place].includes(label)) roomMap[place].push(label);
+    });
+  });
   const rooms = Object.keys(roomMap).sort();
 
   // 각 수업의 시간표 정보 수집
   function getSubjSchedule(subj){
+    // "(맞춤형)" "(방과후)" 접미사 제거 후 실제 수업명으로 조회
+    const isCust = subj.endsWith('(맞춤형)');
+    const isAfter = subj.endsWith('(방과후)');
+    const realSubj = subj.replace(/\(맞춤형\)|\(방과후\)$/,'');
     const slots = [];
-    for(const day of DAYS){
-      for(const cls of Object.keys(SCHEDULES)){
-        const dj = SCHEDULES[cls][day]||[];
-        dj.forEach((s,i)=>{
-          if(s && s.includes(subj)){
-            const grade = parseInt(cls[0]);
-            const is2 = grade===2;
-            let time='';
-            if(!is2){
-              if(day==='월'||day==='수') time=i===0?'13:10~13:50':'14:00~14:40';
-              else time=i===0?'13:50~14:30':'14:40~15:20';
-            } else {
-              if(day==='수') time=i===0?'13:10~13:50':'14:00~14:40';
-              else if(day==='월') time=i===1?'14:00~14:40':'14:40~15:20';
-              else time=i===0?'13:50~14:30':'14:40~15:20';
+    // 방과후 전용이 아닌 경우 SCHEDULES 조회
+    if(!isAfter){
+      for(const day of DAYS){
+        for(const cls of Object.keys(SCHEDULES)){
+          const dj = SCHEDULES[cls][day]||[];
+          dj.forEach((s,i)=>{
+            if(s && s.includes(realSubj)){
+              const grade = parseInt(cls[0]);
+              const is2 = grade===2;
+              let time='';
+              if(!is2){
+                if(day==='월'||day==='수') time=i===0?'13:10~13:50':'14:00~14:40';
+                else time=i===0?'13:50~14:30':'14:40~15:20';
+              } else {
+                if(day==='수') time=i===0?'13:10~13:50':'14:00~14:40';
+                else if(day==='월') time=i===1?'14:00~14:40':'14:40~15:20';
+                else time=i===0?'13:50~14:30':'14:40~15:20';
+              }
+              slots.push({day, cls, time});
             }
-            slots.push({day, cls, time});
-          }
+          });
+        }
+      }
+    }
+    // 맞춤형 전용이 아닌 경우 AFTER_SCHOOL 조회
+    if(!isCust){
+      const asEntry = AFTER_SCHOOL.find(p=>p.name===realSubj);
+      if(asEntry){
+        asEntry.days.forEach(day=>{
+          if(asEntry.timeA) slots.push({day, cls:'A반', time:asEntry.timeA});
+          if(asEntry.timeB) slots.push({day, cls:'B반', time:asEntry.timeB});
         });
       }
     }
     return slots;
   }
 
-  const EMOJI_MAP={발레:'🩰','축구(풋살)':'⚽',종이접기:'📄',도자공예:'🏺',그림책놀이:'📖',칼라클레이:'🎨',음악줄넘기:'🎵',오카리나:'🎶',방송댄스:'💃',뉴스포츠:'🏃',로봇과학:'🤖',컴퓨터:'💻',주산암산:'🧮',우쿨렐레:'🎸',창의과학:'🔬',보드게임:'🎲',영어회화:'🗣️',토탈공예:'✂️',중국어:'🇨🇳',놀이체육:'🏅',전래놀이:'🪀',영어야놀자:'🗣️',창의미술:'🖌️',책놀이:'📚'};
+  const EMOJI_MAP={발레:'🩰','축구(풋살)':'⚽',종이접기:'📄',도자공예:'🏺',그림책놀이:'📖',칼라클레이:'🎨',음악줄넘기:'🎵',오카리나:'🎶',방송댄스:'💃',뉴스포츠:'🏃',로봇과학:'🤖',컴퓨터:'💻',주산암산:'🧮',우쿨렐레:'🎸',창의과학:'🔬',보드게임:'🎲',영어회화:'🗣️',토탈공예:'✂️',중국어:'🇨🇳',놀이체육:'🏅',전래놀이:'🪀',영어야놀자:'🗣️',창의미술:'🖌️',책놀이:'📚',바이올린:'🎻',배드민턴:'🏸',사물놀이:'🥁',창의책놀이:'📚',중국어회화:'🇨🇳','컴퓨터(몬스터 타자왕)':'⌨️','컴퓨터(파워컴스타/SW코딩)':'💻','컴퓨터(로블록스PPT)':'🎮','컴퓨터(융합코딩)':'🖥️','컴퓨터(OA자격증반)':'📱'};
   function getEmoji(s){ return EMOJI_MAP[s]||'📚'; }
   const SUB_COLORS = {음악줄넘기:'#1F3864',놀이체육:'#1F3864','축구(풋살)':'#1F3864',
     뉴스포츠:'#215868',오카리나:'#7030A0',종이접기:'#7030A0',그림책놀이:'#7030A0',
@@ -2045,8 +2329,9 @@ function showRoomSearch(){
     const subjs = roomMap[room]||[];
     if(!subjs.length) return '<div style="padding:20px;text-align:center;color:#aaa;">수업 없음</div>';
     return subjs.map(subj=>{
-      const color = gc(subj);
-      const instr = INSTRUCTOR_MAP[subj];
+      const realSubj = subj.replace(/\(맞춤형\)|\(방과후\)$/,'');
+      const color = gc(realSubj);
+      const instr = INSTRUCTOR_MAP[realSubj];
       const slots = getSubjSchedule(subj);
       const dayOrder = {월:0,화:1,수:2,목:3,금:4};
       slots.sort((a,b)=>(dayOrder[a.day]||0)-(dayOrder[b.day]||0)||(a.time<b.time?-1:1));
@@ -2057,9 +2342,9 @@ function showRoomSearch(){
       <div style="background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;
         border-left:4px solid ${color};box-shadow:0 1px 4px rgba(0,0,0,0.07);">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <span style="font-size:16px;">${getEmoji(subj)}</span>
-          <span style="font-size:15px;font-weight:900;color:${color};">${subj}</span>
-          ${programBadge(subj)}
+          <span style="font-size:16px;">${getEmoji(realSubj)}</span>
+          <span style="font-size:15px;font-weight:900;color:${color};">${realSubj}</span>
+          ${subj.includes('(방과후)')?programBadge('컴퓨터'):subj.includes('(맞춤형)')?programBadge('발레'):programBadge(realSubj)}
           ${instr?`<span style="font-size:11px;color:#888;margin-left:auto;">👤 ${instr.name}</span>`:''}
         </div>
         ${sortedDays.length?`
@@ -2078,9 +2363,10 @@ function showRoomSearch(){
   function roomTabsHTML(room){
     return rooms.map(r=>`
       <button onclick="switchRoom('${r.replace(/'/g,"\\'")}')"
-        style="white-space:nowrap;padding:6px 10px;border:1.5px solid ${r===room?'#1F3864':'#e0e0e0'};
-          border-radius:20px;background:${r===room?'#1F3864':'#fff'};
-          color:${r===room?'#fff':'#555'};font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">
+        style="padding:8px 10px;border:1.5px solid ${r===room?'#1F3864':'#e0e0e0'};
+          border-radius:10px;background:${r===room?'#1F3864':'#fff'};
+          color:${r===room?'#fff':'#374151'};font-size:11px;font-weight:700;
+          cursor:pointer;text-align:left;line-height:1.4;">
         ${r}
       </button>`).join('');
   }
@@ -2105,7 +2391,7 @@ function showRoomSearch(){
             font-size:13px;outline:none;background:rgba(255,255,255,0.95);">
       </div>
       <!-- 교실 칩 스크롤 -->
-      <div id="room-tabs" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;">
+      <div id="room-tabs" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding-bottom:4px;">
         ${roomTabsHTML(initRoom)}
       </div>
     </div>
@@ -2117,6 +2403,8 @@ function showRoomSearch(){
   window.switchRoom=(room)=>{
     document.getElementById('room-tabs').innerHTML=roomTabsHTML(room);
     document.getElementById('room-body').innerHTML=buildRoomContent(room);
+    // 결과 영역으로 부드럽게 스크롤
+    document.getElementById('room-body').scrollIntoView({behavior:'smooth', block:'start'});
   };
 
   // 수업명/교실명 통합 검색
@@ -2326,6 +2614,91 @@ function showSchedulePopup(){
   };
 }
 
+function showAfterSchoolPopup(){
+  const DAY_ORDER={월:0,화:1,수:2,목:3,금:4};
+  const DAY_COLORS={월:"#4472C4",화:"#70AD47",수:"#ED7D31",목:"#9B59B6",금:"#C00000"};
+  const SUBJ_COLORS2={
+    영어회화:"#375623",창의과학:"#17375E",주산암산:"#833C00",중국어회화:"#17375E",
+    바이올린:"#6A1B9A",칼라클레이:"#843C0C",도자공예:"#7B2C00",방송댄스:"#C00000",
+    음악줄넘기:"#1F3864",배드민턴:"#215868",로봇과학:"#FF6B35",보드게임:"#4B2A94",
+    창의미술:"#843C0C",토탈공예:"#833C00",사물놀이:"#B8860B",창의책놀이:"#2E7D32",
+  };
+  function gc2(n){ return SUBJ_COLORS2[n]||"#555"; }
+
+  // 요일별로 그룹핑
+  const byDay={월:[],화:[],수:[],목:[],금:[]};
+  AFTER_SCHOOL.forEach(p=>{
+    p.days.forEach(d=>{ if(byDay[d]) byDay[d].push(p); });
+  });
+
+  // 현재 탭
+  let curDay = DAYS[new Date().getDay()-1]||"월";
+  if(!byDay[curDay]) curDay="월";
+
+  function dayTabsHTML(day){
+    return DAYS.map(d=>`
+      <button id="as-tab-${d}" onclick="switchAsDay('${d}')"
+        style="flex:1;padding:6px 2px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;
+          background:${d===day?'#fff':'rgba(255,255,255,0.15)'};
+          color:${d===day?'#1F3864':'rgba(255,255,255,0.85)'};">${d}</button>`).join('');
+  }
+
+  function buildDayContent(day){
+    const progs = byDay[day]||[];
+    if(!progs.length) return `<div style="text-align:center;padding:30px;color:#aaa;font-size:13px;">${day}요일 방과후 프로그램 없음</div>`;
+    return progs.map(p=>{
+      const c=gc2(p.name);
+      return `<div style="background:#fff;border-radius:12px;padding:13px 15px;margin-bottom:8px;
+        border-left:4px solid ${c};box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+          <span style="font-size:15px;font-weight:900;color:${c};">${p.name}</span>
+          <span style="background:#E3F2FD;color:#1565C0;font-size:9px;font-weight:800;border-radius:4px;padding:1px 6px;">방과후</span>
+          <span style="font-size:11px;color:#9CA3AF;margin-left:auto;">No.${p.no}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px;">
+          <div style="background:#F8F9FA;border-radius:8px;padding:6px 10px;">
+            <div style="font-size:9px;color:#9CA3AF;font-weight:600;">A반</div>
+            <div style="font-size:12px;font-weight:800;color:#374151;">${p.timeA||'-'}</div>
+          </div>
+          ${p.timeB?`<div style="background:#F8F9FA;border-radius:8px;padding:6px 10px;">
+            <div style="font-size:9px;color:#9CA3AF;font-weight:600;">B반</div>
+            <div style="font-size:12px;font-weight:800;color:#374151;">${p.timeB}</div>
+          </div>`:'<div></div>'}
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span onclick="closePopup();setTimeout(()=>showRoomSearchFor('${p.place.split('/')[0].trim()}'),200)"
+            style="font-size:11px;color:#1565C0;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">📍 ${p.place}</span>
+          ${p.material?`<span style="font-size:11px;color:#6B7280;">· 📋 ${p.material}</span>`:''}
+        </div>
+        ${p.grade?`<div style="font-size:11px;color:#374151;margin-top:3px;">👥 ${p.grade}</div>`:''}
+        ${p.note?`<div style="font-size:11px;color:#D97706;margin-top:4px;font-weight:700;">⚠ ${p.note}</div>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  showPopup(`
+    <div style="background:linear-gradient(135deg,#1565C0,#1976D2);padding:16px 18px 14px;border-radius:18px 18px 0 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div>
+          <div style="color:#fff;font-size:17px;font-weight:900;">🏫 방과후 프로그램 시간표</div>
+          <div style="color:rgba(255,255,255,0.75);font-size:11px;margin-top:2px;">총 ${AFTER_SCHOOL.length}개 프로그램</div>
+        </div>
+        <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer;">✕</button>
+      </div>
+      <div id="as-day-tabs" style="display:flex;gap:5px;">${dayTabsHTML(curDay)}</div>
+    </div>
+    <div id="as-body" style="padding:12px;max-height:58vh;overflow-y:auto;background:#F8F9FA;">
+      ${buildDayContent(curDay)}
+    </div>
+  `);
+
+  window.switchAsDay=(day)=>{
+    curDay=day;
+    document.getElementById('as-day-tabs').innerHTML=dayTabsHTML(day);
+    document.getElementById('as-body').innerHTML=buildDayContent(day);
+  };
+}
+
 function showLunchPopup(dateLabel, key){
   const menu = LUNCH&&LUNCH[key]||[];
   const lunchEmoji = m=>{
@@ -2475,17 +2848,44 @@ function showSubjDetail(subj, day, slot){
 }
 
 function renderTimetable(){
+  const grade = currentTTClass==='__afterschool__' ? 1 : parseInt(currentTTClass[0]);
+  const is2 = grade===2;
+  const hc = is2 ? 'var(--primary2)' : 'var(--primary)';
+  document.getElementById('screen-timetable').innerHTML = `
+    <div style="background:${hc};padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="color:#fff;font-size:20px;font-weight:800">반별 시간표</div>
+          <div style="color:#fff;font-size:12px;opacity:0.7">${getThisWeekRange().mon}(월) ~ ${getThisWeekRange().fri}(금) · 과목 터치 시 상세 확인</div>
+        </div>
+      </div>
+    </div>
+    <!-- 탭: 반 선택 + 방과후 -->
+    <div style="display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);padding:10px 12px;gap:6px">
+      ${Object.keys(SCHEDULES).map(k=>{
+        const g=parseInt(k[0]); const hk=g===1?'var(--primary)':'var(--primary2)';
+        return `<button onclick="currentTTClass='${k}';renderTimetable()"
+          style="flex-shrink:0;padding:7px 14px;border-radius:20px;border:2px solid ${currentTTClass===k?hk:'var(--border)'};background:${currentTTClass===k?hk:'#fff'};color:${currentTTClass===k?'#fff':'var(--text)'};font-size:14px;font-weight:700;cursor:pointer">${k}</button>`;
+      }).join('')}
+      <button onclick="currentTTClass='__afterschool__';renderTimetable()"
+        style="flex-shrink:0;padding:7px 14px;border-radius:20px;border:2px solid ${currentTTClass==='__afterschool__'?'#1565C0':'var(--border)'};background:${currentTTClass==='__afterschool__'?'#1565C0':'#fff'};color:${currentTTClass==='__afterschool__'?'#fff':'var(--text)'};font-size:13px;font-weight:700;cursor:pointer">🏫방과후</button>
+    </div>
+    <div style="padding:12px" id="tt-content">
+      ${currentTTClass==='__afterschool__' ? buildAfterSchoolTimetable() : buildMcTimetable()}
+    </div>
+  `;
+}
+
+function buildMcTimetable(){
   const sc = SCHEDULES[currentTTClass]||{};
   const grade = parseInt(currentTTClass[0]);
   const is2 = grade===2;
   const hc = is2 ? 'var(--primary2)' : 'var(--primary)';
   const COL_COLORS = {월:"#4472C4",화:"#70AD47",수:"#ED7D31",목:"#9B59B6",금:"#C00000"};
 
-  // 요일별 슬롯 계산 (엑셀과 동일한 구조)
   function getSlot(day, slotIdx) {
     const daysc = sc[day]||[];
     if(!is2) {
-      // 1학년: 월·수=row3시작, 화·목·금=row4시작(row3=정규)
       if(day==='월'||day==='수') {
         if(slotIdx===0) return daysc[0]||null;
         if(slotIdx===1) return daysc[1]||null;
@@ -2497,7 +2897,6 @@ function renderTimetable(){
         return null;
       }
     } else {
-      // 2학년: 수=row3시작, 월=row4시작(s[1]부터), 화·목·금=row4시작
       if(day==='수') {
         return daysc[slotIdx]||null;
       } else if(day==='월') {
@@ -2514,34 +2913,21 @@ function renderTimetable(){
     }
   }
 
-  // 슬롯인덱스 → 실제 skey 변환 (정규수업 슬롯 때문에 offset 발생)
   function getSlotKey(day, slotIdx) {
     if(!is2) {
-      if(day==='월'||day==='수') {
-        // 1학년 월·수: 슬롯0=s1, 슬롯1=s2
-        return slotIdx===0?'s1':slotIdx===1?'s2':null;
-      } else {
-        // 1학년 화·목·금: 슬롯0=정규, 슬롯1=s1, 슬롯2=s2
-        return slotIdx===1?'s1':slotIdx===2?'s2':null;
-      }
+      if(day==='월'||day==='수') return slotIdx===0?'s1':slotIdx===1?'s2':null;
+      else return slotIdx===1?'s1':slotIdx===2?'s2':null;
     } else {
-      if(day==='수') {
-        // 2학년 수: 슬롯0=s1, 슬롯1=s2
-        return slotIdx===0?'s1':slotIdx===1?'s2':null;
-      } else if(day==='월') {
-        // 2학년 월: 슬롯0=정규, 슬롯1=s2, 슬롯2=s3
-        return slotIdx===1?'s2':slotIdx===2?'s3':null;
-      } else {
-        // 2학년 화·목·금: 슬롯0=정규, 슬롯1=s1, 슬롯2=s2
-        return slotIdx===1?'s1':slotIdx===2?'s2':null;
-      }
+      if(day==='수') return slotIdx===0?'s1':slotIdx===1?'s2':null;
+      else if(day==='월') return slotIdx===1?'s2':slotIdx===2?'s3':null;
+      else return slotIdx===1?'s1':slotIdx===2?'s2':null;
     }
   }
 
   const slotKeys = ['s1','s2','s3'];
   const slotLabels = !is2
-    ? ["월·수 13:10~13:50\n화·목·금 정규수업", "월·수 14:00~14:40\n화·목·금 13:50~14:30", "화·목·금 14:40~15:20"]
-    : ["수 13:10~13:50\n월·화·목·금 정규수업", "수 14:00~14:40\n월·화·목·금 13:50~14:30", "월·수 14:40~15:20\n화·목·금 14:40~15:20"];
+    ? ['맞춤형\n1교시','맞춤형\n1교시','맞춤형\n2교시']
+    : ['맞춤형\n1교시','맞춤형\n2교시','맞춤형\n3교시'];
 
   function renderSlotRow(slotIdx) {
     const tlbl = slotLabels[slotIdx].replace('\n','<br>');
@@ -2553,8 +2939,6 @@ function renderTimetable(){
         const realKey=getSlotKey(d,slotIdx);
         if(!subj) return `<td style="padding:3px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:6px 3px;font-size:8px;color:#CCC;min-height:32px;display:flex;align-items:center;justify-content:center">—</div></td>`;
         if(subj==='정규') return `<td style="padding:3px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:6px 3px;font-size:8px;color:#8892A4;min-height:32px;display:flex;align-items:center;justify-content:center">정규수업</div></td>`;
-
-        // 2-4반 수요일 맞춤형1교시: 창의과학 vs 주산암산 분리 표기
         if(currentTTClass==='2-4' && d==='수' && skey==='s1') {
           const c1=gc('창의과학'), c2=gc('주산암산');
           return `<td style="padding:3px 2px;text-align:center">
@@ -2570,7 +2954,6 @@ function renderTimetable(){
             </div>
           </td>`;
         }
-
         const parts=subj.includes('+')?subj.split('+'):[subj];
         return `<td style="padding:3px 2px;text-align:center">${parts.map(p=>{
           p=p.trim();
@@ -2585,87 +2968,192 @@ function renderTimetable(){
     </tr>`;
   }
 
-  document.getElementById('screen-timetable').innerHTML = `
-    <div style="background:${hc};padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="color:#fff;font-size:20px;font-weight:800">반별 시간표</div>
-          <div style="color:#fff;font-size:12px;opacity:0.7">${getThisWeekRange().mon}(월) ~ ${getThisWeekRange().fri}(금) · 과목 터치 시 상세 확인</div>
-        </div>
-        
-      </div>
+  return `
+    <div style="background:${hc};border-radius:12px 12px 0 0;padding:10px 14px;text-align:center">
+      <div style="color:#fff;font-size:14px;font-weight:800">${getThisWeekRange().mon}(월) ~ ${getThisWeekRange().fri}(금) · 맞춤형 프로그램 시간표 · (${currentTTClass})</div>
     </div>
-    <!-- 반 탭 -->
-    <div style="display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);padding:10px 12px;gap:6px">
-      ${Object.keys(SCHEDULES).map(k=>{
-        const g=parseInt(k[0]); const hk=g===1?'var(--primary)':'var(--primary2)';
-        return `<button onclick="currentTTClass='${k}';renderTimetable()"
-          style="flex-shrink:0;padding:7px 14px;border-radius:20px;border:2px solid ${currentTTClass===k?hk:'var(--border)'};background:${currentTTClass===k?hk:'#fff'};color:${currentTTClass===k?'#fff':'var(--text)'};font-size:14px;font-weight:700;cursor:pointer">${k}</button>`;
-      }).join('')}
+    <div style="background:#fff;border-radius:0 0 12px 12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
+      <table style="width:100%;border-collapse:collapse">
+        <tr>
+          <th style="background:#2C3E50;color:#fff;padding:8px 4px;font-size:10px;text-align:center;width:52px">요일/시간</th>
+          ${DAYS.map(d=>`<th style="background:${COL_COLORS[d]};color:#fff;padding:6px 2px;font-size:11px;font-weight:800;text-align:center">
+            <div>${d}</div>
+            <div style="font-size:9px;font-weight:400;opacity:0.9">${DAY_DATES[d]}</div>
+          </th>`).join('')}
+        </tr>
+        <tr style="background:#F5F5F5">
+          <td style="padding:5px 4px;background:#ECEEF5;font-size:8px;color:#7B8CB0;font-weight:700;text-align:center">정규수업<br><span style="font-weight:400">~13:10</span></td>
+          ${DAYS.map(()=>`<td style="padding:3px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:6px 3px;font-size:8px;color:#8892A4;min-height:28px;display:flex;align-items:center;justify-content:center">정규수업</div></td>`).join('')}
+        </tr>
+        <!-- 점심 -->
+        <tr style="background:#FFFBF0">
+          <td style="padding:5px 4px;background:#FFF5D6;font-size:8px;color:#B8860B;font-weight:700;text-align:center">점심<br><span style="font-weight:400">11:30</span></td>
+          ${DAYS.map(d=>{
+            const [m,dy]=DAY_DATES[d].split('/');
+            const yr=new Date().getFullYear();
+            const key=`${yr}-${String(m).padStart(2,'0')}-${String(dy).padStart(2,'0')}`;
+            const menu=LUNCH&&LUNCH[key]||[];
+            return `<td style="padding:3px 2px;text-align:center">
+              <div onclick="showLunchPopup('${d} ${DAY_DATES[d]}','${key}')"
+                style="background:#FFF5D6;border-radius:6px;padding:5px 3px;font-size:9px;color:#B8860B;
+                min-height:28px;display:flex;align-items:center;justify-content:center;
+                cursor:pointer;border:1px solid ${menu.length?'#F0C040':'transparent'};">
+                🍱
+              </div>
+            </td>`;
+          }).join('')}
+        </tr>
+        ${renderSlotRow(0)+renderSlotRow(1)+renderSlotRow(2)}
+        <tr style="background:#F0FFF4">
+          <td style="padding:5px 4px;background:#D4EDDA;font-size:8px;color:#375623;font-weight:700;text-align:center">하교</td>
+          ${DAYS.map(d=>`<td style="padding:3px 2px;text-align:center"><div style="background:#D4EDDA;border-radius:6px;padding:5px 3px;font-size:8px;color:#375623;min-height:28px;display:flex;align-items:center;justify-content:center">🏠 ${(!is2&&(d==='월'||d==='수'))||(is2&&d==='수')?'14:40':'15:20'}</div></td>`).join('')}
+        </tr>
+      </table>
     </div>
-    <div style="padding:12px">
-      <!-- 제목 -->
-      <div style="background:${hc};border-radius:12px 12px 0 0;padding:10px 14px;text-align:center">
-        <div style="color:#fff;font-size:14px;font-weight:800">${getThisWeekRange().mon}(월) ~ ${getThisWeekRange().fri}(금) · 맞춤형 프로그램 시간표 · (${currentTTClass})</div>
-      </div>
-      <!-- 시간표 테이블 -->
-      <div style="background:#fff;border-radius:0 0 12px 12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
-        <table style="width:100%;border-collapse:collapse">
-          <!-- 요일 헤더 -->
-          <tr>
-            <th style="background:#2C3E50;color:#fff;padding:8px 4px;font-size:10px;text-align:center;width:52px">요일/시간</th>
-            ${DAYS.map(d=>`<th style="background:${COL_COLORS[d]};color:#fff;padding:6px 2px;font-size:11px;font-weight:800;text-align:center">
-              <div>${d}</div>
-              <div style="font-size:9px;font-weight:400;opacity:0.9">${DAY_DATES[d]}</div>
-            </th>`).join('')}
-          </tr>
-          <!-- 정규수업 표시 행 -->
-          <tr style="background:#F8F9FD">
-            <td style="padding:5px 4px;background:#ECEEF5;font-size:8px;color:#7B8CB0;font-weight:700;text-align:center">1~4교시<br><span style="font-weight:400">정규수업</span></td>
-            ${DAYS.map(()=>`<td style="padding:3px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:5px 3px;font-size:8px;color:#8892A4;min-height:28px;display:flex;align-items:center;justify-content:center">정규수업</div></td>`).join('')}
-          </tr>
-          <!-- 점심 -->
-          <tr style="background:#FFFBF0">
-            <td style="padding:5px 4px;background:#FFF5D6;font-size:8px;color:#B8860B;font-weight:700;text-align:center">점심<br><span style="font-weight:400">11:30</span></td>
-            ${DAYS.map(d=>{
-              const [m,dy]=DAY_DATES[d].split('/');
-              const yr=new Date().getFullYear();
-              const key=`${yr}-${String(m).padStart(2,'0')}-${String(dy).padStart(2,'0')}`;
-              const menu=LUNCH&&LUNCH[key]||[];
-              return `<td style="padding:3px 2px;text-align:center">
-                <div onclick="showLunchPopup('${d} ${DAY_DATES[d]}','${key}')"
-                  style="background:#FFF5D6;border-radius:6px;padding:5px 3px;font-size:9px;color:#B8860B;
-                  min-height:28px;display:flex;align-items:center;justify-content:center;
-                  cursor:pointer;border:1px solid ${menu.length?'#F0C040':'transparent'};
-                  transition:background .1s;" onmouseover="this.style.background='#FDEEA0'" onmouseout="this.style.background='#FFF5D6'">
-                  🍱
-                </div>
-              </td>`;
-            }).join('')}
-          </tr>
-          <!-- 맞춤형 슬롯 3행 -->
-          ${renderSlotRow(0)}
-          ${renderSlotRow(1)}
-          ${renderSlotRow(2)}
-          <!-- 하교 -->
-          <tr style="background:#F0FFF4">
-            <td style="padding:5px 4px;background:#D4EDDA;font-size:8px;color:#375623;font-weight:700;text-align:center">하교</td>
-            ${DAYS.map(d=>`<td style="padding:3px 2px;text-align:center"><div style="background:#D4EDDA;border-radius:6px;padding:5px 3px;font-size:8px;color:#375623;min-height:28px;display:flex;align-items:center;justify-content:center">🏠 ${(!is2&&(d==='월'||d==='수'))||(is2&&d==='수')?'14:40':'15:20'}</div></td>`).join('')}
-          </tr>
-        </table>
-      </div>
-      <!-- 안내 문구 -->
-      <div style="background:#FFFFF2CC;border-radius:8px;padding:8px 12px;margin-top:8px;border:1px solid #E6D800">
-        <div style="font-size:10px;color:#7B2C00">※ 화·목·금요일은 맞춤형 수업 13:50부터 시작합니다.</div>
-        <div style="font-size:10px;color:#C55A11;font-weight:700;margin-top:3px">※ 화요일 로봇과학 수업은 수익자부담 · 2동 1층 전담교실 1 · 1교시 13:50~14:30 / 2교시 14:40~15:20</div>
-      </div>
-      <div style="background:var(--danger);border-radius:8px;padding:8px 12px;margin-top:6px;text-align:center">
-        <div style="font-size:11px;color:#fff;font-weight:700">★ ${!is2?'월·수요일 하교: 14:40  /  화·목·금요일 하교: 15:20':'수요일 하교: 14:40  /  화·목·금요일 하교: 15:20'}</div>
-      </div>
+    <div style="background:#FFFFF2CC;border-radius:8px;padding:8px 12px;margin-top:8px;border:1px solid #E6D800">
+      <div style="font-size:10px;color:#7B2C00">※ 화·목·금요일은 맞춤형 수업 13:50부터 시작합니다.</div>
+      <div style="font-size:10px;color:#C55A11;font-weight:700;margin-top:3px">※ 화요일 로봇과학 수업은 수익자부담 · 2동 1층 전담교실 1 · 1교시 13:50~14:30 / 2교시 14:40~15:20</div>
     </div>
-  `;
+    <div style="background:var(--danger);border-radius:8px;padding:8px 12px;margin-top:6px;text-align:center">
+      <div style="font-size:11px;color:#fff;font-weight:700">★ ${!is2?'월·수요일 하교: 14:40  /  화·목·금요일 하교: 15:20':'수요일 하교: 14:40  /  화·목·금요일 하교: 15:20'}</div>
+    </div>`;
 }
 
+function showAfterSchoolDetail(encodedName){
+  const name = decodeURIComponent(encodedName);
+  const p = AFTER_SCHOOL.find(a=>a.name===name);
+  if(!p) return;
+
+  const AS_COLORS={
+    '영어회화':'#375623','창의과학':'#17375E','주산암산':'#833C00','중국어회화':'#17375E',
+    '바이올린':'#6A1B9A','칼라클레이':'#843C0C','도자공예':'#7B2C00','방송댄스':'#C00000',
+    '음악줄넘기':'#1F3864','배드민턴':'#215868','로봇과학':'#FF6B35','보드게임':'#4B2A94',
+    '창의미술':'#843C0C','토탈공예':'#833C00','사물놀이':'#B8860B','창의책놀이':'#2E7D32',
+  };
+  function getColor(n){ const base=n.replace(/\(.*\)$/,'').trim(); for(const[k,v] of Object.entries(AS_COLORS)) if(base.includes(k)) return v; return '#1565C0'; }
+  const c = getColor(name);
+  const instr = INSTRUCTOR_MAP[name];
+  const DAY_COLORS={월:'#4472C4',화:'#70AD47',수:'#ED7D31',목:'#9B59B6',금:'#C00000'};
+
+  showPopup(`
+    <div style="background:linear-gradient(135deg,${c},${c}CC);padding:16px 18px 14px;border-radius:18px 18px 0 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <div style="color:#fff;font-size:17px;font-weight:900;">${name}</div>
+            <span style="background:rgba(255,255,255,0.25);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:1px 7px;">방과후</span>
+          </div>
+          <div style="color:rgba(255,255,255,0.8);font-size:12px;">${p.grade||''}</div>
+        </div>
+        <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer;">✕</button>
+      </div>
+    </div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+      <!-- 장소 -->
+      <div style="background:${c}0D;border-radius:12px;padding:13px 15px;border-left:3px solid ${c};">
+        <div style="font-size:11px;color:${c};font-weight:700;margin-bottom:4px;">📍 수업 장소</div>
+        <div style="font-size:15px;font-weight:900;color:#111;">${p.place}</div>
+      </div>
+      <!-- 시간 -->
+      <div style="background:#F8F9FA;border-radius:12px;padding:13px 15px;">
+        <div style="font-size:11px;color:#6B7280;font-weight:700;margin-bottom:8px;">🕐 수업 시간</div>
+        <div style="display:grid;grid-template-columns:${p.timeB?'1fr 1fr':'1fr'};gap:8px;">
+          <div style="background:#fff;border-radius:8px;padding:8px 12px;border:1px solid #E5E7EB;">
+            <div style="font-size:9px;color:#9CA3AF;font-weight:600;margin-bottom:2px;">A반</div>
+            <div style="font-size:13px;font-weight:800;color:#374151;">${p.timeA}</div>
+          </div>
+          ${p.timeB?`<div style="background:#fff;border-radius:8px;padding:8px 12px;border:1px solid #E5E7EB;">
+            <div style="font-size:9px;color:#9CA3AF;font-weight:600;margin-bottom:2px;">B반</div>
+            <div style="font-size:13px;font-weight:800;color:#374151;">${p.timeB}</div>
+          </div>`:''}
+        </div>
+      </div>
+      <!-- 요일 -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${p.days.map(d=>`<span style="background:${DAY_COLORS[d]||'#555'}18;color:${DAY_COLORS[d]||'#555'};border:1.5px solid ${DAY_COLORS[d]||'#555'}44;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:800;">${d}요일</span>`).join('')}
+      </div>
+      ${p.material?`<div style="background:#FFF8F0;border-radius:10px;padding:10px 14px;font-size:12px;color:#92400E;">📋 ${p.material}</div>`:''}
+      ${instr?`<div style="background:#F0FDF4;border-radius:10px;padding:10px 14px;font-size:12px;color:#166534;">👤 강사: ${instr.name} · <a href="tel:${instr.phone}" style="color:#166534;font-weight:700;">${instr.phone}</a></div>`:''}
+      ${p.note?`<div style="background:#FFF3CD;border-radius:10px;padding:10px 14px;font-size:12px;color:#856404;font-weight:700;">⚠ ${p.note}</div>`:''}
+    </div>
+  `);
+}
+
+function buildAfterSchoolTimetable(){
+  const hc='#1565C0';
+  const COL_COLORS={월:"#4472C4",화:"#70AD47",수:"#ED7D31",목:"#9B59B6",금:"#C00000"};
+
+  // 요일별 수업 수집 및 시간 기준 정렬
+  const byDay={};
+  DAYS.forEach(d=>byDay[d]=[]);
+  AFTER_SCHOOL.forEach(p=>{
+    p.days.forEach(d=>{
+      if(byDay[d]) byDay[d].push(p);
+    });
+  });
+  DAYS.forEach(d=>byDay[d].sort((a,b)=>(a.timeA||'').localeCompare(b.timeA||'')));
+
+  // 전체 시간대 수집 (행 구성용)
+  const allTimes=[...new Set(AFTER_SCHOOL.flatMap(p=>[p.timeA,p.timeB].filter(Boolean)))].sort();
+
+  // 수업명 색상
+  const AS_COLORS={
+    '영어회화':'#375623','창의과학':'#17375E','주산암산':'#833C00','중국어회화':'#17375E',
+    '바이올린':'#6A1B9A','칼라클레이':'#843C0C','도자공예':'#7B2C00','방송댄스':'#C00000',
+    '음악줄넘기':'#1F3864','배드민턴':'#215868','로봇과학':'#FF6B35','보드게임':'#4B2A94',
+    '창의미술':'#843C0C','토탈공예':'#833C00','사물놀이':'#B8860B','창의책놀이':'#2E7D32',
+  };
+  function getColor(name){
+    const base=name.replace(/\(.*\)$/,'').trim();
+    for(const[k,v] of Object.entries(AS_COLORS)) if(base.includes(k)) return v;
+    return '#1565C0';
+  }
+
+  // 행: 각 요일에 수업이 있는 시간대 행
+  const maxRows=Math.max(...DAYS.map(d=>byDay[d].length),1);
+
+  const rows=[];
+  for(let i=0;i<maxRows;i++){
+    rows.push(DAYS.map(d=>{
+      const p=byDay[d][i]||null;
+      if(!p) return `<td style="padding:3px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:6px 3px;font-size:8px;color:#CCC;min-height:40px;display:flex;align-items:center;justify-content:center;">—</div></td>`;
+      const c=getColor(p.name);
+      const label=p.name.replace('컴퓨터(','').replace(')','');
+      const placeShort=p.place.split(' ').slice(-2).join(' ');
+      return `<td style="padding:3px 2px;text-align:center">
+        <div onclick="showAfterSchoolDetail('${encodeURIComponent(p.name)}')"
+          style="background:${c}18;color:${c};border:1.5px solid ${c}55;border-radius:7px;padding:4px 3px;
+          min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;">
+          <span style="font-weight:800;font-size:8px;line-height:1.3;text-align:center;">${label}</span>
+          <span style="font-size:7px;opacity:0.75;text-align:center;line-height:1.2;">${p.timeA}</span>
+          <span style="font-size:6px;opacity:0.6;text-align:center;">${placeShort}</span>
+        </div>
+      </td>`;
+    }));
+  }
+
+  return `
+    <div style="background:${hc};border-radius:12px 12px 0 0;padding:10px 14px;text-align:center">
+      <div style="color:#fff;font-size:14px;font-weight:800">🏫 방과후 프로그램 시간표 · ${AFTER_SCHOOL.length}개 수업</div>
+    </div>
+    <div style="background:#fff;border-radius:0 0 12px 12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
+      <table style="width:100%;border-collapse:collapse">
+        <tr>
+          <th style="background:#2C3E50;color:#fff;padding:6px 4px;font-size:10px;text-align:center;width:18px">순</th>
+          ${DAYS.map(d=>`<th style="background:${COL_COLORS[d]};color:#fff;padding:6px 2px;font-size:11px;font-weight:800;text-align:center">
+            <div>${d}</div><div style="font-size:9px;font-weight:400;opacity:0.9">${DAY_DATES[d]}</div>
+          </th>`).join('')}
+        </tr>
+        ${rows.map((cols,i)=>`<tr style="border-top:1px solid #E0E0E0">
+          <td style="background:#F0F4FF;font-size:9px;color:#666;font-weight:700;text-align:center;padding:3px 2px;">${i+1}</td>
+          ${cols.join('')}
+        </tr>`).join('')}
+      </table>
+    </div>
+    <div style="background:#E3F2FD;border-radius:8px;padding:8px 12px;margin-top:8px;border:1px solid #BBDEFB">
+      <div style="font-size:10px;color:#1565C0;font-weight:700;">💡 수업명을 눌러 상세 정보 확인</div>
+    </div>`;
+}
 function showAttendDetail(encodedKey){
   const [grade,cls,...nameParts]=decodeURIComponent(encodedKey).split('_');
   const name=nameParts.join('_');
