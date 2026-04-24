@@ -1964,6 +1964,19 @@ function ttCell(subj, day, slot) {
   return `<td style="padding:3px 2px;text-align:center">${cells}</td>`;
 }
 
+// 수업 유형 (방과후/맞춤형) — 컴퓨터만 방과후, 나머지 전부 맞춤형
+const PROGRAM_TYPE = {
+  "컴퓨터": "방과후",
+};
+function getProgramType(subj){
+  return PROGRAM_TYPE[subj] || "맞춤형";
+}
+function programBadge(subj){
+  const t = getProgramType(subj);
+  if(t==="방과후") return `<span style="background:#E3F2FD;color:#1565C0;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:800;flex-shrink:0;">방과후</span>`;
+  return `<span style="background:#E8F5E9;color:#2E7D32;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:800;flex-shrink:0;">맞춤형</span>`;
+}
+
 const PLACE_MAP_WEB = {
   "발레":"2동 2층 다목적강당","음악줄넘기":"2동 2층 다목적강당","놀이체육":"2동 2층 다목적강당",
   "축구(풋살)":"2동 2층 다목적강당","뉴스포츠":"슬기관(체육관) 1층",
@@ -2046,6 +2059,7 @@ function showRoomSearch(){
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
           <span style="font-size:16px;">${getEmoji(subj)}</span>
           <span style="font-size:15px;font-weight:900;color:${color};">${subj}</span>
+          ${programBadge(subj)}
           ${instr?`<span style="font-size:11px;color:#888;margin-left:auto;">👤 ${instr.name}</span>`:''}
         </div>
         ${sortedDays.length?`
@@ -2401,7 +2415,10 @@ function showSubjDetail(subj, day, slot){
     <div style="background:${color};padding:16px 16px 14px;border-radius:18px 18px 0 0">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
-          <div style="color:#fff;font-size:18px;font-weight:900">${subj}</div>
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;">
+            <div style="color:#fff;font-size:18px;font-weight:900">${subj}</div>
+            ${programBadge(subj).replace('font-size:9px','font-size:10px')}
+          </div>
           <div style="color:rgba(255,255,255,0.85);font-size:12px;margin-top:2px">${day}요일 (${DAY_DATES[day]}) · ${slotLabel}</div>
         </div>
         <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer">✕</button>
