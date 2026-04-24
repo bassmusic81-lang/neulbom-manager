@@ -1061,6 +1061,18 @@ function renderHome(){
       </div>
     </div>
 
+    <!-- 일일시정표 -->
+    <div style="padding:10px 16px 0;">
+      <button onclick="showSchedulePopup()" style="width:100%;background:#fff;border:1.5px solid #E0E7FF;border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,0.06);">
+        <span style="font-size:24px;">📅</span>
+        <div style="flex:1;text-align:left;">
+          <div style="font-size:13px;font-weight:800;color:#1F3864;">일일시정표</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">교시별 수업시간 확인</div>
+        </div>
+        <span style="color:var(--muted);font-size:18px;">›</span>
+      </button>
+    </div>
+
     ${DAYS.includes(todayDay) ? `
     <div style="padding:16px 16px 0">
       <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px">오늘 수업 · ${todayDay}요일 (${todayDate})</div>
@@ -1959,6 +1971,157 @@ function downloadTimetableXlsx(clsOnly){
     ? `정라초_${currentTTClass}반_시간표_${wr.mon.replace('/','')}-${wr.fri.replace('/','')}.xlsx`
     : `정라초_전체반_시간표_${wr.mon.replace('/','')}-${wr.fri.replace('/','')}.xlsx`;
   XLSX.writeFile(wb, fname);
+}
+
+function showSchedulePopup(){
+  const today = new Date();
+  const dow = today.getDay(); // 0=일,1=월,...,6=토
+  // 요일별 시정표 데이터
+  const SCHEDULE_TABLE = {
+    월: {
+      grade: "1~2학년",
+      rows: [
+        {time:"08:50~09:10", label:"아침활동"},
+        {time:"09:10~09:50", label:"1교시"},
+        {time:"09:50~10:00", label:"휴식"},
+        {time:"10:00~10:40", label:"2교시"},
+        {time:"10:40~10:50", label:"휴식"},
+        {time:"10:50~11:30", label:"3교시"},
+        {time:"11:30~12:20", label:"점심시간", color:"#B8860B"},
+        {time:"12:20~13:00", label:"4교시"},
+        {time:"13:00~13:40", label:"5교시"},
+        {time:"13:40~15:00", label:"방과후 교육활동", color:"#1F3864"},
+      ]
+    },
+    화: {
+      grade: "1~2학년",
+      rows: [
+        {time:"08:50~09:10", label:"아침활동"},
+        {time:"09:10~09:50", label:"1교시"},
+        {time:"09:50~10:00", label:"휴식"},
+        {time:"10:00~10:40", label:"2교시"},
+        {time:"10:40~10:50", label:"휴식"},
+        {time:"10:50~11:30", label:"3교시"},
+        {time:"11:30~12:20", label:"점심시간", color:"#B8860B"},
+        {time:"12:20~13:00", label:"4교시"},
+        {time:"13:00~13:10", label:"휴식"},
+        {time:"13:10~13:50", label:"5교시"},
+        {time:"13:50~14:30", label:"맞춤형 1교시", color:"#1F3864", highlight:true},
+        {time:"14:30~16:00", label:"맞춤형 2교시 / 방과후", color:"#1F3864", highlight:true},
+      ]
+    },
+    수: {
+      grade: "1~2학년",
+      rows: [
+        {time:"08:50~09:10", label:"아침활동"},
+        {time:"09:10~09:50", label:"1교시"},
+        {time:"09:50~10:00", label:"휴식"},
+        {time:"10:00~10:40", label:"2교시"},
+        {time:"10:40~10:50", label:"휴식"},
+        {time:"10:50~11:30", label:"3교시"},
+        {time:"11:30~12:20", label:"점심시간", color:"#B8860B"},
+        {time:"12:20~13:00", label:"4교시"},
+        {time:"13:00~13:10", label:"휴식"},
+        {time:"13:10~13:50", label:"맞춤형 1교시 (1학년)", color:"#1F3864", highlight:true},
+        {time:"14:00~14:40", label:"맞춤형 1·2교시 (2학년)", color:"#833C00", highlight:true},
+        {time:"14:30~16:00", label:"맞춤형 2교시 / 방과후", color:"#1F3864", highlight:true},
+      ]
+    },
+    목: {
+      grade: "1~2학년",
+      rows: [
+        {time:"08:50~09:10", label:"아침활동"},
+        {time:"09:10~09:50", label:"1교시"},
+        {time:"09:50~10:00", label:"휴식"},
+        {time:"10:00~10:40", label:"2교시"},
+        {time:"10:40~10:50", label:"휴식"},
+        {time:"10:50~11:30", label:"3교시"},
+        {time:"11:30~12:20", label:"점심시간", color:"#B8860B"},
+        {time:"12:20~13:00", label:"4교시"},
+        {time:"13:00~13:10", label:"휴식"},
+        {time:"13:10~13:50", label:"5교시"},
+        {time:"13:50~14:30", label:"맞춤형 1교시", color:"#1F3864", highlight:true},
+        {time:"14:30~16:00", label:"맞춤형 2교시 / 방과후", color:"#1F3864", highlight:true},
+      ]
+    },
+    금: {
+      grade: "1~2학년",
+      rows: [
+        {time:"08:50~09:10", label:"아침활동"},
+        {time:"09:10~09:50", label:"1교시"},
+        {time:"09:50~10:00", label:"휴식"},
+        {time:"10:00~10:40", label:"2교시"},
+        {time:"10:40~10:50", label:"휴식"},
+        {time:"10:50~11:30", label:"3교시"},
+        {time:"11:30~12:20", label:"점심시간", color:"#B8860B"},
+        {time:"12:20~13:00", label:"4교시"},
+        {time:"13:00~13:10", label:"휴식"},
+        {time:"13:10~13:50", label:"5교시"},
+        {time:"13:50~14:30", label:"맞춤형 1교시", color:"#1F3864", highlight:true},
+        {time:"14:30~16:00", label:"맞춤형 2교시 / 방과후", color:"#1F3864", highlight:true},
+      ]
+    },
+  };
+  const dayNames = ["일","월","화","수","목","금","토"];
+  const todayName = dayNames[dow];
+  const tabs = ["월","화","수","목","금"];
+
+  function buildTable(day){
+    const data = SCHEDULE_TABLE[day];
+    if(!data) return `<div style="text-align:center;padding:30px;color:#aaa;">주말</div>`;
+    return data.rows.map(row=>`
+      <div style="display:flex;align-items:center;gap:0;border-bottom:1px solid #F3F4F6;
+        background:${row.highlight?row.color+'0D':'#fff'};">
+        <div style="min-width:120px;padding:10px 12px;font-size:11px;color:#888;font-weight:600;flex-shrink:0;
+          border-right:2px solid ${row.highlight?row.color+'55':'#F3F4F6'};
+          background:${row.highlight?row.color+'08':'#FAFAFA'};">
+          ${row.time}
+        </div>
+        <div style="padding:10px 14px;font-size:13px;font-weight:${row.highlight?'800':'600'};
+          color:${row.color||'#374151'};">
+          ${row.highlight?`<span style="display:inline-block;width:6px;height:6px;background:${row.color};border-radius:3px;margin-right:6px;vertical-align:middle;"></span>`:''}${row.label}
+        </div>
+      </div>`).join('');
+  }
+
+  const initDay = (dow>=1&&dow<=5) ? todayName : "월";
+
+  showPopup(`
+    <div style="background:linear-gradient(135deg,#1F3864,#2C5282);padding:16px 18px 14px;border-radius:18px 18px 0 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="color:#fff;font-size:17px;font-weight:900;">📅 일일시정표</div>
+          <div style="color:rgba(255,255,255,0.75);font-size:11px;margin-top:2px;">정라초등학교 1~2학년</div>
+        </div>
+        <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer;">✕</button>
+      </div>
+      <!-- 요일 탭 -->
+      <div style="display:flex;gap:5px;margin-top:12px;">
+        ${tabs.map(d=>`
+          <button id="sched-tab-${d}" onclick="switchSchedTab('${d}')"
+            style="flex:1;padding:6px 2px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;
+              background:${d===initDay?'#fff':'rgba(255,255,255,0.15)'};
+              color:${d===initDay?'#1F3864':'rgba(255,255,255,0.85)'};">
+            ${d}
+          </button>`).join('')}
+      </div>
+    </div>
+    <div id="sched-body" style="max-height:58vh;overflow-y:auto;">
+      ${buildTable(initDay)}
+    </div>
+    <div style="padding:10px 16px 14px;">
+      <div style="font-size:10px;color:#aaa;text-align:center;">※ 16:40까지 교직원 연수 및 협의</div>
+    </div>
+  `);
+
+  // 탭 전환 함수 (팝업 내부용)
+  window.switchSchedTab = (day)=>{
+    tabs.forEach(d=>{
+      const btn=document.getElementById('sched-tab-'+d);
+      if(btn){ btn.style.background=d===day?'#fff':'rgba(255,255,255,0.15)'; btn.style.color=d===day?'#1F3864':'rgba(255,255,255,0.85)'; }
+    });
+    document.getElementById('sched-body').innerHTML = buildTable(day);
+  };
 }
 
 function showLunchPopup(dateLabel, key){
