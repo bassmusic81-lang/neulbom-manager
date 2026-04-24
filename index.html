@@ -213,7 +213,7 @@ button{font-family:inherit;}
 
   <!-- 탭바 -->
   <div id="nav-bar">
-    <button class="tab-btn active" onclick="goTo('home')"><span class="icon">🏠</span><span class="label">홈</span></button>
+    <button class="tab-btn active" onclick="goTo('home');document.getElementById('screen-home').scrollTop=0;"><span class="icon">🏠</span><span class="label">홈</span></button>
     <button class="tab-btn" onclick="goTo('students')"><span class="icon">👨‍🎓</span><span class="label">학생</span></button>
     <button class="tab-btn" onclick="goTo('attendance')"><span class="icon">📋</span><span class="label">출석부</span></button>
     <button class="tab-btn" onclick="goTo('timetable')"><span class="icon">🗓️</span><span class="label">시간표</span></button>
@@ -1963,8 +1963,11 @@ function showRoomSearch(){
       const color = gc(subj);
       const instr = INSTRUCTOR_MAP[subj];
       const slots = getSubjSchedule(subj);
+      const dayOrder = {월:0,화:1,수:2,목:3,금:4};
+      slots.sort((a,b)=>(dayOrder[a.day]||0)-(dayOrder[b.day]||0)||(a.time<b.time?-1:1));
       const dayGroups = {};
       slots.forEach(s=>{ if(!dayGroups[s.day]) dayGroups[s.day]=[]; dayGroups[s.day].push(s.cls+' '+s.time); });
+      const sortedDays = Object.keys(dayGroups).sort((a,b)=>(dayOrder[a]||0)-(dayOrder[b]||0));
       return `
       <div style="background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;
         border-left:4px solid ${color};box-shadow:0 1px 4px rgba(0,0,0,0.07);">
@@ -1973,13 +1976,14 @@ function showRoomSearch(){
           <span style="font-size:15px;font-weight:900;color:${color};">${subj}</span>
           ${instr?`<span style="font-size:11px;color:#888;margin-left:auto;">👤 ${instr.name}</span>`:''}
         </div>
-        ${Object.keys(dayGroups).length?`
+        ${sortedDays.length?`
         <div style="display:flex;flex-wrap:wrap;gap:5px;">
-          ${Object.entries(dayGroups).map(([day,times])=>`
-          <div style="background:${color}0F;border:1px solid ${color}33;border-radius:8px;padding:4px 10px;">
+          ${sortedDays.map(day=>{
+            const times=[...new Set(dayGroups[day].map(t=>t.split(' ')[1]))].sort();
+            return `<div style="background:${color}0F;border:1px solid ${color}33;border-radius:8px;padding:4px 10px;">
             <span style="font-size:11px;font-weight:800;color:${color};">${day}요일</span>
-            <div style="font-size:10px;color:#666;margin-top:1px;">${[...new Set(times.map(t=>t.split(' ')[1]))].join(' / ')}</div>
-          </div>`).join('')}
+            <div style="font-size:10px;color:#666;margin-top:1px;">${times.join(' / ')}</div>
+          </div>`;}).join('')}
         </div>`:'<div style="font-size:11px;color:#aaa;">시간표 미배정</div>'}
       </div>`;
     }).join('');
@@ -2065,7 +2069,10 @@ function showRoomSearch(){
       const instr=INSTRUCTOR_MAP[subj];
       const slots=getSubjSchedule(subj);
       const dayGroups={};
+      const dayOrder2={월:0,화:1,수:2,목:3,금:4};
+      slots.sort((a,b)=>(dayOrder2[a.day]||0)-(dayOrder2[b.day]||0)||(a.time<b.time?-1:1));
       slots.forEach(s=>{if(!dayGroups[s.day])dayGroups[s.day]=[];dayGroups[s.day].push(s.cls+' '+s.time);});
+      const sortedDays2=Object.keys(dayGroups).sort((a,b)=>(dayOrder2[a]||0)-(dayOrder2[b]||0));
       return `<div style="background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:4px solid ${color};box-shadow:0 1px 4px rgba(0,0,0,0.07);">
         <div style="font-size:10px;color:#aaa;margin-bottom:6px;">📍 ${room}</div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
@@ -2073,7 +2080,7 @@ function showRoomSearch(){
           <span style="font-size:15px;font-weight:900;color:${color};">${subj}</span>
           ${instr?`<span style="font-size:11px;color:#888;margin-left:auto;">👤 ${instr.name}</span>`:''}
         </div>
-        ${Object.keys(dayGroups).length?`<div style="display:flex;flex-wrap:wrap;gap:5px;">${Object.entries(dayGroups).map(([day,times])=>`<div style="background:${color}0F;border:1px solid ${color}33;border-radius:8px;padding:4px 10px;"><span style="font-size:11px;font-weight:800;color:${color};">${day}요일</span><div style="font-size:10px;color:#666;margin-top:1px;">${[...new Set(times.map(t=>t.split(' ')[1]))].join(' / ')}</div></div>`).join('')}</div>`:'<div style="font-size:11px;color:#aaa;">시간표 미배정</div>'}
+        ${Object.keys(dayGroups).length?`<div style="display:flex;flex-wrap:wrap;gap:5px;">${sortedDays2.map(day=>{const times=[...new Set(dayGroups[day].map(t=>t.split(' ')[1]))].sort();return `<div style="background:${color}0F;border:1px solid ${color}33;border-radius:8px;padding:4px 10px;"><span style="font-size:11px;font-weight:800;color:${color};">${day}요일</span><div style="font-size:10px;color:#666;margin-top:1px;">${times.join(' / ')}</div></div>`;}).join('')}</div>`:'<div style="font-size:11px;color:#aaa;">시간표 미배정</div>'}
       </div>`;
     }).join('');
   };
