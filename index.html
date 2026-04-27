@@ -665,7 +665,15 @@ const MANUAL_OVERRIDE = {
   "오윤오":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"} },
 };
 
-// 학생별 특수 일정 계산 (노트 파싱 + 수동 보완 병합)
+// 맞춤형 수업 없는 날 (공휴일·휴업일)
+const NO_CLASS_DATES = {
+  "2026-05-01": "노동절",
+  "2026-05-04": "재량휴업일",
+  "2026-05-05": "어린이날",
+  "2026-05-25": "대체공휴일",
+};
+
+
 function getStudentSpecial(nm, note) {
   const parsed = parseSpecialFromNote(note) || {};
   const override = MANUAL_OVERRIDE[nm] || {};
@@ -1154,8 +1162,8 @@ function renderHome(){
           <div style="color:#fff;font-size:22px;font-weight:900;">8</div>
           <div style="color:rgba(255,255,255,0.75);font-size:10px;font-weight:600;margin-top:2px;">학급</div>
           <div style="margin-top:5px;display:flex;flex-direction:column;gap:2px;">
-            <div style="background:rgba(255,255,255,0.15);border-radius:6px;padding:2px 6px;font-size:9px;color:rgba(255,255,255,0.85);">1학년 4반</div>
-            <div style="background:rgba(255,255,255,0.15);border-radius:6px;padding:2px 6px;font-size:9px;color:rgba(255,255,255,0.85);">2학년 4반</div>
+            <div style="background:rgba(100,210,150,0.3);border-radius:6px;padding:2px 6px;font-size:9px;color:#A7F3D0;">맞춤형 ${Object.keys(PLACE_MAP_WEB).length}개</div>
+            <div style="background:rgba(100,170,255,0.3);border-radius:6px;padding:2px 6px;font-size:9px;color:#BFDBFE;">방과후 ${AFTER_SCHOOL.length}개</div>
           </div>
         </div>
 
@@ -2952,6 +2960,10 @@ function buildMcTimetable(){
     return `<tr style="border-top:${slotIdx===0?'2px solid '+hc:'1px solid #E0E0E0'}">
       <td style="padding:5px 4px;background:${hc}18;font-size:8px;color:${hc};font-weight:800;text-align:center;line-height:1.4;white-space:pre-line;vertical-align:middle;min-width:52px">${tlbl}</td>
       ${DAYS.map(d=>{
+        const [m2,dy2]=DAY_DATES[d].split('/');
+        const yr2=new Date().getFullYear();
+        const dk=`${yr2}-${String(m2).padStart(2,'0')}-${String(dy2).padStart(2,'0')}`;
+        if(NO_CLASS_DATES&&NO_CLASS_DATES[dk]) return `<td style="padding:3px 2px;text-align:center"><div style="background:#EEEEEE;border-radius:6px;padding:6px 3px;font-size:8px;color:#BDBDBD;min-height:32px;display:flex;align-items:center;justify-content:center;">🚫 수업없음</div></td>`;
         const subj=getSlot(d,slotIdx);
         const realKey=getSlotKey(d,slotIdx);
         if(!subj) return `<td style="padding:3px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:6px 3px;font-size:8px;color:#CCC;min-height:32px;display:flex;align-items:center;justify-content:center">—</div></td>`;
@@ -2993,14 +3005,29 @@ function buildMcTimetable(){
       <table style="width:100%;border-collapse:collapse">
         <tr>
           <th style="background:#2C3E50;color:#fff;padding:8px 4px;font-size:10px;text-align:center;width:52px">요일/시간</th>
-          ${DAYS.map(d=>`<th style="background:${COL_COLORS[d]};color:#fff;padding:6px 2px;font-size:11px;font-weight:800;text-align:center">
-            <div>${d}</div>
-            <div style="font-size:9px;font-weight:400;opacity:0.9">${DAY_DATES[d]}</div>
-          </th>`).join('')}
+          ${DAYS.map(d=>{
+            const [m,dy]=DAY_DATES[d].split('/');
+            const yr=new Date().getFullYear();
+            const key=`${yr}-${String(m).padStart(2,'0')}-${String(dy).padStart(2,'0')}`;
+            const noClass=NO_CLASS_DATES&&NO_CLASS_DATES[key];
+            return `<th style="background:${noClass?'#9E9E9E':COL_COLORS[d]};color:#fff;padding:6px 2px;font-size:11px;font-weight:800;text-align:center">
+              <div>${d}</div>
+              <div style="font-size:9px;font-weight:400;opacity:0.9">${DAY_DATES[d]}</div>
+              ${noClass?`<div style="font-size:7px;background:rgba(0,0,0,0.25);border-radius:4px;padding:1px 4px;margin-top:2px;">🚫 ${noClass}</div>`:''}
+            </th>`;
+          }).join('')}
         </tr>
         <tr style="background:#F5F5F5">
           <td style="padding:5px 4px;background:#ECEEF5;font-size:8px;color:#7B8CB0;font-weight:700;text-align:center">정규수업<br><span style="font-weight:400">~13:10</span></td>
-          ${DAYS.map(()=>`<td style="padding:3px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:6px 3px;font-size:8px;color:#8892A4;min-height:28px;display:flex;align-items:center;justify-content:center">정규수업</div></td>`).join('')}
+          ${DAYS.map(d=>{
+            const [m,dy]=DAY_DATES[d].split('/');
+            const yr=new Date().getFullYear();
+            const key=`${yr}-${String(m).padStart(2,'0')}-${String(dy).padStart(2,'0')}`;
+            const noClass=NO_CLASS_DATES&&NO_CLASS_DATES[key];
+            return noClass
+              ? `<td style="padding:3px 2px;text-align:center" colspan="1"><div style="background:#EEEEEE;border-radius:6px;padding:6px 3px;font-size:8px;color:#9E9E9E;min-height:28px;display:flex;align-items:center;justify-content:center;">휴일</div></td>`
+              : `<td style="padding:3px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:6px 3px;font-size:8px;color:#8892A4;min-height:28px;display:flex;align-items:center;justify-content:center">정규수업</div></td>`;
+          }).join('')}
         </tr>
         <!-- 점심 -->
         <tr style="background:#FFFBF0">
