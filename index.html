@@ -293,7 +293,7 @@ const STUDENTS = [
   {id:"11이승빈",name:"이승빈",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:3,phone:"010-7704-6079",note:""},
   {id:"11이연우",name:"이연우",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:4,phone:"010-2607-1430",note:""},
   {id:"11전준서",name:"전준서",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:5,phone:"010-9255-4678",note:"월·화·수·목 1교시만 / 금 1·2교시"},
-  {id:"11정건",name:"정  건",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:6,phone:"010-6653-3510",note:"화 로봇과학A(1교시)\n월·수 14:40 학원차 탑승 → 10분 전(14:30) 조기하교"},
+  {id:"11정건",name:"정  건",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:6,phone:"010-6653-3510",note:"화 로봇과학A(1교시)\n월·수 14:40 학원차 탑승 → 10분 전(14:30) 조기하교\n화·목·금 맞춤형 1교시만 → 비욘드잉글리시 학원 (4/28~)"},
   {id:"11최예준",name:"최예준",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:7,phone:"010-2489-3734",note:"매일 1교시만 / 2교시 취소"},
   {id:"11김선유",name:"김선유",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:9,phone:"010-7116-7920",note:""},
   {id:"11유하연",name:"유하연",grade:1,cls:1,clsKey:"1-1",clsLabel:"1학년 1반",num:13,phone:"010-8285-5724",note:""},
@@ -428,6 +428,7 @@ const INCIDENTS = [
   {seq:8,date:"4/2(목)",subject:"컴퓨터→중국어",student:"2-1 한봄",content:"컴퓨터 방과후 첫날 교실 이동 몰라 맞춤형으로 이동\n어머니 방문 후 조기하교",action:"이동 경로 재안내 필요",tag:"⚠ 조기하교"},
   {seq:9,date:"4/3(금)",subject:"전래놀이(2교시)",student:"1-1 정윤솔",content:"1-2 남학생 3명 불쾌 행동으로 조기하교",action:"신원 확인 / 담임 통보",tag:"⚠ 조기하교"},
   {seq:10,date:"4/21(화)",subject:"방송댄스",student:"1-3 최우찬 / 1-3 조경준",content:"수업 시작 전 복도에서 잡기 놀이 중 최우찬이 백태클 → 조경준 넘어짐\n강사 화장실 지도 중 부재 상황에서 발생\n최우찬·조경준·이산 3명은 평소 장난 수위 높아 매 수업 주의 지도 중\n서로 부딪히거나 타격하는 행위 빈번 → 신체 접촉 금지 강력 훈육",action:"강사 직접 훈육 완료 / 담임 통보 필요 / 3명 집중 관찰 지속",tag:"⚠ 안전사고"},
+  {seq:12,date:"4/28(화)",subject:"맞춤형 1교시",student:"1-1 정  건",content:"화·목·금 맞춤형 1교시 후 비욘드잉글리시 학원 등원 (4/28부터 매주)\n오늘(4/28)은 어머니 동행 → 1교시 후 학원 동행",action:"어머니 직접 방문 확인 / 담임 공유",tag:"📌 하교변경"},
   {seq:11,date:"4/24(목)",subject:"놀이체육(맞춤형 2교시)",student:"2-3 최지훈",content:"맞춤형 2교시 놀이체육 수업 중 눈에 공을 맞음 → 보건실 다녀옴",action:"보건실 처치 완료",tag:"⚠ 안전사고"}
 ];
 
@@ -501,6 +502,7 @@ const ATTEND_DB = [
 {"d":"2026-04-23","g":"1","c":"2","n":"박무율","t":"1교시만 참여 후 귀가","e":"보호자 동행","note":"","cd":"2026-04-24"},
 {"d":"2026-04-24","g":"1","c":"1","n":"박민재","t":"1교시만 참여 후 귀가","e":"보호자 동행","note":"","cd":"2026-04-24"},
 {"d":"2026-04-24","g":"2","c":"1","n":"문채빈","t":"맞춤형 프로그램 참여하지 않음","e":"도보학원","note":"웅진씽크빅","cd":"2026-04-24"},
+{"d":"2026-04-28","g":"1","c":"1","n":"박민재","t":"맞춤형 프로그램 참여하지 않음","e":"보호자 동행","note":"병원진료","cd":"2026-04-28"},
 ];
 
 const CALENDAR = {
@@ -678,7 +680,7 @@ const MANUAL_OVERRIDE = {
   "왕선호":  { replaceS1:{화:"로봇과학A"} },
   "정윤솔":  { replaceS1:{화:"로봇과학A"} },
   "이나은":  { replaceS1:{화:"로봇과학A"} },
-  "정  건":  { replaceS1:{화:"로봇과학A"} },
+  "정  건":  { replaceS1:{화:"로봇과학A"}, skipS2Days:["화","목","금"] },
   "양우진":  { replaceS1:{화:"로봇과학A"} },
   "고태규":  { replaceS1:{화:"로봇과학A"} },
   "백창훈":  { replaceS1:{화:"로봇과학A"} },
@@ -1161,14 +1163,29 @@ function renderHome(){
   ];
 
   // 오늘 출결 관련 특이사항만 표시
-  const ATT_KEYWORDS = ["하교","취소","결석","지각","불참","학원","도보 귀가","보호자","1교시만","조기","컴퓨터","늦게 도착","미이동","결보강","공부","지연","차량"];
-  const WARN_ONLY = ["⚠ 민원","⚠ ["];  // 민원/사고 등 출결 무관 경고는 제외
+  const ATT_KEYWORDS = ["하교","취소","결석","지각","불참","학원","도보 귀가","보호자","1교시만","조기","늦게 도착","미이동","결보강","공부","지연","차량"];
   const todayNotes = STUDENTS.filter(s=>{
     if(!s.note) return false;
     const hasAtt = ATT_KEYWORDS.some(k=>s.note.includes(k));
     if(!hasAtt) return false;
-    // 오늘 요일 관련이거나 매일/전체 적용인 경우
-    return s.note.includes(todayDay) || s.note.includes("매일") || s.note.includes("전체") || s.note.includes("월~금");
+    const sp = getStudentSpecial(s.name, s.note);
+    if(!sp) return false;
+    // skipDays: 오늘 전체 취소
+    if(sp.skipDays && sp.skipDays.includes(todayDay)) return true;
+    // skipAllM: 월요일 전체 취소
+    if(sp.skipAllM && todayDay==='월') return true;
+    // skipS1Days/skipS2Days/skipS3Days: 오늘 교시 취소
+    if(sp.skipS1Days && sp.skipS1Days.includes(todayDay)) return true;
+    if(sp.skipS2Days && sp.skipS2Days.includes(todayDay)) return true;
+    if(sp.skipS3Days && sp.skipS3Days.includes(todayDay)) return true;
+    // noS2Days
+    if(sp.noS2Days && sp.noS2Days.includes(todayDay)) return true;
+    // earlyLeave 관련 note에 오늘 요일 포함 (수업변경 replaceS1은 제외)
+    const noteLines = s.note.split('\n');
+    return noteLines.some(line=>{
+      if(!line.includes(todayDay)) return false;
+      return ATT_KEYWORDS.some(k=>line.includes(k));
+    });
   });
 
   const daycareTotal = Object.values(DAYCARE).reduce((s,r)=>s+r.length,0);
