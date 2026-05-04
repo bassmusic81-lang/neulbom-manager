@@ -431,6 +431,7 @@ const INCIDENTS = [
   {seq:12,date:"4/28(화)",subject:"맞춤형 1교시",student:"1-1 정  건",content:"화·목·금 맞춤형 1교시 후 비욘드잉글리시 학원 등원 (4/28부터 매주)\n오늘(4/28)은 어머니 동행 → 1교시 후 학원 동행",action:"어머니 직접 방문 확인 / 담임 공유",tag:"📌 하교변경"},
   {seq:13,date:"4/29(화)",subject:"늘봄지원실 민원전화",student:"2-1 한봄",content:"13:29 늘봄지원실로 전화\n하이클래스 사진 관련 민원\n- 저번에도 같은 학생 사진만 올라오고 자녀 사진은 잘 올라오지 않음\n- 자녀 사진은 표정이 별로거나 뒤에 있었음\n- 이런 것들이 차별이라고 생각한다고 함\n어머니 학년·반·이름 공개 거부 → 내용 전달만 부탁\n전화번호 메모 후 크로샷으로 한봄 어머니 확인",action:"담당 교사 전달 필요 / 사진 게시 형평성 주의 요망",tag:"⚠ 민원"},
   {seq:14,date:"4/29(화)",subject:"늘봄지원실 민원전화",student:"2-1 한봄",content:"14:43 늘봄지원실로 전화\n교무실로 연결해 달라고 요청 → 안된다고 안내하고 용건을 물어봄\n- 학교에서 전화가 왔는데 받지 못했다고 함\n- 담임선생님이 하이톡 메시지 하지 말라고 했다고 말함\n→ 전화를 빈번히 하여 업무에 방해가 된다고 전달함",action:"담임 및 관련 교사 공유 필요 / 반복 연락 모니터링",tag:"⚠ 민원"},
+  {seq:15,date:"5/4(월)",subject:"긴급돌봄 미등교",student:"여러 학생",content:"5/4(월) 재량휴업일 긴급돌봄 신청 후 미등교 학생 현황\n\n① 박세민 — 10일까지 현장체험학습 신청\n② 박서아 — 10일까지 현장체험학습 신청\n③ 장우주 — 긴급돌봄 신청하였으나 보내지 않음\n④ 김민준 — 긴급돌봄 신청하였으나 보내지 않음\n⑤ 최유진 — 전화통화 못함\n⑥ 최정우 — 미등교 (전화통화 못함)",action:"전화 미연결 학생(최정우) 재시도 / 담임 공유",tag:"⚠ 미등교"},
   {seq:11,date:"4/24(목)",subject:"놀이체육(맞춤형 2교시)",student:"2-3 최지훈",content:"맞춤형 2교시 놀이체육 수업 중 눈에 공을 맞음 → 보건실 다녀옴",action:"보건실 처치 완료",tag:"⚠ 안전사고"}
 ];
 
@@ -1025,7 +1026,7 @@ function renderDaycare(){
               font-size:14px;font-weight:900;color:#C62828;flex-shrink:0;">${s.waitNo}</div>
             <div style="flex:1;min-width:0;">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                <span style="font-size:15px;font-weight:900;color:#111;">${s.name}</span>
+                <span onclick="openDaycareStudent('${s.clsKey}','${s.name}')" style="font-size:15px;font-weight:900;color:#111;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${s.name}</span>
                 <span style="background:${gbg};color:${gc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;">${s.clsLabel}</span>
               </div>
               <div style="font-size:11px;color:var(--muted);margin-top:3px;white-space:pre-line;">${s.note.replace(/🏫 돌봄 대기 .+번/,'').trim()}</div>
@@ -1066,7 +1067,7 @@ function renderDaycare(){
           </div>
           <div style="flex:1;min-width:0;">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;">
-              <span style="font-size:15px;font-weight:800;">${s.name}</span>
+              <span onclick="openDaycareStudent('${s.cls}','${s.name}')" style="font-size:15px;font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${s.name}</span>
               <span style="font-size:10px;color:var(--muted);background:#F0F2F8;
                 border-radius:4px;padding:1px 6px;">${s.cls}</span>
               <span style="font-size:10px;font-weight:700;
@@ -1089,6 +1090,104 @@ function renderDaycare(){
   `;
   requestAnimationFrame(()=>applyAvatarPhotos(document.getElementById('screen-daycare')));
 }
+
+function openDaycareStudent(cls, name){
+  // 1. STUDENTS에서 먼저 찾기 (clsKey 비교)
+  const stu = STUDENTS.find(s=>s.name===name && s.clsKey===cls);
+  if(stu){ openStuModal(stu.id); return; }
+
+  // 2. DAYCARE에서 찾기 (돌봄 전용 학생)
+  let found=null, room='';
+  for(const [r,list] of Object.entries(DAYCARE)){
+    const s=list.find(s=>s.name===name && s.cls===cls);
+    if(s){found=s;room=r;break;}
+  }
+  if(!found){
+    // cls 무시하고 이름만으로 재시도
+    for(const [r,list] of Object.entries(DAYCARE)){
+      const s=list.find(s=>s.name===name);
+      if(s){found=s;room=r;break;}
+    }
+  }
+  if(!found) return;
+
+  const rc={'돌봄1교실':'#5C3D99','돌봄2교실':'#7B3F00'}[room]||'#5C3D99';
+  const typeBg={맞벌이:"#E3F2FD",한부모:"#FFEBEE",다자녀:"#E8F5E9"};
+  const typeColor={맞벌이:"#1565C0",한부모:"#C00000",다자녀:"#2E7D32"};
+
+  // STUDENTS note도 병합 (같은 이름, 같은 cls 학생)
+  const stuNote = (STUDENTS.find(s=>s.name===name && s.clsKey===found.cls)||{}).note||'';
+  const daycareNote = found.note||'';
+  const allNote = [stuNote, daycareNote].filter(Boolean).join('\n');
+
+  // INCIDENTS에서 해당 학생 관련 기록 수집
+  const incidents = INCIDENTS.filter(inc=>
+    inc.student && (inc.student.includes(name)) ||
+    inc.content && inc.content.includes(name)
+  );
+  const incHtml = incidents.length ? `
+    <div style="background:#FEF2F2;border-radius:10px;padding:10px 14px;border-left:3px solid #DC2626;margin-top:2px;">
+      <div style="font-size:10px;font-weight:800;color:#991B1B;margin-bottom:6px;">📋 수업별 특이사항 (${incidents.length}건)</div>
+      ${incidents.map(inc=>`
+        <div style="padding:5px 0;border-bottom:1px solid #FEE2E2;last-child:border:none;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+            <span style="background:#DC262618;color:#DC2626;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:800;">${inc.date}</span>
+            <span style="font-size:10px;font-weight:700;color:#374151;">${inc.subject}</span>
+            <span style="font-size:9px;color:#fff;background:#DC2626;border-radius:4px;padding:1px 5px;font-weight:700;">${inc.tag}</span>
+          </div>
+          <div style="font-size:10px;color:#6B7280;white-space:pre-line;line-height:1.6;">${
+            // 해당 학생 관련 줄만 추출
+            inc.content.split('\n').filter(l=>l.trim()&&(l.includes(name)||!l.startsWith('①')&&!l.startsWith('②')&&!l.startsWith('③')&&!l.startsWith('④')&&!l.startsWith('⑤')&&!l.startsWith('⑥')||l.includes(name))).map(l=>{
+              // ①~⑥ 중 해당 학생 줄만
+              if(/^[①②③④⑤⑥]/.test(l)) return l.includes(name)?l:'';
+              return l;
+            }).filter(Boolean).join('\n')
+          }</div>
+          ${inc.action?`<div style="font-size:10px;color:#059669;margin-top:3px;">→ ${inc.action}</div>`:''}
+        </div>
+      `).join('')}
+    </div>` : '';
+
+  showPopup(`
+    <div style="background:${rc};padding:16px;border-radius:18px 18px 0 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="stu-avatar" data-pk="${found.cls.replace('-','')+found.name}"
+            style="width:44px;height:44px;border-radius:22px;background:rgba(255,255,255,0.25);
+            display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0;">
+            ${found.num||'?'}
+          </div>
+          <div>
+            <div style="color:#fff;font-size:18px;font-weight:900;">${found.name}</div>
+            <div style="color:rgba(255,255,255,0.8);font-size:11px;margin-top:2px;">${found.cls} · ${room}</div>
+          </div>
+        </div>
+        <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:30px;height:30px;color:#fff;font-size:14px;cursor:pointer;">✕</button>
+      </div>
+    </div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:8px;">
+      <div style="background:#F8F5FF;border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="background:${typeBg[found.type]||'#F3F4F6'};color:${typeColor[found.type]||'#374151'};
+            border-radius:6px;padding:2px 10px;font-size:11px;font-weight:700;">${found.type||''}</span>
+          ${found.gender?`<span style="background:#F0F2F8;color:#374151;border-radius:6px;padding:2px 10px;font-size:11px;font-weight:700;">${found.gender}</span>`:''}
+        </div>
+        <div style="font-size:12px;color:#374151;">👤 보호자: ${found.guardian||'-'}</div>
+        ${found.phone?`<a href="tel:${found.phone}" style="font-size:12px;color:#1565C0;font-weight:700;text-decoration:none;">📞 ${found.phone}</a>`:''}
+      </div>
+      ${allNote
+        ? `<div style="background:#FFF3CD;border-radius:10px;padding:10px 14px;border-left:3px solid #F59E0B;">
+            <div style="font-size:10px;font-weight:800;color:#92400E;margin-bottom:4px;">📌 특이사항</div>
+            <div style="font-size:12px;color:#78350F;white-space:pre-line;line-height:1.7;">${allNote}</div>
+           </div>`
+        : `<div style="text-align:center;padding:12px;color:var(--muted);font-size:13px;">특이사항 없음</div>`
+      }
+      ${incHtml}
+    </div>
+  `);
+  requestAnimationFrame(()=>applyAvatarPhotos(document.querySelector('.popup-overlay')));
+}
+
 
 function showDaycareNote(noteText){
   // 해당 note와 일치하는 전체 교실 학생 수집
@@ -1581,7 +1680,7 @@ function renderStudentList(){
             <div style="flex:1;min-width:0;">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                 <span style="font-size:12px;font-weight:700;color:${roomColor[s.room]};min-width:26px;">${s.num}번</span>
-                <span style="font-size:15px;font-weight:800;">${s.name}</span>
+                <span onclick="openDaycareStudent('${s.cls}','${s.name}')" style="font-size:15px;font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${s.name}</span>
                 <span style="background:${roomBg[s.room]};color:${roomColor[s.room]};
                   border-radius:5px;padding:1px 6px;font-size:9px;font-weight:800;">${s.room}</span>
               </div>
