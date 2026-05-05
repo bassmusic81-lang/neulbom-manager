@@ -2412,6 +2412,13 @@ function getPlace(subj){
   return '장소 미정';
 }
 
+function getPlaceByDay(subj, day, slot){
+  if(subj==='보드게임' && day==='수') return '2동 1층 과학실 1';
+  if(subj==='그림책놀이' && day==='금') return '2동 1층 전담교실 2';
+  if(subj==='뉴스포츠' && day==='목') return '2동 2층 다목적강당';
+  return getPlace(subj);
+}
+
 function showRoomSearchFor(room){
   showRoomSearch();
   // 팝업이 열린 후 해당 교실로 전환
@@ -2440,6 +2447,7 @@ function showIdleRoomWizard(){
 
   // 요일별 수업장소 오버라이드 (PLACE_MAP_WEB의 기본값과 다른 경우)
   const DAY_ROOM_OVERRIDE = {
+    수: { "보드게임": "2동 1층 과학실 1" },
     금: { "그림책놀이": "2동 1층 전담교실 2" },
     목: { "뉴스포츠": "2동 2층 다목적강당" },
   };
@@ -3092,7 +3100,7 @@ function showLunchPopup(dateLabel, key){
 function showSubjDetail(subj, day, slot){
   const color = gc(subj);
   const instr = INSTRUCTOR_MAP[subj];
-  const place = getPlace(subj);
+  const place = getPlaceByDay(subj, day, slot);
   const roster = getRosterAllClasses(subj, day, slot);
   const slotLabel = slot==='s1'?'맞춤형 1교시':slot==='s2'?'맞춤형 2교시':'맞춤형 3교시';
   const timeMap = {s1:'13:50~14:30', s2:'14:40~15:20', s3:'15:20~16:00'};
@@ -3308,7 +3316,7 @@ function buildMcTimetable(){
         const parts=subj.includes('+')?subj.split('+'):[subj];
         return `<td style="padding:3px 2px;text-align:center">${parts.map(p=>{
           p=p.trim();
-          const color=gc(p); const place=getPlace(p);
+          const color=gc(p); const place=getPlaceByDay(p,d,'s1');
           return `<div onclick="showSubjDetail('${p}','${d}','${realKey||skey}')"
             style="background:${color}20;color:${color};border:1.5px solid ${color}66;border-radius:7px;padding:5px 3px;margin-bottom:2px;cursor:pointer;min-height:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
             <span style="font-weight:800;font-size:9px;text-align:center;line-height:1.2">${p}</span>
