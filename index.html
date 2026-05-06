@@ -1938,7 +1938,7 @@ function renderCourseView(){
           <div style="flex:1;min-width:0;">
             <div style="font-size:15px;font-weight:900;color:${color};">${subj}</div>
             <div style="font-size:10px;color:var(--muted);margin-top:1px;">
-              ${instr?`👤 ${instr.name} · `:''}📍 ${getPlace(subj)}
+              ${instr?`👤 ${instr.name} · `:''}📍 ${getPlaceByDay(subj, sessions[0]?.day||'', sessions[0]?.slot||'')}
             </div>
           </div>
           <span style="font-size:10px;color:var(--muted);flex-shrink:0;">▼ 탭하여 열기</span>
@@ -2341,7 +2341,7 @@ function ttCell(subj, day, slot) {
   const cells = parts.map(p=>{
     p=p.trim();
     const color=gc(p);
-    const place=getPlace(p);
+    const place=getPlaceByDay(p,day,slot);
     return `<div class="subj-cell" onclick="showSubjDetail('${p}','${day}','${slot}')"
       style="background:${color}20;color:${color};border:1.5px solid ${color}66;border-radius:7px;padding:5px 3px;margin-bottom:2px;cursor:pointer;min-height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
       <span style="font-weight:800;font-size:9px;text-align:center;line-height:1.2">${p}</span>
@@ -2417,7 +2417,10 @@ function getPlace(subj){
 function getPlaceByDay(subj, day, slot){
   if(subj==='보드게임' && day==='수') return '2동 1층 과학실 1';
   if(subj==='그림책놀이' && day==='금') return '2동 1층 전담교실 2';
-  if(subj==='뉴스포츠' && day==='목') return '2동 2층 다목적강당';
+  // 체육관 지붕공사 (5/6~): 뉴스포츠·놀이체육 장소 변경
+  if(subj==='뉴스포츠' && day==='목') return '운동장 (우천시 1동 3층 늘봄교실 1)';
+  if(subj==='뉴스포츠' && day==='화') return '운동장 (우천시 본동 3층 다목적실)';
+  if(subj==='놀이체육' && day==='금') return '운동장 (우천시 본동 3층 다목적실)';
   return getPlace(subj);
 }
 
