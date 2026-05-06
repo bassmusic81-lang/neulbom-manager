@@ -253,13 +253,26 @@ function applyAvatarPhotos(root){
   // data-pk가 있고 사진이 있는 아바타에 줌 클릭 핸들러 추가
   (root||document).querySelectorAll('.stu-avatar[data-pk]').forEach(el=>{
     const pk = el.dataset.pk;
-    if(window.PHOTO_LARGE && window.PHOTO_LARGE[pk] && !el._photoHandled){
-      el._photoHandled = true;
+    if(!pk) return;
+    // PHOTO_LARGE에 사진이 있으면 background-image를 직접 적용 (CSS shorthand 충돌 방지)
+    if(window.PHOTO_LARGE && window.PHOTO_LARGE[pk]){
+      // 인라인 background를 보존하되, background-image만 덮어씀
+      el.style.backgroundImage = `url("${window.PHOTO_LARGE[pk]}")`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+      el.style.color = 'transparent';
       el.style.cursor = 'pointer';
-      el.addEventListener('click', e=>{
-        e.stopPropagation();
-        showPhotoZoom(pk, el.closest('.student-item, [style*="border-left"]')?.querySelector('.stu-name, [style*="font-weight:800"]')?.textContent || pk);
-      });
+      // 클릭 핸들러는 한 번만 등록
+      if(!el._photoHandled){
+        el._photoHandled = true;
+        el.addEventListener('click', function(e){
+          e.stopPropagation();
+          const currentPk = this.dataset.pk;
+          if(!window.PHOTO_LARGE || !window.PHOTO_LARGE[currentPk]) return;
+          const nameEl = this.closest('.student-item, [style*="border-left"]')?.querySelector('.stu-name, [style*="font-weight:800"]');
+          showPhotoZoom(currentPk, nameEl?.textContent?.trim() || currentPk);
+        });
+      }
     }
   });
 }
