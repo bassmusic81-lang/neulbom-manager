@@ -353,7 +353,7 @@ const STUDENTS = [
   {id:"21김재준",name:"김재준",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:2,phone:"010-3435-8715",note:"화 로봇과학A(1교시) / 목·금 2교시 제외\n⚠ [4/2] 전래놀이 결보강 중 폭행 피해"},
   {id:"21김주안",name:"김주안",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:3,phone:"010-8927-1127",note:""},
   {id:"21고율아",name:"고율아",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:10,phone:"010-9604-8549",note:""},
-  {id:"21문채빈",name:"문채빈",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:12,phone:"010-7174-6106",note:"매일 1교시만 / 화취소"},
+  {id:"21문채빈",name:"문채빈",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:12,phone:"010-7174-6106",note:"수 수업 취소(담임 학습) / 월 그림책놀이 취소 / 화·목·금 2교시 취소"},
   {id:"21유지우",name:"유지우",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:14,phone:"010-5432-8107",note:"화 뉴스포츠+칼라클레이 / 목 1교시만"},
   {id:"21윤효은",name:"윤효은",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:15,phone:"010-4248-8997",note:"월·목·금취소 / 화·수 1교시만\n🏫 돌봄 대기 3번"},
   {id:"21이소율",name:"이소율",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:16,phone:"010-2849-3614",note:"맞춤형 전체 취소"},
@@ -685,7 +685,7 @@ function parseSpecialFromNote(note) {
 
 // 파서로 처리 못하는 특수 케이스 (운영상 결정)
 const MANUAL_OVERRIDE = {
-  "문채빈": { skipS2Days:["화","수","목","금"], skipS3Days:["월"] },
+  "문채빈": { skipDays:["수"], skipS2Days:["화","목","금"], skipS3Days:["월"] },
   "유지우":  { skipS3Days:["월"] },
   "구도안":  (()=>{ const t=new Date(),tk=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`; return tk>='2026-04-20' ? {skipDays:["월","화","수","목","금"]} : {skipS3Days:["월"]}; })(),
   "정래은":  (()=>{ const t=new Date(),tk=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`; return tk<'2026-05-20' ? {skipDays:["월","화","수","목","금"]} : {}; })(),
@@ -1804,8 +1804,11 @@ function openStuModal(id){
     : `<span style="color:rgba(255,255,255,0.5);font-size:12px">연락처 없음</span>`;
 
   document.getElementById('stu-modal-body').innerHTML = `
-    ${s.note?`<div style="background:#FFF0F0;border-radius:12px;padding:14px;border:1.5px solid #FFCDD2;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px">⚠ 특이사항</div>
+    ${s.note?`<div onclick="showStudentNoteDetail('${s.id}')" style="background:#FFF0F0;border-radius:12px;padding:14px;border:1.5px solid #FFCDD2;margin-bottom:10px;cursor:pointer;transition:transform 0.1s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div style="font-size:12px;font-weight:700;color:var(--danger);">⚠ 특이사항</div>
+        <span style="font-size:10px;color:var(--danger);background:#FFCDD2;border-radius:4px;padding:2px 6px;font-weight:700;">탭하여 자세히 보기 ›</span>
+      </div>
       <div style="font-size:13px;color:var(--danger);line-height:20px;white-space:pre-line">${s.note}</div>
     </div>`:''}
     ${(()=>{
@@ -1818,15 +1821,18 @@ function openStuModal(id){
         '📋 출석관리':'#2E7D32','✅ 처리완료':'#388E3C','분실물 확인필요':'#6A1B9A'
       };
       return `<div style="background:#FFF8E1;border-radius:12px;padding:14px;border:1.5px solid #FFE082;margin-bottom:10px">
-        <div style="font-size:12px;font-weight:700;color:#F57F17;margin-bottom:8px">📋 관련 특이사항 기록 (${related.length}건)</div>
+        <div style="font-size:12px;font-weight:700;color:#F57F17;margin-bottom:8px">📋 관련 특이사항 기록 (${related.length}건) · 탭하여 자세히 보기</div>
         ${related.map(inc=>{
           const tc=tagColor[inc.tag]||'#555';
-          return `<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:6px;border-left:3px solid ${tc};">
+          return `<div onclick="event.stopPropagation();showIncidentDetail(${inc.seq})"
+            style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:6px;border-left:3px solid ${tc};cursor:pointer;transition:transform 0.1s;"
+            onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
               <span style="font-size:10px;font-weight:800;color:${tc};background:${tc}15;border-radius:4px;padding:1px 6px;">${inc.tag}</span>
               <span style="font-size:10px;color:var(--muted);">${inc.date} · ${inc.subject}</span>
+              <span style="margin-left:auto;font-size:10px;color:${tc};font-weight:700;">›</span>
             </div>
-            <div style="font-size:12px;color:var(--text);line-height:1.6;white-space:pre-line;">${inc.content}</div>
+            <div style="font-size:12px;color:var(--text);line-height:1.6;white-space:pre-line;max-height:60px;overflow:hidden;">${inc.content}</div>
             ${inc.action?`<div style="font-size:11px;color:#1565C0;margin-top:5px;font-weight:600;">→ ${inc.action}</div>`:''}
           </div>`;
         }).join('')}
@@ -1874,6 +1880,111 @@ function openStuModal(id){
 
 function closeStuModal(){
   document.getElementById('stu-modal').classList.add('hidden');
+}
+
+// ── 학생 특이사항(note) 상세 팝업 ──
+function showStudentNoteDetail(stuId){
+  const s = STUDENTS.find(x=>x.id===stuId);
+  if(!s) return;
+  const hc = s.grade===1 ? 'var(--primary)' : 'var(--primary2)';
+
+  // note 파싱
+  const sp = getStudentSpecial(s.name.trim(), s.note) || {};
+  const DAYS_KOR = ["월","화","수","목","금"];
+
+  // 파싱 결과 시각화
+  const parsedRows = [];
+  if(sp.skipDays?.length) parsedRows.push({label:"📅 전체 취소 요일", value:sp.skipDays.join(', ')+' 요일'});
+  if(sp.skipS1Days?.length) parsedRows.push({label:"❌ 1교시 취소", value:sp.skipS1Days.join(', ')+' 요일'});
+  if(sp.skipS2Days?.length) parsedRows.push({label:"❌ 2교시 취소", value:sp.skipS2Days.join(', ')+' 요일'});
+  if(sp.skipS3Days?.length) parsedRows.push({label:"❌ 3교시 취소", value:sp.skipS3Days.join(', ')+' 요일'});
+  if(sp.replaceS1) Object.entries(sp.replaceS1).forEach(([d,v])=>parsedRows.push({label:`🔁 ${d} 1교시 교체`, value:v}));
+  if(sp.replaceS2) Object.entries(sp.replaceS2).forEach(([d,v])=>parsedRows.push({label:`🔁 ${d} 2교시 교체`, value:v}));
+
+  showPopup(`
+    <div style="background:${hc};padding:16px;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="color:#fff;font-size:17px;font-weight:900;">⚠ ${s.name} 특이사항</div>
+        <div style="color:rgba(255,255,255,0.85);font-size:12px;margin-top:2px;">${s.clsLabel} · ${s.num}번</div>
+      </div>
+      <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:16px;max-height:65vh;overflow-y:auto;">
+      <div style="background:#FFF0F0;border-radius:10px;padding:14px;border-left:4px solid var(--danger);margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:800;color:var(--danger);margin-bottom:6px;letter-spacing:0.5px;">📝 등록된 특이사항</div>
+        <div style="font-size:14px;color:var(--danger);line-height:1.7;white-space:pre-line;font-weight:600;">${s.note||'(없음)'}</div>
+      </div>
+
+      ${parsedRows.length ? `
+        <div style="background:#F0F4FF;border-radius:10px;padding:14px;border-left:4px solid #1565C0;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:800;color:#1565C0;margin-bottom:8px;letter-spacing:0.5px;">🔍 시스템 적용 내역</div>
+          ${parsedRows.map(r=>`
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #DBE7FF;">
+              <span style="font-size:12px;color:#1F2937;font-weight:600;">${r.label}</span>
+              <span style="font-size:12px;color:#1565C0;font-weight:800;">${r.value}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      ${s.phone ? `
+        <div style="background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--border);margin-bottom:8px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📞 보호자 연락처</div>
+          <a href="tel:${s.phone}" style="font-size:15px;color:#1565C0;font-weight:800;text-decoration:none;">${s.phone}</a>
+        </div>
+      ` : ''}
+
+      <button onclick="closePopup()" style="width:100%;background:#F0F0F0;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;">닫기</button>
+    </div>
+  `);
+}
+
+// ── INCIDENT 상세 팝업 ──
+function showIncidentDetail(seq){
+  const inc = INCIDENTS.find(x=>x.seq===seq);
+  if(!inc) return;
+  const tagColor={
+    '⚠ 요주의':'#E65100','⚠ 민원':'#C62828','민원 1회':'#E65100',
+    '⚠ 폭행사건':'#B71C1C','⚠ 안전사고':'#B71C1C','⚠ 조기하교':'#1565C0',
+    '📋 출석관리':'#2E7D32','✅ 처리완료':'#388E3C','분실물 확인필요':'#6A1B9A'
+  };
+  const tc = tagColor[inc.tag] || '#555';
+
+  showPopup(`
+    <div style="background:${tc};padding:16px;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:space-between;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+          <span style="background:rgba(255,255,255,0.25);color:#fff;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:800;">${inc.tag}</span>
+          <span style="font-size:11px;color:rgba(255,255,255,0.85);">#${inc.seq}</span>
+        </div>
+        <div style="color:#fff;font-size:15px;font-weight:900;margin-top:2px;">${inc.subject}</div>
+        <div style="color:rgba(255,255,255,0.85);font-size:12px;margin-top:2px;">${inc.date}</div>
+      </div>
+      <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:32px;height:32px;color:#fff;font-size:15px;cursor:pointer;flex-shrink:0;">✕</button>
+    </div>
+    <div style="padding:16px;max-height:65vh;overflow-y:auto;">
+      ${inc.student ? `
+        <div style="background:#FFF8E1;border-radius:10px;padding:12px 14px;border-left:4px solid #F57F17;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:800;color:#F57F17;margin-bottom:5px;letter-spacing:0.5px;">👥 관련 학생</div>
+          <div style="font-size:13px;color:#78350F;font-weight:700;white-space:pre-line;line-height:1.6;">${inc.student}</div>
+        </div>
+      ` : ''}
+
+      <div style="background:#fff;border-radius:10px;padding:14px;border:1.5px solid ${tc}33;margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:800;color:${tc};margin-bottom:6px;letter-spacing:0.5px;">📋 내용</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.8;white-space:pre-line;">${inc.content}</div>
+      </div>
+
+      ${inc.action ? `
+        <div style="background:#E3F2FD;border-radius:10px;padding:14px;border-left:4px solid #1565C0;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:800;color:#1565C0;margin-bottom:6px;letter-spacing:0.5px;">✅ 후속 조치</div>
+          <div style="font-size:13px;color:#0D47A1;line-height:1.7;white-space:pre-line;">${inc.action}</div>
+        </div>
+      ` : ''}
+
+      <button onclick="closePopup()" style="width:100%;background:#F0F0F0;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;">닫기</button>
+    </div>
+  `);
 }
 
 // ── 강사 연락처 팝업 ──
