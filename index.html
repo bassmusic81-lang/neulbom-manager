@@ -446,6 +446,7 @@ const INCIDENTS = [
   {seq:12,date:"4/28(화)",subject:"맞춤형 1교시",student:"1-1 정  건",content:"화·목·금 맞춤형 1교시 후 비욘드잉글리시 학원 등원 (4/28부터 매주)\n오늘(4/28)은 어머니 동행 → 1교시 후 학원 동행",action:"어머니 직접 방문 확인 / 담임 공유",tag:"📌 하교변경"},
   {seq:13,date:"4/29(화)",subject:"늘봄지원실 민원전화",student:"2-1 한봄",content:"13:29 늘봄지원실로 전화\n하이클래스 사진 관련 민원\n- 저번에도 같은 학생 사진만 올라오고 자녀 사진은 잘 올라오지 않음\n- 자녀 사진은 표정이 별로거나 뒤에 있었음\n- 이런 것들이 차별이라고 생각한다고 함\n어머니 학년·반·이름 공개 거부 → 내용 전달만 부탁\n전화번호 메모 후 크로샷으로 한봄 어머니 확인",action:"담당 교사 전달 필요 / 사진 게시 형평성 주의 요망",tag:"⚠ 민원"},
   {seq:14,date:"4/29(화)",subject:"늘봄지원실 민원전화",student:"2-1 한봄",content:"14:43 늘봄지원실로 전화\n교무실로 연결해 달라고 요청 → 안된다고 안내하고 용건을 물어봄\n- 학교에서 전화가 왔는데 받지 못했다고 함\n- 담임선생님이 하이톡 메시지 하지 말라고 했다고 말함\n→ 전화를 빈번히 하여 업무에 방해가 된다고 전달함",action:"담임 및 관련 교사 공유 필요 / 반복 연락 모니터링",tag:"⚠ 민원"},
+  {seq:16,date:"5/11(월)",subject:"로봇과학(방과후·월)",student:"3-2 김하운",content:"📌 지속적 수업 방해 행동\n\n[행동 양상]\n• 다른 친구와 잡담 시도\n• 수업 중 릴스 등에서 들은 노래를 부름\n• 교실 입장 시 노래를 흥얼거리며 들어옴\n• 같은 반 차승우 학생과 같은 자리(2인 책상)에 앉고 싶어함\n• 차승우 옆자리에서 계속 말을 걸고 로봇 조립을 방해\n\n[3월 말 조치 이력]\n• 김하운 어머니와 로봇과학 강사 통화\n• 차승우와 같이 앉지 않도록 지시\n• 처음에는 잘 따르지 않다가 개별석으로 이동\n• 개별석 이동 후에도 다른 자리 학생들과 잡담 시도\n\n[5/11(월) 수업 사건]\n• 차승우 학생이 하리보젤리를 하나 줌\n• 김하운이 그것을 먹지 않고 로봇에 부착하고 장난\n• 하리보젤리가 땅에 떨어짐\n• 강사가 버리라고 지시 → 버리지 않고 그것을 먹음\n• 본인 발언: \"땅에 떨어진 것도 먹어요\"\n\n[영향]\n수업에 참여하는 다른 학생들에게 방해가 됨",action:"강사 보고 접수 / 담임 공유 예정 / 보호자 재상담 검토",tag:"⚠ 요주의"},
   {seq:15,date:"5/4(월)",subject:"긴급돌봄 미등교",student:"여러 학생",content:"5/4(월) 재량휴업일 긴급돌봄 신청 후 미등교 학생 현황\n\n① 박세민 — 10일까지 현장체험학습 신청\n② 박서아 — 10일까지 현장체험학습 신청\n③ 장우주 — 긴급돌봄 신청하였으나 보내지 않음\n④ 김민준 — 긴급돌봄 신청하였으나 보내지 않음\n⑤ 최유진 — 전화통화 못함\n⑥ 최정우 — 미등교 (전화통화 못함)",action:"전화 미연결 학생(최정우) 재시도 / 담임 공유",tag:"⚠ 미등교"},
   {seq:11,date:"4/24(목)",subject:"놀이체육(맞춤형 2교시)",student:"2-3 최지훈",content:"맞춤형 2교시 놀이체육 수업 중 눈에 공을 맞음 → 보건실 다녀옴",action:"보건실 처치 완료",tag:"⚠ 안전사고"}
 ];
@@ -3960,6 +3961,164 @@ function renderAttendDB(){
 }
 
 // ── 특이사항 ──
+// ── INCIDENT 캘린더 뷰 ──
+let incCalMonth = new Date();
+function parseIncDate(dateStr){
+  // "5/11(월)" or "5/4(월)" → {month, day}
+  const m = dateStr.match(/(\d+)\/(\d+)/);
+  if(!m) return null;
+  return { month: parseInt(m[1]), day: parseInt(m[2]) };
+}
+function renderIncidentCalendar(){
+  const y = incCalMonth.getFullYear();
+  const m = incCalMonth.getMonth(); // 0-based
+  const monthNum = m + 1;
+  const monthNames = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+  const dayNames = ["일","월","화","수","목","금","토"];
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const firstDay = new Date(y, m, 1).getDay();
+
+  // 이 달의 사건 매핑 {day: [inc, inc, ...]}
+  const dayMap = {};
+  INCIDENTS.forEach(inc=>{
+    const p = parseIncDate(inc.date);
+    if(p && p.month === monthNum) {
+      if(!dayMap[p.day]) dayMap[p.day] = [];
+      dayMap[p.day].push(inc);
+    }
+  });
+
+  // 태그 색상
+  const tagColor = (tag='') => {
+    if(tag.includes("처리완료")) return "#388E3C";
+    if(tag.includes("출석관리")) return "#1565C0";
+    if(tag.includes("폭행") || tag.includes("안전사고")) return "#B71C1C";
+    if(tag.includes("민원")) return "#C62828";
+    if(tag.includes("미등교")) return "#E65100";
+    if(tag.includes("⚠")) return "#FF6B35";
+    return "#6B7280";
+  };
+
+  // 캘린더 셀
+  const cells = [...Array(firstDay).fill(null), ...Array.from({length:daysInMonth},(_,i)=>i+1)];
+  while(cells.length % 7 !== 0) cells.push(null);
+
+  // 이 달 통계
+  const monthIncidents = Object.values(dayMap).flat();
+  const totalCount = monthIncidents.length;
+  const seriousCount = monthIncidents.filter(i=>(i.tag||'').includes('⚠')).length;
+
+  return `
+    <!-- 월 이동 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:10px;border:1px solid var(--border);">
+      <button onclick="incCalMonth=new Date(${y},${m-1},1);renderNotes()" style="background:none;border:none;font-size:22px;color:#7B2C00;cursor:pointer;padding:4px 10px;">‹</button>
+      <div style="text-align:center;">
+        <div style="font-size:16px;font-weight:900;color:#7B2C00;">${y}년 ${monthNames[m]}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">사건 ${totalCount}건 ${seriousCount>0?`· ⚠ ${seriousCount}건`:''}</div>
+      </div>
+      <button onclick="incCalMonth=new Date(${y},${m+1},1);renderNotes()" style="background:none;border:none;font-size:22px;color:#7B2C00;cursor:pointer;padding:4px 10px;">›</button>
+    </div>
+
+    <!-- 캘린더 -->
+    <div style="background:#fff;border-radius:12px;padding:10px;border:1px solid var(--border);margin-bottom:10px;">
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:5px;">
+        ${dayNames.map((d,i)=>`<div style="text-align:center;font-size:11px;font-weight:800;padding:5px 0;color:${i===0?'#C00000':i===6?'#1565C0':'#374151'};">${d}</div>`).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;">
+        ${cells.map((day,idx)=>{
+          if(!day) return `<div style="aspect-ratio:1;"></div>`;
+          const dow = idx % 7;
+          const incs = dayMap[day] || [];
+          const hasInc = incs.length > 0;
+          const dayColor = dow===0?'#C00000':dow===6?'#1565C0':'#374151';
+          // 가장 심각한 태그 색상
+          const mainColor = hasInc ? tagColor(incs.find(i=>i.tag?.includes('⚠'))?.tag || incs[0].tag) : null;
+
+          return `<div ${hasInc?`onclick="showIncidentsByDate('${monthNum}/${day}')"`:''} 
+            style="aspect-ratio:1;background:${hasInc?mainColor+'15':'#F9FAFB'};
+            border:1.5px solid ${hasInc?mainColor:'transparent'};border-radius:8px;
+            padding:4px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+            cursor:${hasInc?'pointer':'default'};position:relative;overflow:hidden;">
+            <div style="font-size:11px;font-weight:${hasInc?'900':'600'};color:${hasInc?mainColor:dayColor};">${day}</div>
+            ${hasInc?`
+              <div style="font-size:9px;color:${mainColor};font-weight:800;margin-top:2px;">●${incs.length>1?`×${incs.length}`:''}</div>
+            `:''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- 범례 -->
+    <div style="background:#FFF8E1;border-radius:10px;padding:10px 14px;font-size:11px;color:#78350F;border-left:3px solid #F57F17;margin-bottom:10px;">
+      💡 날짜를 탭하면 해당 일자의 사건 목록을 볼 수 있습니다.
+    </div>
+
+    <!-- 이 달 사건 요약 (최근 사건 위쪽으로) -->
+    ${totalCount>0?`
+      <div style="font-size:12px;font-weight:800;color:#7B2C00;margin:10px 0 8px 4px;">📋 ${monthNames[m]} 사건 목록 (${totalCount}건)</div>
+      ${monthIncidents.sort((a,b)=>{
+        const da=parseIncDate(a.date), db=parseIncDate(b.date);
+        return db.day - da.day;
+      }).map(inc=>{
+        const bc = tagColor(inc.tag);
+        return `<div onclick="showIncidentDetail(${inc.seq})" class="incident-card" style="border-color:${bc};cursor:pointer;margin-bottom:8px;"
+          onmousedown="this.style.transform='scale(0.99)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+            <span style="background:${bc}22;color:${bc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:800;">${inc.date}</span>
+            <span style="font-weight:800;font-size:12px;color:#7B2C00;flex:1;">${inc.subject}</span>
+            <span style="background:${bc}22;color:${bc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;">${inc.tag}</span>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:#B71C1C;margin-bottom:3px;">${inc.student}</div>
+          <div style="font-size:11px;color:#555;line-height:1.5;max-height:36px;overflow:hidden;">${inc.content}</div>
+        </div>`;
+      }).join('')}
+    `:`<div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;">📭 이 달은 등록된 사건이 없습니다.</div>`}
+  `;
+}
+
+// 특정 날짜의 사건 목록 팝업
+function showIncidentsByDate(dateKey){
+  const incs = INCIDENTS.filter(inc=>{
+    const p = parseIncDate(inc.date);
+    return p && `${p.month}/${p.day}` === dateKey;
+  });
+  if(!incs.length) return;
+
+  const tagColor = (tag='') => {
+    if(tag.includes("처리완료")) return "#388E3C";
+    if(tag.includes("출석관리")) return "#1565C0";
+    if(tag.includes("폭행") || tag.includes("안전사고")) return "#B71C1C";
+    if(tag.includes("민원")) return "#C62828";
+    if(tag.includes("미등교")) return "#E65100";
+    if(tag.includes("⚠")) return "#FF6B35";
+    return "#6B7280";
+  };
+
+  showPopup(`
+    <div style="background:#7B2C00;padding:14px;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="color:#fff;font-size:16px;font-weight:900;">📅 ${dateKey} 사건</div>
+        <div style="color:rgba(255,255,255,0.8);font-size:11px;margin-top:2px;">${incs.length}건 등록됨</div>
+      </div>
+      <button onclick="closePopup()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;width:30px;height:30px;color:#fff;font-size:14px;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:12px;max-height:65vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
+      ${incs.map(inc=>{
+        const bc = tagColor(inc.tag);
+        return `<div onclick="closePopup();setTimeout(()=>showIncidentDetail(${inc.seq}),150)"
+          style="background:#fff;border-radius:10px;padding:10px 12px;border-left:4px solid ${bc};cursor:pointer;border:1px solid ${bc}33;">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+            <span style="background:${bc}22;color:${bc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:800;">${inc.tag}</span>
+            <span style="font-weight:800;font-size:12px;color:#7B2C00;">${inc.subject}</span>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:#B71C1C;margin-bottom:3px;">${inc.student}</div>
+          <div style="font-size:11px;color:#555;line-height:1.5;max-height:40px;overflow:hidden;">${inc.content}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `);
+}
+
 function renderNotes(){
   const noteStus = STUDENTS.filter(s=>s.note);
   document.getElementById('screen-notes').innerHTML = `
@@ -3967,13 +4126,14 @@ function renderNotes(){
       <div style="color:#fff;font-size:20px;font-weight:800">특이사항</div>
       <div style="color:#fff;font-size:12px;opacity:0.7">${noteStus.length}명 기록됨 · 수업별 ${INCIDENTS.length}건 · DB ${ATTEND_DB.length}건</div>
     </div>
-    <div style="display:flex;background:#fff;border-bottom:1px solid var(--border)">
-      <button onclick="notesTab='students';renderNotes()" style="flex:1;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:700;color:${notesTab==='students'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='students'?'#7B2C00':'transparent'}">학생 특이사항</button>
-      <button onclick="notesTab='incidents';renderNotes()" style="flex:1;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:700;color:${notesTab==='incidents'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='incidents'?'#7B2C00':'transparent'}">수업별 특이사항</button>
-      <button onclick="notesTab='attenddb';renderNotes()" style="flex:1;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:700;color:${notesTab==='attenddb'?'#1565C0':'var(--muted)'};border-bottom:3px solid ${notesTab==='attenddb'?'#1565C0':'transparent'}">📋 출석DB</button>
+    <div style="display:flex;background:#fff;border-bottom:1px solid var(--border);overflow-x:auto;">
+      <button onclick="notesTab='students';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='students'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='students'?'#7B2C00':'transparent'};white-space:nowrap;">학생 특이</button>
+      <button onclick="notesTab='incidents';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='incidents'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='incidents'?'#7B2C00':'transparent'};white-space:nowrap;">수업별</button>
+      <button onclick="notesTab='calendar';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='calendar'?'#FF6B35':'var(--muted)'};border-bottom:3px solid ${notesTab==='calendar'?'#FF6B35':'transparent'};white-space:nowrap;">📅 캘린더</button>
+      <button onclick="notesTab='attenddb';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='attenddb'?'#1565C0':'var(--muted)'};border-bottom:3px solid ${notesTab==='attenddb'?'#1565C0':'transparent'};white-space:nowrap;">📋 출석DB</button>
     </div>
     <div style="padding:12px">
-      ${notesTab==='attenddb' ? renderAttendDB() : notesTab==='students' ? noteStus.map(s=>{
+      ${notesTab==='calendar' ? renderIncidentCalendar() : notesTab==='attenddb' ? renderAttendDB() : notesTab==='students' ? noteStus.map(s=>{
         const isW=s.note.includes("⚠");
         const bc=isW?"#F44336":"#FFB347";
         return `<div class="incident-card" style="border-color:${bc}">
@@ -3992,14 +4152,17 @@ function renderNotes(){
         else if(tag.includes("출석관리")) bc="#4472C4";
         else if(tag.includes("폭행")) bc="#C00000";
         else if(tag.includes("⚠")) bc="#FF6B35";
-        return `<div class="incident-card" style="border-color:${bc}">
+        return `<div class="incident-card" onclick="showIncidentDetail(${inc.seq})"
+          style="border-color:${bc};cursor:pointer;transition:transform 0.1s;"
+          onmousedown="this.style.transform='scale(0.99)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">
             <span style="background:${bc}22;color:${bc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">${inc.date}</span>
             <span style="font-weight:800;font-size:13px;color:#7B2C00;flex:1">${inc.subject}</span>
             <span style="background:${bc}22;color:${bc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">${tag}</span>
+            <span style="font-size:11px;color:${bc};font-weight:700;">›</span>
           </div>
           <div style="font-size:12px;font-weight:700;color:#B71C1C;margin-bottom:4px;white-space:pre-line">${inc.student}</div>
-          <div style="font-size:12px;color:#555;line-height:18px;margin-bottom:6px;white-space:pre-line">${inc.content}</div>
+          <div style="font-size:12px;color:#555;line-height:18px;margin-bottom:6px;white-space:pre-line;max-height:80px;overflow:hidden;">${inc.content}</div>
           <div style="font-size:11px;color:${bc};font-weight:600">▶ ${inc.action}</div>
         </div>`;
       }).join('')}
