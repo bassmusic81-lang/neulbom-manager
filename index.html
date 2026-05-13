@@ -2624,7 +2624,7 @@ const PLACE_MAP_WEB = {
   "칼라클레이":"1동 3층 늘봄교실 2","창의과학":"1동 3층 늘봄교실 2","중국어":"1동 3층 늘봄교실 2",
   "영어회화":"1동 1층 영어체험실","영어야놀자":"1동 1층 영어체험실",
   "방송댄스":"3동 2층 나리실","전래놀이":"3동 2층 나리실",
-  "보드게임":"3동 2층 영양교육실","우쿨렐레":"본동 3층 다목적실",
+  "보드게임":"2동 1층 과학실 1","우쿨렐레":"본동 3층 다목적실",
   "도자공예":"3동 1층 과학실 2","로봇과학":"2동 1층 전담교실 1",
   "책놀이":"2동 1층 전담교실 1",
 };
@@ -2690,7 +2690,7 @@ function showIdleRoomWizard(){
         if(!subj||subj==='—') return;
         subj.split('+').forEach(s=>{
           s=s.trim();
-          const place=(DAY_ROOM_OVERRIDE[day]&&DAY_ROOM_OVERRIDE[day][s]) || getPlace(s);
+          const place=getPlaceByDay(s, day, '');
           if(place==='장소 미정') return;
           if(!busy[place]) busy[place]=[];
           let time='';
@@ -2819,6 +2819,28 @@ function showRoomSearch(){
     // 방과후에도 같은 수업명이 있으면 항상 "(맞춤형)" 구분
     const label = afterSchoolNames.has(subj) ? subj+'(맞춤형)' : subj;
     if(!roomMap[place].includes(label)) roomMap[place].push(label);
+  }
+  // 요일별 장소 오버라이드도 추가 (예: 보드게임 수→과학실 1, 뉴스포츠 화→운동장 등)
+  // SCHEDULES를 순회하면서 getPlaceByDay 결과가 PLACE_MAP_WEB 기본값과 다르면 별도 등록
+  for(const [cls, sc] of Object.entries(SCHEDULES)){
+    for(const [day, slots] of Object.entries(sc)){
+      slots.forEach(subj=>{
+        if(!subj||subj==='—') return;
+        subj.split('+').forEach(s=>{
+          s=s.trim();
+          const overridePlace = getPlaceByDay(s, day, '');
+          const defaultPlace = PLACE_MAP_WEB[s];
+          if(overridePlace && overridePlace !== defaultPlace && overridePlace !== '장소 미정'){
+            if(!roomMap[overridePlace]) roomMap[overridePlace]=[];
+            const label = afterSchoolNames.has(s) ? s+'(맞춤형)' : s;
+            const dayLabel = `${label} (${day})`;
+            if(!roomMap[overridePlace].includes(dayLabel) && !roomMap[overridePlace].includes(label)){
+              roomMap[overridePlace].push(dayLabel);
+            }
+          }
+        });
+      });
+    }
   }
   // 방과후: AFTER_SCHOOL 기반
   AFTER_SCHOOL.forEach(p=>{
@@ -3056,7 +3078,15 @@ function downloadTimetableXlsx(clsOnly){
     로봇과학:'FF6B35',로봇과학A:'FF6B35',로봇과학B:'E55A00',컴퓨터:'2C6BB5',
   };
   function getColor(subj){ if(!subj) return '555555'; for(const[k,v] of Object.entries(SUBJ_COLORS)) if(subj.includes(k)) return v; return '555555'; }
-  function getPlace(subj){ return PLACE_MAP_WEB?.[subj]||''; }
+  // 요일별 오버라이드를 반영한 장소 조회 (전역 getPlaceByDay와 동일 로직)
+  function getPlaceLocal(subj, day){
+    if(subj==='보드게임' && day==='수') return '2동 1층 과학실 1';
+    if(subj==='그림책놀이' && day==='금') return '2동 1층 전담교실 2';
+    if(subj==='뉴스포츠' && day==='목') return '운동장 (우천시 1동 3층 늘봄교실 1)';
+    if(subj==='뉴스포츠' && day==='화') return '운동장 (우천시 본동 3층 다목적실)';
+    if(subj==='놀이체육' && day==='금') return '운동장 (우천시 본동 3층 다목적실)';
+    return PLACE_MAP_WEB?.[subj]||'';
+  }
 
   for(const cls of clsList){
     const sc=SCHEDULES[cls]||{};
@@ -3086,7 +3116,7 @@ function downloadTimetableXlsx(clsOnly){
       for(const day of DAYS){
         const subj=getSubj(day,i);
         if(!subj||subj==='—'){ row.push((!is2&&(day!=='월'&&day!=='수')&&i===0)||(is2&&day!=='수'&&i===0)?'정규수업':'—'); }
-        else { const pl=getPlace(subj); row.push(subj+(pl?' ('+pl+')':'')); }
+        else { const pl=getPlaceLocal(subj, day); row.push(subj+(pl?' ('+pl+')':'')); }
       }
       rows.push(row);
     }
