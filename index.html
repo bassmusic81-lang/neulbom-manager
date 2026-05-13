@@ -3432,7 +3432,19 @@ function showSubjDetail(subj, day, slot){
   const place = getPlaceByDay(subj, day, slot);
   const roster = getRosterAllClasses(subj, day, slot);
   const slotLabel = slot==='s1'?'맞춤형 1교시':slot==='s2'?'맞춤형 2교시':'맞춤형 3교시';
-  const timeMap = {s1:'13:50~14:30', s2:'14:40~15:20', s3:'15:20~16:00'};
+  // 요일과 슬롯, 학년에 따른 정확한 시간 계산
+  // (1학년/2학년 모두 동일 패턴: 월·수 1교시=13:10, 화·목·금 1교시=13:50, 2학년 월 1교시는 없음)
+  function calcTime(d, sl){
+    if(sl==='s1'){
+      return (d==='월'||d==='수') ? '13:10~13:50' : '13:50~14:30';
+    } else if(sl==='s2'){
+      return (d==='월'||d==='수') ? '14:00~14:40' : '14:40~15:20';
+    } else if(sl==='s3'){
+      return d==='월' ? '14:40~15:20' : '15:20~16:00';
+    }
+    return '';
+  }
+  const slotTime = calcTime(day, slot);
 
   // 출석 세션 키 생성 (출석부와 동일한 키 구조)
   function getAttKey(stu) {
@@ -3494,7 +3506,7 @@ function showSubjDetail(subj, day, slot){
       <div style="background:${color}10;border-radius:12px;padding:12px;border-left:4px solid ${color}">
         <div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px">📍 수업 장소</div>
         <div style="font-size:15px;font-weight:800;color:var(--text)">${place}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">🕐 ${timeMap[slot]||''}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">🕐 ${slotTime}</div>
       </div>
       <!-- 강사 -->
       ${instr ? `
