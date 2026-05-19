@@ -374,7 +374,7 @@ const STUDENTS = [
   {id:"22이윤솔",name:"이윤슬",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:16,phone:"010-9382-5731",note:"화 로봇과학B(2교시)\n목 2교시 방송댄스 취소"},
   {id:"22이효주",name:"이효주",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:17,phone:"010-6616-2672",note:""},
   {id:"22천하늘",name:"천하늘",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:18,phone:"010-8530-1544",note:""},
-  {id:"22황리아",name:"황리아",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:20,phone:"010-5743-0549",note:"전입 (5/6~)"},
+  {id:"22황리아",name:"황리아",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:20,phone:"010-5743-0549",note:"전입 (5/6~) / 월 첫수업만(동생 하교)"},
   {id:"22최라희",name:"최라희",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:19,phone:"010-7686-7679",note:"금 2교시 취소 / 그림책놀이(1교시)만 하교"},
   {id:"23정래은",name:"정래은",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:4,phone:"010-3305-4699",note:"꽃가루 알레르기로 당분간 맞춤형 전체 결석\n5/20 이후 복귀 예정 (정확한 날짜 별도 연락)"},
   {id:"23조연준",name:"조연준",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:5,phone:"010-5697-8882",note:"화 로봇과학A(1교시)"},
@@ -708,6 +708,7 @@ function parseSpecialFromNote(note) {
 // 파서로 처리 못하는 특수 케이스 (운영상 결정)
 const MANUAL_OVERRIDE = {
   "문채빈": { skipDays:["수"], skipS2Days:["화","목","금"], skipS3Days:["월"] },
+  "황리아": { skipS3Days:["월"] },
   "유지우":  { skipS3Days:["월"] },
   "구도안":  (()=>{ const t=new Date(),tk=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`; return tk>='2026-04-20' ? {skipDays:["월","화","수","목","금"]} : {skipS3Days:["월"]}; })(),
   "정래은":  (()=>{ const t=new Date(),tk=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`; return tk<'2026-05-20' ? {skipDays:["월","화","수","목","금"]} : {}; })(),
