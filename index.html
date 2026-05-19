@@ -2798,7 +2798,8 @@ function showIdleRoomWizard(){
               </div>`).join('')}
           </div>`;
         }).join('')}
-      </div>`;
+      </div>
+      ${teacherRoomsHTML()}`;
   }
 
   function dayTabsHTML(day){
@@ -2807,6 +2808,131 @@ function showIdleRoomWizard(){
         style="flex:1;padding:6px 2px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;
           background:${d===day?'#fff':'rgba(255,255,255,0.15)'};
           color:${d===day?'#C2410C':'rgba(255,255,255,0.85)'};">${d}</button>`).join('');
+  }
+
+  // 전담교사 특별실 사용 정보 (2026.03.05. 교과전담 시간표 기준)
+  // grid: 요일별 1~5교시 배열 (빈 칸은 '')
+  const TEACHER_ROOMS = [
+    { room:"1동 1층 영어체험실", teacher:"백미향(교무)", subj:"영어 4-1·2, 5학년", hours:"16시간",
+      grid:{ 월:["4-2","4-1","5-1","5-2",""], 화:["4-1","4-2","5-4","5-3",""], 수:["","","","",""], 목:["5-1","5-4","5-3","5-2",""], 금:["5-2","5-4","5-3","5-1",""] } },
+    { room:"2동 1층 전담교실 1", teacher:"장신영(연구)", subj:"과학 4학년, 영어 4-3·4", hours:"16시간",
+      grid:{ 월:["4-1","4-3","4-2","4-4",""], 화:["4-3","4-3","4-1","4-1",""], 수:["4-4","4-4","4-2","4-2",""], 목:["","4-3","4-4","",""], 금:["","4-3","4-4","",""] } },
+    { room:"본동 3층 다목적실", teacher:"권효주", subj:"영어 3·6학년", hours:"18시간",
+      grid:{ 월:["3-3","3-1","3-2","","6-2"], 화:["순회(맹방초)","","","",""], 수:["6-3","6-4","6-1","6-1","6-4"], 목:["3-2","3-3","3-1","6-2",""], 금:["6-1","6-2","6-3","6-3",""] } },
+    { room:"슬기관 1 / 운동장", teacher:"권순규", subj:"체육·협 3·6학년", hours:"14시간",
+      grid:{ 월:["6-3","6-4","6-1","6-2",""], 화:["순회(호산초)","","","",""], 수:["6-1","6-3","6-2","6-4",""], 목:["","6-3","6-4","6-1",""], 금:["6-2","4-1","4-2","",""] } },
+    { room:"슬기관 1 / 운동장", teacher:"김권일", subj:"체육·협 3·5학년", hours:"14시간",
+      grid:{ 월:["4-3","4-4","","",""], 화:["5-1","5-2","5-3","5-4",""], 수:["순회(하장초)","","","",""], 목:["5-3","5-2","5-1","5-4",""], 금:["5-4","5-3","5-1","5-2",""] } },
+    { room:"슬기관 1 / 운동장", teacher:"이기백(체육)", subj:"체육 3·4학년", hours:"17시간",
+      grid:{ 월:["3-3","3-2","3-3","3-1",""], 화:["4-2","3-1","3-2","",""], 수:["4-1","4-3","4-1","4-4",""], 목:["","4-2","4-3","4-4",""], 금:["3-3","3-1","3-2","",""] } },
+    { room:"2동 1층 전담교실 2", teacher:"장현숙(과학)", subj:"과학 3·5학년", hours:"16.5시간",
+      grid:{ 월:["5-2","5-3","","","3-1"], 화:["5-4","5-4","5-4","5-1",""], 수:["","","","",""], 목:["5-1","5-1","5-2","5-2",""], 금:["3-1","3-1","5-3","5-3",""] } },
+    { room:"3동 1층 과학실 2", teacher:"김미경(생활)", subj:"과학 3·6학년", hours:"16.5시간",
+      grid:{ 월:["6-1","6-2","6-3","6-4",""], 화:["6-4","6-4","6-1","6-1",""], 수:["","","","",""], 목:["6-2","6-2","6-3","6-3",""], 금:["3-2","3-2","3-2·3-3","3-3","3-3"] } },
+    { room:"3동 2층 영양교육실", teacher:"정춘영", subj:"영양교육 1~6학년·창체", hours:"전학년 2차시",
+      grid:null, note:"전 학년 2차시 · 학급별 시수표 별도" },
+    { room:"1동 1층 도서관", teacher:"이선자/김지연", subj:"독서교육 1~6학년·창체", hours:"6시간",
+      grid:{ 월:["",""], 화:["2-4","1-4"], 수:["2-3","1-3"], 목:["2-2","1-2"], 금:["2-1","1-1"] },
+      note:"2학기 기준 · 1교시 2학년, 2교시 1학년 / 전 학년 6차시" },
+  ];
+
+  // 교실별 전담 정보 그룹핑
+  function teacherRoomsByRoom(){
+    const map = {};
+    TEACHER_ROOMS.forEach(t=>{
+      // "슬기관 1 / 운동장" 같은 복합 표기는 첫 장소 기준
+      const key = t.room;
+      if(!map[key]) map[key]=[];
+      map[key].push(t);
+    });
+    return map;
+  }
+
+  function teacherRoomsHTML(){
+    const DOW = ["월","화","수","목","금"];
+    const dcol = {월:"#4472C4",화:"#70AD47",수:"#ED7D31",목:"#9B59B6",금:"#C00000"};
+    // 교시별 시간 (오전 1~4교시는 전 학년 공통, 오후 5~6교시는 학년군별 상이)
+    const PT_COMMON = ["09:10~09:50","10:00~10:40","10:50~11:30","11:40~12:20"]; // 1~4교시
+    const PT_P5 = { g12:"13:00~13:40", g3:"13:00~13:40", g456:"13:10~13:50" };   // 5교시
+    const PT_P6 = { g3:"13:50~14:30", g456:"14:00~14:40" };                       // 6교시
+    function gradeOf(cell){
+      const m = (cell||'').match(/^([1-6])-/);
+      if(!m) return null;
+      const g = parseInt(m[1]);
+      if(g<=2) return 'g12'; if(g===3) return 'g3'; return 'g456';
+    }
+    // 한 교시 행의 시간 라벨 (해당 행에 등장하는 학년에 따라)
+    function periodTimeLabel(t, pIdx){
+      if(pIdx<4) return PT_COMMON[pIdx];
+      // 5·6교시: 행의 셀들 학년 확인
+      const grades = new Set();
+      DOW.forEach(d=>{ const g=gradeOf((t.grid[d]||[])[pIdx]); if(g) grades.add(g); });
+      const tbl = pIdx===4 ? PT_P5 : PT_P6;
+      const times = [...new Set([...grades].map(g=>tbl[g]).filter(Boolean))];
+      return times.length ? times.join('\n') : (tbl.g456||'');
+    }
+    function gridCard(t){
+      if(!t.grid){
+        return `<div style="background:#fff;border:1px solid #DDD6FE;border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:800;color:#5B21B6;">📍 ${t.room}</div>
+          <div style="font-size:11px;color:#374151;margin:4px 0;"><b>${t.teacher}</b> · ${t.subj} <span style="color:#6D28D9;">(${t.hours})</span></div>
+          <div style="font-size:10px;color:#6B7280;">${t.note||''}</div>
+        </div>`;
+      }
+      const maxP = Math.max(...DOW.map(d=>(t.grid[d]||[]).length));
+      let rows = '';
+      for(let p=0;p<maxP;p++){
+        const tl = periodTimeLabel(t, p);
+        rows += `<tr>
+          <td style="padding:5px 4px;text-align:center;background:#F5F3FF;border:1px solid #E9E3FF;">
+            <div style="font-weight:800;color:#5B21B6;font-size:11px;">${p+1}</div>
+            <div style="font-size:8px;color:#8B7BB8;line-height:1.3;white-space:pre-line;margin-top:1px;">${tl}</div>
+          </td>
+          ${DOW.map(d=>{
+            const v=(t.grid[d]||[])[p]||'';
+            const isSpecial = v.includes('순회');
+            return `<td style="padding:5px 3px;text-align:center;font-size:10px;border:1px solid #E9E3FF;
+              ${v?`background:${isSpecial?'#FEF3C7':dcol[d]+'14'};color:${isSpecial?'#92400E':dcol[d]};font-weight:700;`:'background:#FAFAFA;color:#D1D5DB;'}">
+              ${v||'·'}</td>`;
+          }).join('')}
+        </tr>`;
+      }
+      return `<div style="background:#fff;border:1px solid #DDD6FE;border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
+          <span style="font-size:13px;font-weight:800;color:#5B21B6;">📍 ${t.room}</span>
+          <span style="font-size:10px;background:#EDE9FE;color:#6D28D9;border-radius:4px;padding:1px 6px;">${t.hours}</span>
+        </div>
+        <div style="font-size:11px;color:#374151;margin-bottom:7px;"><b>${t.teacher}</b> · ${t.subj}</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;min-width:320px;">
+            <thead><tr>
+              <th style="padding:5px 4px;background:#EDE9FE;color:#5B21B6;font-size:10px;font-weight:800;border:1px solid #E9E3FF;width:60px;">교시·시간</th>
+              ${DOW.map(d=>`<th style="padding:5px 3px;background:${dcol[d]};color:#fff;font-size:10px;font-weight:800;border:1px solid #E9E3FF;">${d}</th>`).join('')}
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+        ${t.note?`<div style="font-size:9px;color:#9CA3AF;margin-top:6px;">※ ${t.note}</div>`:''}
+      </div>`;
+    }
+    return `
+      <div style="margin-top:18px;padding-top:14px;border-top:2px dashed #E5E7EB;">
+        <div onclick="(function(){var b=document.getElementById('tr-body');b.style.display=b.style.display==='none'?'block':'none';})()"
+          style="display:flex;align-items:center;gap:6px;margin-bottom:10px;cursor:pointer;">
+          <span style="background:#EDE9FE;color:#5B21B6;border-radius:6px;padding:3px 12px;font-size:12px;font-weight:800;">📚 전담수업 특별실 시간표</span>
+          <span style="font-size:10px;color:#9CA3AF;margin-left:auto;">▼ 탭하여 펼치기</span>
+        </div>
+        <div id="tr-body" style="display:none;">
+          <div style="background:#F5F3FF;border-radius:8px;padding:8px 12px;font-size:10px;color:#6D28D9;margin-bottom:10px;border-left:3px solid #8B5CF6;line-height:1.7;">
+            ⏰ <b>교시 시간</b> (40분 수업·10분 휴식)<br>
+            1교시 09:10~09:50 · 2교시 10:00~10:40 · 3교시 10:50~11:30 · 4교시 11:40~12:20<br>
+            5교시 — 3학년 13:00~13:40 / 4·5·6학년 13:10~13:50<br>
+            6교시 — 3학년 13:50~14:30 / 4·5·6학년 14:00~14:40<br>
+            <span style="color:#9CA3AF;">※ 2026.03.05. 교과전담 시간표 기준 · 일부 셀은 원본 확인 후 보정 필요</span>
+          </div>
+          ${TEACHER_ROOMS.map(gridCard).join('')}
+        </div>
+      </div>`;
   }
 
   showPopup(`
