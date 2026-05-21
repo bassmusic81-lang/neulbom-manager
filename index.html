@@ -384,7 +384,7 @@ const STUDENTS = [
   {id:"23최하율",name:"최하율",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:10,phone:"010-9929-8792",note:"화·목 1교시 컴퓨터(방과후)+로봇과학B(2교시) / 목취소"},
   {id:"23김리안",name:"김리안",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:11,phone:"010-6249-6442",note:"월·수 정규수업 후 1시간 교실 공부 → 맞춤형 참여 / 화 로봇과학B(2교시)"},
   {id:"23김서율",name:"김서율",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:12,phone:"010-9447-0801",note:""},
-  {id:"23김지유",name:"김지유",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:13,phone:"010-5001-7827",note:""},
+  {id:"23김지유",name:"김지유",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:13,phone:"010-5001-7827",note:"수 2교시(우쿨렐레) 당분간 미참여 (참여 시 전화 안내 요청)"},
   {id:"23김하윤",name:"김하윤",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:14,phone:"010-3370-0308",note:""},
   {id:"23이나연",name:"이나연",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:17,phone:"010-4710-7532",note:""},
   {id:"23최서우",name:"최서우",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:19,phone:"010-8580-9053",note:""},
@@ -710,6 +710,7 @@ function parseSpecialFromNote(note) {
 const MANUAL_OVERRIDE = {
   "문채빈": { skipDays:["수"], skipS2Days:["화","목","금"], skipS3Days:["월"] },
   "황리아": { skipS3Days:["월"] },
+  "김지유": { skipS2Days:["수"] },
   "유지우":  { skipS3Days:["월"] },
   "구도안":  (()=>{ const t=new Date(),tk=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`; return tk>='2026-04-20' ? {skipDays:["월","화","수","목","금"]} : {skipS3Days:["월"]}; })(),
   "정래은":  (()=>{ const t=new Date(),tk=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`; return tk<'2026-05-20' ? {skipDays:["월","화","수","목","금"]} : {}; })(),
