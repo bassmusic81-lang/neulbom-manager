@@ -408,13 +408,79 @@ const STUDENTS = [
 const SCHEDULES = {
   "1-1":{월:["발레","칼라클레이"],화:["오카리나","음악줄넘기"],수:["주산암산","종이접기"],목:["오카리나","영어회화"],금:["놀이체육","전래놀이"]},
   "1-2":{월:["주산암산","종이접기"],화:["음악줄넘기","오카리나"],수:["보드게임","주산암산"],목:["영어회화","오카리나"],금:["영어야놀자","전래놀이"]},
-  "1-3":{월:["칼라클레이","주산암산"],화:["방송댄스","음악줄넘기"],수:["보드게임","주산암산"],목:["영어회화","토탈공예"],금:["놀이체육","영어야놀자"]},
+  "1-3":{월:["칼라클레이","주산암산"],화:["방송댄스","음악줄넘기"],수:["보드게임","주산암산"],목:["영어회화","토탈공예"],금:["전래놀이","영어야놀자"]},
   "1-4":{월:["종이접기+도자공예","칼라클레이"],화:["음악줄넘기","오카리나"],수:["창의과학","종이접기"],목:["토탈공예","오카리나"],금:["전래놀이","영어야놀자"]},
   "2-1":{월:["—","축구(풋살)","그림책놀이"],화:["뉴스포츠","칼라클레이"],수:["종이접기","우쿨렐레"],목:["뉴스포츠","중국어"],금:["창의미술","놀이체육"]},
   "2-2":{월:["—","발레","축구(풋살)"],화:["뉴스포츠","칼라클레이"],수:["우쿨렐레","창의과학"],목:["중국어","방송댄스"],금:["그림책놀이","창의미술"]},
   "2-3":{월:["—","종이접기","그림책놀이"],화:["칼라클레이","뉴스포츠"],수:["종이접기","우쿨렐레"],목:["방송댄스","뉴스포츠"],금:["영어야놀자","놀이체육"]},
   "2-4":{월:["—","도자공예","종이접기"],화:["칼라클레이","방송댄스"],수:["창의과학","보드게임"],목:["뉴스포츠","중국어"],금:["창의미술","그림책놀이"]}
 };
+// 시간표 변경 이력: 특정 날짜부터 변경된 수업 (날짜 기준 분기 표시용)
+// SCHEDULES는 최신값(from 이후) 기준. 그 이전 날짜에는 oldSubj로 표시
+const SCHEDULE_CHANGES = [
+  { clsKey:"1-3", day:"금", slotIdx:0, from:"2026-06-05", oldSubj:"놀이체육", newSubj:"전래놀이" },
+];
+// 특정 일자만 한시적 변경 (강사 휴가·대회 인솔 등으로 1회성 대체)
+const SCHEDULE_OVERRIDES_BY_DATE = [
+  // 2026-06-09 (화) 육상대회 인솔로 음악줄넘기·뉴스포츠 대체
+  { date:"2026-06-09", clsKey:"1-2", day:"화", oldSubj:"음악줄넘기", newSubj:"보드게임",     place:"1동 1층 영어체험실", reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"1-4", day:"화", oldSubj:"음악줄넘기", newSubj:"보드게임",     place:"1동 1층 영어체험실", reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"1-1", day:"화", oldSubj:"음악줄넘기", newSubj:"영어야놀자",   place:"본동 3층 다목적실",   reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"1-3", day:"화", oldSubj:"음악줄넘기", newSubj:"영어야놀자",   place:"본동 3층 다목적실",   reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"2-1", day:"화", oldSubj:"뉴스포츠",   newSubj:"담임 교실대체", place:"각 반 교실",         reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"2-2", day:"화", oldSubj:"뉴스포츠",   newSubj:"담임 교실대체", place:"각 반 교실",         reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"2-3", day:"화", oldSubj:"뉴스포츠",   newSubj:"방송댄스",     place:"3동 2층 나리실",     reason:"육상대회 인솔" },
+];
+function getDisplaySubj(clsKey, day, currentSubj, dateKey){
+  if(!currentSubj || !dateKey) return currentSubj;
+  for(const ch of SCHEDULE_CHANGES){
+    if(ch.clsKey===clsKey && ch.day===day && ch.newSubj===currentSubj){
+      return dateKey < ch.from ? ch.oldSubj : ch.newSubj;
+    }
+  }
+  return currentSubj;
+}
+// 특정 반·요일 시간표 배열을 dateKey 기준 변환해서 반환
+function getScheduleForDay(clsKey, day, dateKey){
+  const sc = SCHEDULES[clsKey]; if(!sc) return null;
+  const arr = sc[day]; if(!arr) return arr;
+  if(!dateKey) return arr;
+  return arr.map((subj, idx) => {
+    if(!subj || subj==='—') return subj;
+    // 영구 변경 (SCHEDULE_CHANGES)
+    for(const ch of SCHEDULE_CHANGES){
+      if(ch.clsKey===clsKey && ch.day===day && ch.newSubj===subj){
+        if(typeof ch.slotIdx==='number' && ch.slotIdx!==idx) continue;
+        subj = dateKey < ch.from ? ch.oldSubj : ch.newSubj;
+      }
+    }
+    // 한시 변경 (SCHEDULE_OVERRIDES_BY_DATE) - oldSubj 매칭으로 자동 적용
+    for(const ov of SCHEDULE_OVERRIDES_BY_DATE){
+      if(ov.date===dateKey && ov.clsKey===clsKey && ov.day===day && ov.oldSubj===subj){
+        subj = ov.newSubj;
+        break;
+      }
+    }
+    return subj;
+  });
+}
+// 한시 변경 정보 조회 (oldSubj 또는 newSubj 매칭)
+function getActiveDayOverride(clsKey, day, subj, dateKey){
+  if(!dateKey) return null;
+  for(const ov of SCHEDULE_OVERRIDES_BY_DATE){
+    if(ov.date===dateKey && ov.clsKey===clsKey && ov.day===day &&
+       (ov.oldSubj===subj || ov.newSubj===subj)) return ov;
+  }
+  return null;
+}
+// 특정 요일의 dateKey 반환 (현재 viewWeekOffset의 그 요일)
+function getDayDateKey(day){
+  const dd = DAY_DATES[day];
+  if(!dd) return null;
+  const [m,d] = dd.split('/');
+  const yr = new Date().getFullYear();
+  return `${yr}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
 
 const INSTRUCTOR_MAP = {
   "영어회화":{name:"윤형숙",phone:"010-2358-1168"},"창의과학":{name:"윤정민",phone:"010-6379-5200"},
@@ -745,7 +811,8 @@ const SC = {
   주산암산:"#833C00",토탈공예:"#833C00",창의미술:"#833C00",칼라클레이:"#843C0C",
   창의과학:"#17375E",중국어:"#17375E",영어회화:"#375623",영어야놀자:"#375623",
   방송댄스:"#C00000",전래놀이:"#C00000",보드게임:"#4B2A94",우쿨렐레:"#215868",
-  도자공예:"#7B2C00",로봇과학:"#FF6B35",로봇과학A:"#FF6B35",로봇과학B:"#E55A00"
+  도자공예:"#7B2C00",로봇과학:"#FF6B35",로봇과학A:"#FF6B35",로봇과학B:"#E55A00",
+  "담임 교실대체":"#607D8B", "교실 대체수업":"#607D8B"
 };
 function gc(s){
   if(!s) return "#555";
@@ -1909,7 +1976,9 @@ function openStuModal(id){
     if(WED_JUSA_M.has(nm)) return day==='수' ? ['주산암산'] : null;
     if(sp?.skipDays?.includes(day)) return null;
 
-    const daysc = sc[day]||[];
+    // dateKey 기반 변환된 시간표 사용 (현재 viewWeekOffset의 그 요일)
+    const dKey = getDayDateKey(day);
+    const daysc = getScheduleForDay(s.clsKey, day, dKey) || [];
     const subjs = [];
 
     if(!is2) {
@@ -2556,11 +2625,9 @@ function resetAtt(){
 // ── 수강자 명단 계산 ──
 function getRoster(subj, day, clsKey) {
   if(!subj || subj==='—') return [];
-  const roster = [];
-  // 현재 반 학생 중 해당 요일 해당 과목 수업인 학생
   const [g,cl] = clsKey.split('-').map(Number);
-  const sc = SCHEDULES[clsKey]||{};
-  const daySubjs = sc[day]||[];
+  const dKey = getDayDateKey(day);
+  const daySubjs = getScheduleForDay(clsKey, day, dKey) || [];
   if(!daySubjs.some(s=>s&&s.includes(subj))) return [];
   return STUDENTS.filter(s=>s.grade===g && s.cls===cl)
     .sort((a,b)=>a.num-b.num);
@@ -2633,9 +2700,10 @@ function getRosterAllClasses(subj, day, slot) {
     return null;
   }
 
-  for(const [clsKey, sc] of Object.entries(SCHEDULES)){
+  const dKeyForDay = getDayDateKey(day);
+  for(const clsKey of Object.keys(SCHEDULES)){
     const [g,cl] = clsKey.split('-').map(Number);
-    const daySubjs = sc[day]||[];
+    const daySubjs = getScheduleForDay(clsKey, day, dKeyForDay) || [];
     const pos = getDefaultPos(g, day, slot);
     if(pos===null) continue;
     const defaultSubjAtPos = daySubjs[pos]||'';
@@ -2678,16 +2746,28 @@ function getRosterAllClasses(subj, day, slot) {
 }
 
 // ── 시간표 셀 렌더 헬퍼 ──
-function ttCell(subj, day, slot) {
+// dateKey: 현재 viewWeekOffset의 해당 요일 날짜 (한시 변경 적용용)
+function ttCell(subj, day, slot, dateKey) {
   if(!subj || subj==='—') return `<td style="padding:3px 2px;text-align:center"><div style="background:#F5F5F5;border-radius:6px;padding:6px 3px;font-size:8px;color:#CCC;min-height:32px;display:flex;align-items:center;justify-content:center">—</div></td>`;
   if(subj==='정규') return `<td style="padding:3px 2px;text-align:center"><div style="background:#F0F2F8;border-radius:6px;padding:6px 3px;font-size:8px;color:#8892A4;min-height:32px;display:flex;align-items:center;justify-content:center">정규수업</div></td>`;
+  const clsKey = (typeof currentTTClass==='string' && /^\d-\d$/.test(currentTTClass)) ? currentTTClass : null;
   const parts = subj.includes('+') ? subj.split('+') : [subj];
   const cells = parts.map(p=>{
     p=p.trim();
     const color=gc(p);
-    const place=getPlaceByDay(p,day,slot);
+    let place=getPlaceByDay(p,day,slot);
+    let isTemp = false;
+    // 한시 변경 적용
+    if(clsKey && dateKey){
+      const ov = getActiveDayOverride(clsKey, day, p, dateKey);
+      if(ov){
+        isTemp = true;
+        if(ov.place) place = ov.place;
+      }
+    }
     return `<div class="subj-cell" onclick="showSubjDetail('${p}','${day}','${slot}')"
-      style="background:${color}20;color:${color};border:1.5px solid ${color}66;border-radius:7px;padding:5px 3px;margin-bottom:2px;cursor:pointer;min-height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
+      style="background:${color}20;color:${color};border:1.5px solid ${color}66;border-radius:7px;padding:5px 3px;margin-bottom:2px;cursor:pointer;min-height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative">
+      ${isTemp?`<span style="position:absolute;top:1px;right:2px;font-size:6px;background:#E65100;color:#fff;padding:0 3px;border-radius:3px;line-height:1.4;font-weight:800;">대체</span>`:''}
       <span style="font-weight:800;font-size:9px;text-align:center;line-height:1.2">${p}</span>
       ${place?`<span style="font-size:7px;opacity:0.75;text-align:center;line-height:1.2">${place.replace('\n',' ')}</span>`:''}
     </div>`;
@@ -3140,8 +3220,9 @@ function showRoomSearch(){
     // 방과후 전용이 아닌 경우 SCHEDULES 조회
     if(!isAfter){
       for(const day of DAYS){
+        const dKey = getDayDateKey(day);
         for(const cls of Object.keys(SCHEDULES)){
-          const dj = SCHEDULES[cls][day]||[];
+          const dj = getScheduleForDay(cls, day, dKey) || [];
           dj.forEach((s,i)=>{
             if(s && s.includes(realSubj)){
               const grade = parseInt(cls[0]);
@@ -3365,13 +3446,13 @@ function downloadTimetableXlsx(clsOnly){
   }
 
   for(const cls of clsList){
-    const sc=SCHEDULES[cls]||{};
     const grade=parseInt(cls[0]);
     const is2=grade===2;
     const gradeLabel=`${grade}학년 ${cls[2]}반`;
 
     function getSubj(day, slotIdx){
-      const dj=sc[day]||[];
+      const dKey = getDayDateKey(day);
+      const dj = getScheduleForDay(cls, day, dKey) || [];
       if(!is2){ if(day==='월'||day==='수') return dj[slotIdx]; else return slotIdx===0?null:dj[slotIdx-1]; }
       else { if(day==='수') return dj[slotIdx]; else if(day==='월') return slotIdx===0?null:dj[slotIdx]; else return slotIdx===0?null:dj[slotIdx-1]; }
     }
@@ -3849,14 +3930,14 @@ function renderTimetable(){
 }
 
 function buildMcTimetable(){
-  const sc = SCHEDULES[currentTTClass]||{};
   const grade = parseInt(currentTTClass[0]);
   const is2 = grade===2;
   const hc = is2 ? 'var(--primary2)' : 'var(--primary)';
   const COL_COLORS = {월:"#4472C4",화:"#70AD47",수:"#ED7D31",목:"#9B59B6",금:"#C00000"};
 
   function getSlot(day, slotIdx) {
-    const daysc = sc[day]||[];
+    const dKey = getDayDateKey(day);
+    const daysc = getScheduleForDay(currentTTClass, day, dKey) || [];
     if(!is2) {
       if(day==='월'||day==='수') {
         if(slotIdx===0) return daysc[0]||null;
@@ -3936,9 +4017,15 @@ function buildMcTimetable(){
         const parts=subj.includes('+')?subj.split('+'):[subj];
         return `<td style="padding:3px 2px;text-align:center">${parts.map(p=>{
           p=p.trim();
-          const color=gc(p); const place=getPlaceByDay(p,d,'s1');
+          const color=gc(p);
+          let place=getPlaceByDay(p,d,'s1');
+          // 한시 변경 적용 (newPlace 우선)
+          const ov = getActiveDayOverride(currentTTClass, d, p, dk);
+          if(ov && ov.place) place = ov.place;
+          const isTemp = !!ov;
           return `<div onclick="showSubjDetail('${p}','${d}','${realKey||skey}')"
-            style="background:${color}20;color:${color};border:1.5px solid ${color}66;border-radius:7px;padding:5px 3px;margin-bottom:2px;cursor:pointer;min-height:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
+            style="background:${color}20;color:${color};border:1.5px solid ${color}66;border-radius:7px;padding:5px 3px;margin-bottom:2px;cursor:pointer;min-height:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative">
+            ${isTemp?`<span style="position:absolute;top:1px;right:2px;font-size:6px;background:#E65100;color:#fff;padding:0 3px;border-radius:3px;line-height:1.4;font-weight:800;">대체</span>`:''}
             <span style="font-weight:800;font-size:9px;text-align:center;line-height:1.2">${p}</span>
             <span style="font-size:7px;opacity:0.75;text-align:center;line-height:1.2">${place.split(' ').slice(0,2).join(' ')}</span>
           </div>`;
