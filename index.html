@@ -409,7 +409,7 @@ const STUDENTS = [
 const SCHEDULES = {
   "1-1":{월:["발레","칼라클레이"],화:["오카리나","음악줄넘기"],수:["주산암산","종이접기"],목:["오카리나","영어회화"],금:["놀이체육","전래놀이"]},
   "1-2":{월:["주산암산","종이접기"],화:["음악줄넘기","오카리나"],수:["보드게임","주산암산"],목:["영어회화","오카리나"],금:["영어야놀자","전래놀이"]},
-  "1-3":{월:["칼라클레이","주산암산"],화:["방송댄스","음악줄넘기"],수:["보드게임","주산암산"],목:["영어회화","토탈공예"],금:["놀이체육","영어야놀자"]},
+  "1-3":{월:["칼라클레이","주산암산"],화:["방송댄스","음악줄넘기"],수:["보드게임","주산암산"],목:["영어회화","토탈공예"],금:["전래놀이","영어야놀자"]},
   "1-4":{월:["종이접기+도자공예","칼라클레이"],화:["음악줄넘기","오카리나"],수:["창의과학","종이접기"],목:["토탈공예","오카리나"],금:["전래놀이","영어야놀자"]},
   "2-1":{월:["—","축구(풋살)","그림책놀이"],화:["뉴스포츠","칼라클레이"],수:["종이접기","우쿨렐레"],목:["뉴스포츠","중국어"],금:["창의미술","놀이체육"]},
   "2-2":{월:["—","발레","축구(풋살)"],화:["뉴스포츠","칼라클레이"],수:["우쿨렐레","창의과학"],목:["중국어","방송댄스"],금:["그림책놀이","창의미술"]},
@@ -827,6 +827,66 @@ function applyDateOverrideToSp(sp, nm, day, dateKey){
 function getStudentDateOverride(nm, day, dateKey){
   if(!dateKey) return null;
   return STUDENT_DATE_OVERRIDES.find(o => o.name===nm && o.date===dateKey) || null;
+}
+
+// 시간표 변경 이력 - 영구 변경
+const SCHEDULE_CHANGES = [
+  { clsKey:"1-3", day:"금", slotIdx:0, from:"2026-06-05", oldSubj:"놀이체육", newSubj:"전래놀이" },
+];
+// 시간표 한시 변경 (6/9 육상대회 인솔 등)
+const SCHEDULE_OVERRIDES_BY_DATE = [
+  { date:"2026-06-09", clsKey:"1-2", day:"화", oldSubj:"음악줄넘기", newSubj:"보드게임",     place:"1동 1층 영어체험실", reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"1-4", day:"화", oldSubj:"음악줄넘기", newSubj:"보드게임",     place:"1동 1층 영어체험실", reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"1-1", day:"화", oldSubj:"음악줄넘기", newSubj:"영어야놀자",   place:"본동 3층 다목적실",   reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"1-3", day:"화", oldSubj:"음악줄넘기", newSubj:"영어야놀자",   place:"본동 3층 다목적실",   reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"2-1", day:"화", oldSubj:"뉴스포츠",   newSubj:"담임 교실대체", place:"각 반 교실",         reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"2-2", day:"화", oldSubj:"뉴스포츠",   newSubj:"담임 교실대체", place:"각 반 교실",         reason:"육상대회 인솔" },
+  { date:"2026-06-09", clsKey:"2-3", day:"화", oldSubj:"뉴스포츠",   newSubj:"방송댄스",     place:"3동 2층 나리실",     reason:"육상대회 인솔" },
+];
+function getDayDateKey(day){
+  const dd = DAY_DATES[day];
+  if(!dd) return null;
+  const [m,d] = dd.split('/');
+  const yr = new Date().getFullYear();
+  return `${yr}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+function getScheduleForDay(clsKey, day, dateKey){
+  const sc = SCHEDULES[clsKey]; if(!sc) return null;
+  const arr = sc[day]; if(!arr) return arr;
+  if(!dateKey) return arr;
+  return arr.map((subj, idx) => {
+    if(!subj || subj==='—') return subj;
+    for(const ch of SCHEDULE_CHANGES){
+      if(ch.clsKey===clsKey && ch.day===day && ch.newSubj===subj){
+        if(typeof ch.slotIdx==='number' && ch.slotIdx!==idx) continue;
+        subj = dateKey < ch.from ? ch.oldSubj : ch.newSubj;
+      }
+    }
+    for(const ov of SCHEDULE_OVERRIDES_BY_DATE){
+      if(ov.date===dateKey && ov.clsKey===clsKey && ov.day===day && ov.oldSubj===subj){
+        subj = ov.newSubj;
+        break;
+      }
+    }
+    return subj;
+  });
+}
+function getActiveDayOverride(clsKey, day, subj, dateKey){
+  if(!dateKey) return null;
+  for(const ov of SCHEDULE_OVERRIDES_BY_DATE){
+    if(ov.date===dateKey && ov.clsKey===clsKey && ov.day===day &&
+       (ov.oldSubj===subj || ov.newSubj===subj)) return ov;
+  }
+  return null;
+}
+function getDisplaySubj(clsKey, day, currentSubj, dateKey){
+  if(!currentSubj || !dateKey) return currentSubj;
+  for(const ch of SCHEDULE_CHANGES){
+    if(ch.clsKey===clsKey && ch.day===day && ch.newSubj===currentSubj){
+      return dateKey < ch.from ? ch.oldSubj : ch.newSubj;
+    }
+  }
+  return currentSubj;
 }
 
 let attData = {};
