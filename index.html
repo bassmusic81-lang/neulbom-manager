@@ -12,6 +12,7 @@
 <title>정라초 늘봄 관리</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.65;}}
 :root{
   --primary:#1F3864;--primary2:#833C00;--accent:#4472C4;
   --bg:#F4F6FB;--card:#fff;--danger:#C00000;
@@ -363,7 +364,7 @@ const STUDENTS = [
   {id:"22김민재",name:"김민재",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:3,phone:"010-8266-0829",note:"수·목·금 1교시 후 이지향피아노학원 차량 탑승 (4/6~)\n월 축구(풋살) 취소 / 화 칼라클레이 취소"},
   {id:"22오윤오",name:"오윤오",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:5,phone:"010-5543-8924",note:"맞춤형 2교시 미참여 / 화·목 1교시 컴퓨터(방과후)"},
   {id:"22왕선호",name:"왕선호",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:6,phone:"010-7392-8793",note:"화 로봇과학A(1교시)"},
-  {id:"22육민준",name:"육민준",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:7,phone:"010-8865-5774",note:"화 로봇과학A(1교시)"},
+  {id:"22육민준",name:"육민준",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:7,phone:"010-8865-5774",note:"맞춤형 2교시 미참여 / 화 로봇과학A(1교시)"},
   {id:"22최성윤",name:"최성윤",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:8,phone:"010-8626-0407",note:"화 로봇과학B(2교시)\n목 2교시 방송댄스 취소"},
   {id:"22김나온",name:"김나온",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:10,phone:"010-9430-0537",note:""},
   {id:"22김시경",name:"김시경",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:11,phone:"010-2499-2062",note:""},
@@ -433,6 +434,7 @@ const INSTRUCTOR_MAP = {
 };
 
 const INCIDENTS = [
+  {seq:21,date:"6/18(목)",subject:"📞 학부모 민원 (학교폭력 우려 문의)",student:"1-3 이다은 (15번)",content:"📞 학부모 직접 강사 연락 사건\n\n[발생 일시]\n• 2026년 6월 18일(목)\n\n[학부모 행동]\n• 이다은 어머니가 이다은이 수업받는 모든 맞춤형 프로그램 강사에게 개별 전화\n\n[문의 내용]\n• 맞춤형 수업 중 다른 학생에게 학교폭력을 당하지 않는지 확인 문의\n\n[전화받은 강사 명단 (이다은 수강 과목 강사)]\n• 칼라클레이 강사 (월 1교시)\n• 주산암산 강사 (월·수 2교시)\n• 방송댄스 강사 (화 1교시)\n• 보드게임 강사 (수 1교시)\n• 영어회화 강사 (목 1교시)\n• 전래놀이 강사 (금 1교시)\n\n[현재 상황 파악]\n• 실제 학교폭력 사건은 보고된 바 없음\n• 어머니의 사전 우려 차원의 문의로 추정\n• 다만 6개 프로그램 강사 전체에게 직접 연락한 점은 이례적\n\n[참고]\n• 이다은 일정: 월·수 1·2교시 / 화·목·금 1교시만 / 2시40분 하교\n• 보호자 연락처: 010-8241-8819",action:"① 강사 전체 공지 - 어머니께서 우려 차원 문의하셨으니 이다은 수업 중 동향 세심히 관찰 / ② 수업 중 갈등·불편 상황 발생 시 즉시 늘봄지원실 보고 / ③ 어머니께 별도 연락드려 어떤 우려가 있는지 구체 청취 / ④ 어머니에게 향후 우려 시 강사 개별 연락보다 늘봄지원실 우선 안내 권유 (033-571-5300) / ⑤ 이다은 본인에게도 자연스럽게 학교생활 안부 확인",tag:"📞 학부모 민원"},
   {seq:20,date:"상시",subject:"⚠️ 응급대응 (땅콩 알레르기)",student:"2-1 이하린",content:"🚨 땅콩 알레르기 학생 - 응급 대응 절차\n\n[학생 정보]\n• 이름: 이하린 (2-1, 18번)\n• 보호자 연락처: 010-2848-1331\n• 알레르기 항목: 땅콩\n\n[이상 증상 - 즉시 대응 필요]\n• 가려움 호소\n• 목이 답답함 호소\n• 배가 아픔 호소\n• 기타 컨디션 이상 (조금이라도 아픔 호소 시)\n\n[증상 발생 시 대응 절차]\n① 즉시 수업 중단\n② 학생을 보건실로 인솔\n③ 늘봄지원실 즉시 연락 (033-571-5300)\n④ 보호자(010-2848-1331)에게 상황 전달\n\n[강사 사전 안내 사항]\n• 모든 맞춤형 강사에게 공유 완료\n• 강사앱 학생 모달에 ⚠️ 표시\n• 간식 제공 시 땅콩 함유 여부 반드시 확인",action:"맞춤형 강사 전체 공유 / 보건실 사전 협조 / 보호자 비상 연락처 확인 / 간식 제공 시 알레르기 항목 사전 점검 의무화",tag:"🔒 비공개"},
   {seq:19,date:"여름방학",subject:"🔒 건강관리 (당뇨)",student:"1-2 변민재 (돌봄1교실)",content:"📌 여름방학 돌봄 신청 - 인슐린 주사 관리 안내\n\n[기본 정보]\n• 학생: 변민재 (돌봄1교실 4번, 1-2)\n• 보호자: 유영민 / 010-5914-7526\n• 매일 점심 직전 인슐린 주사 필요\n• 당뇨 관리 중인 학생\n\n[여름방학 인슐린 주사 장소]\n• 1학년 연구실\n  (학기중과 다름 - 변경됨)\n\n[운영 시 유의 사항]\n• 여름방학 점심시간을 어머니께 정확히 안내 필요\n  - 어머니가 시간 맞춰 인슐린 주사 준비\n• 당뇨 관리 관련 궁금한 점 → 어머니와 직접 상담\n\n[비상 대비물품]\n• 사탕 충분히 비축 (저혈당 대비)\n  - 여름방학 시작 전 확보\n• 음료수도 필요 시 미리 요청 가능\n\n[전달 경로]\n• 전소정 → 심효순 (2026-06-10)\n• 학부모앱·강사앱 공개 금지",action:"여름방학 점심시간 확정 후 변민재 어머니께 사전 안내 / 사탕·음료수 사전 확보 / 인슐린 장소(1학년 연구실) 어머니 확인 / 당뇨 관리 관련 어머니와 상담 채널 유지",tag:"🔒 비공개"},
   {seq:18,date:"5/22(목)",subject:"놀이체육(맞춤형 1교시)",student:"1-3 최우찬",content:"📌 강사 지도 불응 - 훈육 지도\n\n[사건 경위]\n• 맞춤형 1교시 놀이체육 수업 중\n• 다른 친구에게 공을 던지는 행위\n• 강사가 \"공을 던지지 말라\"고 지도\n• 최우찬, 강사 지도에 따르지 않음\n\n[훈육 조치]\n• 늘봄지원실장 직접 훈육 지도\n• 다음 사항을 학생에게 주지시킴:\n  ① 강사 선생님 지도에 협조할 것\n  ② 반복 시 늘봄지원실로 이동\n  ③ 지원실장과 1:1 면담 진행\n  ④ 개별 지도(분리 지도) 받게 됨\n\n[참고]\n• 4/21 방송댄스 시간 안전사고(백태클) 이력 있음\n• 평소 장난 수위 높은 학생군에 포함되어 관찰 중",action:"강사 보고 접수 / 늘봄지원실장 1차 훈육 완료 / 담임 공유 예정 / 반복 시 분리 지도 적용",tag:"⚠ 요주의"},
@@ -756,7 +758,7 @@ const MANUAL_OVERRIDE = {
   "백창훈":  { replaceS1:{화:"로봇과학A"} },
   "배준원":  { replaceS1:{화:"로봇과학A"} },
   "최아린":  { replaceS1:{화:"로봇과학A"} },
-  "육민준":  { replaceS1:{화:"로봇과학A"} },
+  "육민준":  { replaceS1:{화:"로봇과학A"}, skipS2Days:["화","수","목","금"], skipS3Days:["월"] },
   "주원":  { replaceS1:{화:"로봇과학A"} },
   "최예린":  { replaceS1:{화:"로봇과학A"} },
   "조연준":  { replaceS1:{화:"로봇과학A"} },
@@ -801,6 +803,30 @@ function getStudentSpecial(nm, note) {
     else merged[k]=v;
   }
   return Object.keys(merged).length>0 ? merged : null;
+}
+
+// 학생별 특정 날짜 출결 변경 (한시 참여/결석)
+const STUDENT_DATE_OVERRIDES = [
+  { name:"육민준", date:"2026-07-23", joinAll:true, reason:"특별 참여 (1·2교시 모두 참여)" },
+];
+function applyDateOverrideToSp(sp, nm, day, dateKey){
+  if(!dateKey) return sp;
+  const ov = STUDENT_DATE_OVERRIDES.find(o => o.name===nm && o.date===dateKey);
+  if(!ov) return sp;
+  const newSp = sp ? {...sp} : {};
+  if(ov.joinAll){
+    ['skipDays','skipS1Days','skipS2Days','skipS3Days'].forEach(k=>{
+      if(newSp[k]) newSp[k] = newSp[k].filter(d => d !== day);
+    });
+  } else if(ov.skipAll){
+    newSp.skipDays = [...new Set([...(newSp.skipDays||[]), day])];
+  }
+  newSp._dateOverride = ov;
+  return newSp;
+}
+function getStudentDateOverride(nm, day, dateKey){
+  if(!dateKey) return null;
+  return STUDENT_DATE_OVERRIDES.find(o => o.name===nm && o.date===dateKey) || null;
 }
 
 let attData = {};
@@ -1808,33 +1834,36 @@ function openStuModal(id){
   function getPersonalSubjs(day) {
     if(SKIP_ALL_M.has(nm)) return null;
     if(WED_JUSA_M.has(nm)) return day==='수' ? ['주산암산'] : null;
-    if(sp?.skipDays?.includes(day)) return null;
+    // 한시 override (예: 7/23 육민준 joinAll)
+    const _dKeyP = typeof getDayDateKey==='function' ? getDayDateKey(day) : null;
+    const _spDay = applyDateOverrideToSp(sp, nm, day, _dKeyP);
+    if(_spDay?.skipDays?.includes(day)) return null;
 
-    const daysc = sc[day]||[];
+    // dateKey 기반 변환된 시간표 사용
+    const daysc = getScheduleForDay(s.clsKey, day, _dKeyP) || [];
     const subjs = [];
 
     if(!is2) {
       // 1학년: replaceS1/S2 포함
-      const s1raw = (sp?.replaceS1?.[day]) || daysc[0];
-      const s2raw = (sp?.replaceS2?.[day]) || daysc[1];
-      if(!sp?.skipS1Days?.includes(day) && s1raw && s1raw!=='—') subjs.push(s1raw);
-      if(!sp?.skipS2Days?.includes(day) && s2raw) subjs.push(s2raw);
+      const s1raw = (_spDay?.replaceS1?.[day]) || daysc[0];
+      const s2raw = (_spDay?.replaceS2?.[day]) || daysc[1];
+      if(!_spDay?.skipS1Days?.includes(day) && s1raw && s1raw!=='—') subjs.push(s1raw);
+      if(!_spDay?.skipS2Days?.includes(day) && s2raw) subjs.push(s2raw);
     } else {
       if(day==='월') {
-        // s[0]="—" 건너뜀, s[1]=2교시, s[2]=3교시
-        if(!sp?.skipS2Days?.includes(day) && daysc[1] && daysc[1]!=='—') subjs.push(daysc[1]);
-        if(!sp?.skipS3Days?.includes(day) && daysc[2]) subjs.push(daysc[2]);
+        if(!_spDay?.skipS2Days?.includes(day) && daysc[1] && daysc[1]!=='—') subjs.push(daysc[1]);
+        if(!_spDay?.skipS3Days?.includes(day) && daysc[2]) subjs.push(daysc[2]);
       } else if(day==='수') {
-        const s1w = (sp?.replaceS1?.[day]) || (daysc[0]&&daysc[0]!=='—'?daysc[0]:null);
-        const s2w = (sp?.replaceS2?.[day]) || daysc[1];
-        if(!sp?.skipS1Days?.includes(day) && s1w) subjs.push(s1w);
-        if(!sp?.skipS2Days?.includes(day) && s2w) subjs.push(s2w);
+        const s1w = (_spDay?.replaceS1?.[day]) || (daysc[0]&&daysc[0]!=='—'?daysc[0]:null);
+        const s2w = (_spDay?.replaceS2?.[day]) || daysc[1];
+        if(!_spDay?.skipS1Days?.includes(day) && s1w) subjs.push(s1w);
+        if(!_spDay?.skipS2Days?.includes(day) && s2w) subjs.push(s2w);
       } else {
         // 화·목·금
-        const s1 = (sp?.replaceS1?.[day]) || (daysc[0]&&daysc[0]!=='—'?daysc[0]:null);
-        const s2 = (sp?.replaceS2?.[day]) || daysc[1];
-        if(!sp?.skipS1Days?.includes(day) && s1) subjs.push(s1);
-        if(!sp?.skipS2Days?.includes(day) && s2) subjs.push(s2);
+        const s1 = (_spDay?.replaceS1?.[day]) || (daysc[0]&&daysc[0]!=='—'?daysc[0]:null);
+        const s2 = (_spDay?.replaceS2?.[day]) || daysc[1];
+        if(!_spDay?.skipS1Days?.includes(day) && s1) subjs.push(s1);
+        if(!_spDay?.skipS2Days?.includes(day) && s2) subjs.push(s2);
       }
     }
     return subjs.length>0 ? subjs : [];
@@ -1849,19 +1878,40 @@ function openStuModal(id){
   avatarEl.dataset.pk = _mpk;
   // 모달 열린 후 줌 핸들러 등록
   requestAnimationFrame(()=>applyAvatarPhotos(document.getElementById('stu-modal')));
-  document.getElementById('stu-modal-name').textContent = s.name;
+  // ⚠️ 시작 줄 = 응급 알림, 나머지 = 일반 노트로 분리
+  const _splitNote = (note)=>{
+    if(!note) return {alerts:[], normal:''};
+    const lines = note.split('\n');
+    const alerts=[], normal=[];
+    for(const l of lines){
+      if(l.trim().startsWith('⚠️')) alerts.push(l.trim().replace(/^⚠️\s*/,''));
+      else normal.push(l);
+    }
+    return {alerts, normal: normal.join('\n').trim()};
+  };
+  const {alerts: _stuAlerts, normal: _stuNormalNote} = _splitNote(s.note);
+  document.getElementById('stu-modal-name').innerHTML = `${s.name}${_stuAlerts.length?`<span style="background:#DC2626;color:#fff;font-size:11px;font-weight:900;padding:3px 9px;border-radius:11px;margin-left:8px;animation:pulse 2s infinite;vertical-align:middle;">⚠️ 응급</span>`:''}`;
   document.getElementById('stu-modal-cls').textContent = s.clsLabel;
   document.getElementById('stu-modal-phone').innerHTML = s.phone
     ? `<a href="tel:${s.phone}" style="background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 12px;color:#fff;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px">📞 ${s.phone}</a>`
     : `<span style="color:rgba(255,255,255,0.5);font-size:12px">연락처 없음</span>`;
 
+  const _alertBanner = _stuAlerts.length ? `
+    <div style="background:#FEE2E2;border:2px solid #DC2626;border-radius:12px;padding:12px 14px;margin-bottom:10px;animation:pulse 2.5s infinite;">
+      <div style="font-size:12px;color:#991B1B;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+        <span style="font-size:16px;">🚨</span>응급 안전 안내
+      </div>
+      ${_stuAlerts.map(a=>`<div style="font-size:12px;color:#7F1D1D;font-weight:700;line-height:1.5;margin-bottom:2px;">⚠️ ${a}</div>`).join('')}
+    </div>` : '';
+
   document.getElementById('stu-modal-body').innerHTML = `
-    ${s.note?`<div onclick="showStudentNoteDetail('${s.id}')" style="background:#FFF0F0;border-radius:12px;padding:14px;border:1.5px solid #FFCDD2;margin-bottom:10px;cursor:pointer;transition:transform 0.1s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">
+    ${_alertBanner}
+    ${_stuNormalNote?`<div onclick="showStudentNoteDetail('${s.id}')" style="background:#FFF0F0;border-radius:12px;padding:14px;border:1.5px solid #FFCDD2;margin-bottom:10px;cursor:pointer;transition:transform 0.1s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
         <div style="font-size:12px;font-weight:700;color:var(--danger);">⚠ 특이사항</div>
         <span style="font-size:10px;color:var(--danger);background:#FFCDD2;border-radius:4px;padding:2px 6px;font-weight:700;">탭하여 자세히 보기 ›</span>
       </div>
-      <div style="font-size:13px;color:var(--danger);line-height:20px;white-space:pre-line">${s.note}</div>
+      <div style="font-size:13px;color:var(--danger);line-height:20px;white-space:pre-line">${_stuNormalNote}</div>
     </div>`:''}
     ${(()=>{
       // 이 학생이 관련된 사건 목록 (student 필드에 이름 포함)
@@ -2485,7 +2535,9 @@ function getRosterAllClasses(subj, day, slot) {
   // 학생 개인 일정 기준으로 해당 슬롯의 실제 수업 반환
   function getPersonalSubj(stu, day, slot, defaultSubj) {
     const nm = stu.name.trim();
-    const sp = getStudentSpecial(nm, stu.note);
+    // 한시 override 적용
+    const _dKey = typeof getDayDateKey==='function' ? getDayDateKey(day) : null;
+    const sp = applyDateOverrideToSp(getStudentSpecial(nm, stu.note), nm, day, _dKey);
     const is2 = stu.grade===2;
 
     if(sp?.skipDays?.includes(day)) return null;
