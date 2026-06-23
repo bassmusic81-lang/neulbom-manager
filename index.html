@@ -4419,7 +4419,7 @@ function renderNotes(){
       <div style="position:relative;">
         <input id="notes-search-input" type="text" value="${q.replace(/"/g,'&quot;')}"
           oninput="notesSearch=this.value;_updateNotesBody()"
-          placeholder="🔍 학생 이름으로 검색 (예: 오윤오, 이하린)"
+          placeholder="🔍 학생 이름·키워드 검색 (예: 오윤오, 땅콩, 당뇨, 학교폭력)"
           style="width:100%;padding:11px 38px 11px 14px;border:2px solid #FFE4D6;border-radius:10px;font-size:13px;font-weight:600;background:#FAFAFA;box-sizing:border-box;outline:none;"
         />
         <button id="notes-search-clear" onclick="notesSearch='';document.getElementById('notes-search-input').value='';_updateNotesBody();document.getElementById('notes-search-input').focus()"
@@ -4439,10 +4439,34 @@ function renderNotes(){
 
 // 검색·탭 변경 시 결과 영역만 부분 업데이트 (input 요소 보존)
 function _updateNotesBody(){
-  const q = (notesSearch || '').trim().replace(/\s+/g,'');
-  const matchStu = (nm) => !q || (nm || '').replace(/\s+/g,'').includes(q);
-  const noteStus = STUDENTS.filter(s => s.note).filter(s => matchStu(s.name));
-  const incidentsFiltered = INCIDENTS.filter(inc => !q || (inc.student || '').replace(/\s+/g,'').includes(q));
+  const qRaw = (notesSearch || '').trim();
+  const q = qRaw.replace(/\s+/g,'').toLowerCase();
+  // 학생: 이름 + 노트 모두 검색
+  const matchStu = (s) => {
+    if(!q) return true;
+    const hay = ((s.name || '') + ' ' + (s.note || '')).replace(/\s+/g,'').toLowerCase();
+    return hay.includes(q);
+  };
+  // INCIDENTS: student + subject + content + action + tag 모두 검색
+  const matchInc = (inc) => {
+    if(!q) return true;
+    const hay = [inc.student, inc.subject, inc.content, inc.action, inc.tag, inc.date]
+      .filter(Boolean).join(' ').replace(/\s+/g,'').toLowerCase();
+    return hay.includes(q);
+  };
+  const noteStus = STUDENTS.filter(s => s.note).filter(matchStu);
+  const incidentsFiltered = INCIDENTS.filter(matchInc);
+
+  // 검색어 하이라이트 헬퍼
+  const highlight = (text) => {
+    if(!qRaw || !text) return text || '';
+    // 공백 무시 매칭이므로 단순 정규식 highlight (검색어가 그대로 들어간 경우만)
+    try {
+      const escaped = qRaw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      return text.replace(new RegExp(escaped,'gi'),
+        m => `<mark style="background:#FEF3C7;color:#92400E;padding:0 2px;border-radius:3px;font-weight:800;">${m}</mark>`);
+    } catch(e){ return text; }
+  };
 
   // ✕ 버튼 표시 토글
   const clearBtn = document.getElementById('notes-search-clear');
@@ -4453,7 +4477,7 @@ function _updateNotesBody(){
   if(hint){
     if(q){
       hint.style.display = 'block';
-      hint.innerHTML = `🔎 '${q}' 검색 결과 · 학생 특이 ${noteStus.length}건 / 수업별 ${incidentsFiltered.length}건`;
+      hint.innerHTML = `🔎 '${qRaw}' 검색 결과 · 학생 특이 ${noteStus.length}건 / 수업별 ${incidentsFiltered.length}건`;
     } else {
       hint.style.display = 'none';
     }
@@ -4480,25 +4504,25 @@ function _updateNotesBody(){
     html = renderAttendDB();
   } else if(notesTab === 'students'){
     if(noteStus.length === 0){
-      html = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">${q?`'${q}'로 검색된 학생 특이사항이 없습니다.`:'기록된 학생 특이사항이 없습니다.'}</div>`;
+      html = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">${q?`'${qRaw}'로 검색된 학생 특이사항이 없습니다.`:'기록된 학생 특이사항이 없습니다.'}</div>`;
     } else {
       html = noteStus.map(s=>{
         const isW=s.note.includes("⚠");
         const bc=isW?"#F44336":"#FFB347";
         return `<div class="incident-card" onclick="openStuModal('${s.id}')" style="border-color:${bc};cursor:pointer;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
-            <span style="font-weight:800;font-size:15px">${s.name}</span>
+            <span style="font-weight:800;font-size:15px">${highlight(s.name)}</span>
             <span style="background:${s.grade===1?"#1F386420":"#833C0020"};color:${s.grade===1?"var(--primary)":"var(--primary2)"};border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700">${s.clsLabel}</span>
             ${isW?`<span style="background:#FFCDD2;color:var(--danger);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">⚠ 민원</span>`:''}
           </div>
-          <div style="font-size:12px;color:#555;line-height:18px;white-space:pre-line">${s.note}</div>
+          <div style="font-size:12px;color:#555;line-height:18px;white-space:pre-line">${highlight(s.note)}</div>
           ${s.phone?`<a href="tel:${s.phone}" onclick="event.stopPropagation()" style="font-size:12px;color:var(--accent);font-weight:600;margin-top:8px;display:block">📞 ${s.phone}</a>`:''}
         </div>`;
       }).join('');
     }
   } else {
     if(incidentsFiltered.length === 0){
-      html = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">${q?`'${q}'로 검색된 수업별 기록이 없습니다.`:'기록된 수업별 사건이 없습니다.'}</div>`;
+      html = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">${q?`'${qRaw}'로 검색된 수업별 기록이 없습니다.`:'기록된 수업별 사건이 없습니다.'}</div>`;
     } else {
       html = incidentsFiltered.map(inc=>{
         const tag=inc.tag||'';
@@ -4512,13 +4536,13 @@ function _updateNotesBody(){
           onmousedown="this.style.transform='scale(0.99)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">
             <span style="background:${bc}22;color:${bc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">${inc.date}</span>
-            <span style="font-weight:800;font-size:13px;color:#7B2C00;flex:1">${inc.subject}</span>
+            <span style="font-weight:800;font-size:13px;color:#7B2C00;flex:1">${highlight(inc.subject)}</span>
             <span style="background:${bc}22;color:${bc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">${tag}</span>
             <span style="font-size:11px;color:${bc};font-weight:700;">›</span>
           </div>
-          <div style="font-size:12px;font-weight:700;color:#B71C1C;margin-bottom:4px;white-space:pre-line">${inc.student}</div>
-          <div style="font-size:12px;color:#555;line-height:18px;margin-bottom:6px;white-space:pre-line;max-height:80px;overflow:hidden;">${inc.content}</div>
-          <div style="font-size:11px;color:${bc};font-weight:600">▶ ${inc.action}</div>
+          <div style="font-size:12px;font-weight:700;color:#B71C1C;margin-bottom:4px;white-space:pre-line">${highlight(inc.student)}</div>
+          <div style="font-size:12px;color:#555;line-height:18px;margin-bottom:6px;white-space:pre-line;max-height:80px;overflow:hidden;">${highlight(inc.content)}</div>
+          <div style="font-size:11px;color:${bc};font-weight:600">▶ ${highlight(inc.action)}</div>
         </div>`;
       }).join('');
     }
