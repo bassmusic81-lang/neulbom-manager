@@ -402,7 +402,7 @@ const STUDENTS = [
   {id:"21한봄",name:"한봄",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:19,phone:"010-8206-7592",note:"⚠ 민원 8회\n화·목 1교시 컴퓨터(방과후)\n⚠ [4/2] 컴퓨터 첫날 미이동 → 어머니 방문 후 조기하교\n⚠ [4/29] 하이클래스 사진 민원 + 빈번한 전화 업무방해 안내"},
   {id:"22김다운",name:"김다운",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:1,phone:"010-3386-4519",note:"화 로봇과학A(1교시)"},
   {id:"22김민재",name:"김민재",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:3,phone:"010-8266-0829",note:"수·목·금 1교시 후 이지향피아노학원 차량 탑승 (4/6~)\n월 축구(풋살) 취소 / 화 칼라클레이 취소"},
-  {id:"22오윤오",name:"오윤오",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:5,phone:"010-5543-8924",note:"화·목 1교시 컴퓨터(방과후)"},
+  {id:"22오윤오",name:"오윤오",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:5,phone:"010-5543-8924",note:"맞춤형 2교시 미참여 (월요일 1교시 발레까지 참여 후 하교) / 화·목 1교시 컴퓨터(방과후)"},
   {id:"22왕선호",name:"왕선호",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:6,phone:"010-7392-8793",note:"화 로봇과학A(1교시)"},
   {id:"22육민준",name:"육민준",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:7,phone:"010-8865-5774",note:"화 로봇과학A(1교시)"},
   {id:"22최성윤",name:"최성윤",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:8,phone:"010-8626-0407",note:"화 로봇과학B(2교시)\n목 2교시 방송댄스 취소"},
@@ -840,7 +840,7 @@ const MANUAL_OVERRIDE = {
   "최지훈":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"} },
   "윤재영":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"} },
   "김태범":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"} },
-  "오윤오":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"} },
+  "오윤오":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"}, skipS2Days:["화","수","목","금"], skipS3Days:["월"] },
 };
 
 // 맞춤형 수업 없는 날 (공휴일·휴업일)
@@ -889,6 +889,7 @@ let currentTTClass = '1-1';
 let stuFilter = '전체';
 let stuQuery = '';
 let notesTab = 'students';
+let notesSearch = '';
 let openDrop = null;
 
 function getTodayDay(){
@@ -4404,32 +4405,102 @@ function showIncidentsByDate(dateKey){
 }
 
 function renderNotes(){
-  const noteStus = STUDENTS.filter(s=>s.note);
+  // 헤더·검색바·탭 영역은 한 번만 그리고, 결과 영역만 동적으로 업데이트
+  // → input 요소를 보존해서 한글 IME 조합이 끊기지 않음
+  const q = (notesSearch || '').trim();
   document.getElementById('screen-notes').innerHTML = `
     <div style="background:#7B2C00;padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
       <div style="color:#fff;font-size:20px;font-weight:800">특이사항</div>
-      <div style="color:#fff;font-size:12px;opacity:0.7">${noteStus.length}명 기록됨 · 수업별 ${INCIDENTS.length}건 · DB ${ATTEND_DB.length}건</div>
+      <div style="color:#fff;font-size:12px;opacity:0.7">${STUDENTS.filter(s=>s.note).length}명 기록됨 · 수업별 ${INCIDENTS.length}건 · DB ${ATTEND_DB.length}건</div>
     </div>
-    <div style="display:flex;background:#fff;border-bottom:1px solid var(--border);overflow-x:auto;">
-      <button onclick="notesTab='students';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='students'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='students'?'#7B2C00':'transparent'};white-space:nowrap;">학생 특이</button>
-      <button onclick="notesTab='incidents';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='incidents'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='incidents'?'#7B2C00':'transparent'};white-space:nowrap;">수업별</button>
-      <button onclick="notesTab='calendar';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='calendar'?'#FF6B35':'var(--muted)'};border-bottom:3px solid ${notesTab==='calendar'?'#FF6B35':'transparent'};white-space:nowrap;">📅 캘린더</button>
-      <button onclick="notesTab='attenddb';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='attenddb'?'#1565C0':'var(--muted)'};border-bottom:3px solid ${notesTab==='attenddb'?'#1565C0':'transparent'};white-space:nowrap;">📋 출석DB</button>
+
+    <!-- 학생 검색바 (한 번만 렌더 → 한글 IME 안전) -->
+    <div style="background:#fff;padding:12px 14px;border-bottom:1px solid var(--border);">
+      <div style="position:relative;">
+        <input id="notes-search-input" type="text" value="${q.replace(/"/g,'&quot;')}"
+          oninput="notesSearch=this.value;_updateNotesBody()"
+          placeholder="🔍 학생 이름으로 검색 (예: 오윤오, 이하린)"
+          style="width:100%;padding:11px 38px 11px 14px;border:2px solid #FFE4D6;border-radius:10px;font-size:13px;font-weight:600;background:#FAFAFA;box-sizing:border-box;outline:none;"
+        />
+        <button id="notes-search-clear" onclick="notesSearch='';document.getElementById('notes-search-input').value='';_updateNotesBody();document.getElementById('notes-search-input').focus()"
+          style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#E5E7EB;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;color:#6B7280;display:${q?'inline-block':'none'}">✕</button>
+      </div>
+      <div id="notes-search-hint" style="margin-top:8px;font-size:11px;color:#7B2C00;font-weight:700;display:${q?'block':'none'}"></div>
     </div>
-    <div style="padding:12px">
-      ${notesTab==='calendar' ? renderIncidentCalendar() : notesTab==='attenddb' ? renderAttendDB() : notesTab==='students' ? noteStus.map(s=>{
+
+    <!-- 탭 -->
+    <div id="notes-tabs" style="display:flex;background:#fff;border-bottom:1px solid var(--border);overflow-x:auto;"></div>
+
+    <!-- 결과 영역 -->
+    <div id="notes-body" style="padding:12px"></div>
+  `;
+  _updateNotesBody();
+}
+
+// 검색·탭 변경 시 결과 영역만 부분 업데이트 (input 요소 보존)
+function _updateNotesBody(){
+  const q = (notesSearch || '').trim().replace(/\s+/g,'');
+  const matchStu = (nm) => !q || (nm || '').replace(/\s+/g,'').includes(q);
+  const noteStus = STUDENTS.filter(s => s.note).filter(s => matchStu(s.name));
+  const incidentsFiltered = INCIDENTS.filter(inc => !q || (inc.student || '').replace(/\s+/g,'').includes(q));
+
+  // ✕ 버튼 표시 토글
+  const clearBtn = document.getElementById('notes-search-clear');
+  if(clearBtn) clearBtn.style.display = q ? 'inline-block' : 'none';
+
+  // 검색 힌트
+  const hint = document.getElementById('notes-search-hint');
+  if(hint){
+    if(q){
+      hint.style.display = 'block';
+      hint.innerHTML = `🔎 '${q}' 검색 결과 · 학생 특이 ${noteStus.length}건 / 수업별 ${incidentsFiltered.length}건`;
+    } else {
+      hint.style.display = 'none';
+    }
+  }
+
+  // 탭 영역 (카운트 포함)
+  const tabsEl = document.getElementById('notes-tabs');
+  if(tabsEl){
+    tabsEl.innerHTML = `
+      <button onclick="notesTab='students';_updateNotesBody()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='students'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='students'?'#7B2C00':'transparent'};white-space:nowrap;">학생 특이 ${q?`(${noteStus.length})`:''}</button>
+      <button onclick="notesTab='incidents';_updateNotesBody()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='incidents'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='incidents'?'#7B2C00':'transparent'};white-space:nowrap;">수업별 ${q?`(${incidentsFiltered.length})`:''}</button>
+      <button onclick="notesTab='calendar';_updateNotesBody()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='calendar'?'#FF6B35':'var(--muted)'};border-bottom:3px solid ${notesTab==='calendar'?'#FF6B35':'transparent'};white-space:nowrap;">📅 캘린더</button>
+      <button onclick="notesTab='attenddb';_updateNotesBody()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='attenddb'?'#1565C0':'var(--muted)'};border-bottom:3px solid ${notesTab==='attenddb'?'#1565C0':'transparent'};white-space:nowrap;">📋 출석DB</button>
+    `;
+  }
+
+  // 결과 영역
+  const bodyEl = document.getElementById('notes-body');
+  if(!bodyEl) return;
+  let html = '';
+  if(notesTab === 'calendar'){
+    html = renderIncidentCalendar();
+  } else if(notesTab === 'attenddb'){
+    html = renderAttendDB();
+  } else if(notesTab === 'students'){
+    if(noteStus.length === 0){
+      html = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">${q?`'${q}'로 검색된 학생 특이사항이 없습니다.`:'기록된 학생 특이사항이 없습니다.'}</div>`;
+    } else {
+      html = noteStus.map(s=>{
         const isW=s.note.includes("⚠");
         const bc=isW?"#F44336":"#FFB347";
-        return `<div class="incident-card" style="border-color:${bc}">
+        return `<div class="incident-card" onclick="openStuModal('${s.id}')" style="border-color:${bc};cursor:pointer;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
             <span style="font-weight:800;font-size:15px">${s.name}</span>
             <span style="background:${s.grade===1?"#1F386420":"#833C0020"};color:${s.grade===1?"var(--primary)":"var(--primary2)"};border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700">${s.clsLabel}</span>
             ${isW?`<span style="background:#FFCDD2;color:var(--danger);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">⚠ 민원</span>`:''}
           </div>
           <div style="font-size:12px;color:#555;line-height:18px;white-space:pre-line">${s.note}</div>
-          ${s.phone?`<a href="tel:${s.phone}" style="font-size:12px;color:var(--accent);font-weight:600;margin-top:8px;display:block">📞 ${s.phone}</a>`:''}
+          ${s.phone?`<a href="tel:${s.phone}" onclick="event.stopPropagation()" style="font-size:12px;color:var(--accent);font-weight:600;margin-top:8px;display:block">📞 ${s.phone}</a>`:''}
         </div>`;
-      }).join('') : INCIDENTS.map(inc=>{
+      }).join('');
+    }
+  } else {
+    if(incidentsFiltered.length === 0){
+      html = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">${q?`'${q}'로 검색된 수업별 기록이 없습니다.`:'기록된 수업별 사건이 없습니다.'}</div>`;
+    } else {
+      html = incidentsFiltered.map(inc=>{
         const tag=inc.tag||'';
         let bc="#FFB347";
         if(tag.includes("처리완료")) bc="#375623";
@@ -4449,9 +4520,10 @@ function renderNotes(){
           <div style="font-size:12px;color:#555;line-height:18px;margin-bottom:6px;white-space:pre-line;max-height:80px;overflow:hidden;">${inc.content}</div>
           <div style="font-size:11px;color:${bc};font-weight:600">▶ ${inc.action}</div>
         </div>`;
-      }).join('')}
-    </div>
-  `;
+      }).join('');
+    }
+  }
+  bodyEl.innerHTML = html;
 }
 
 // ── 학사일정 ──
