@@ -172,12 +172,12 @@ button{font-family:inherit;}
   .tab-btn {
     flex-direction: column;
     padding: 12px 6px;
-    font-size: 12px;
+    font-size: 10px;
     border-radius: 10px;
     margin: 0 4px;
     width: calc(100% - 8px);
   }
-  .tab-btn .icon { font-size: 24px; }
+  .tab-btn .icon { font-size: 22px; }
   #screens {
     grid-area: main;
     overflow-y: auto;
@@ -186,47 +186,6 @@ button{font-family:inherit;}
     max-width: 100%;
   }
   .screen { height: auto; min-height: 100%; }
-
-  /* ━━━━━━━━━━━━━━ 데스크톱 시인성 개선 ━━━━━━━━━━━━━━ */
-  /* 컨텐츠 가운데 정렬 + 최대 너비 확장 (와이드 모니터 가독성) */
-  .screen > * { max-width: 1100px; margin-left: auto; margin-right: auto; }
-
-  /* 인라인 작은 폰트 일괄 확대 */
-  [style*="font-size:7px"]  { font-size: 10px !important; }
-  [style*="font-size:8px"]  { font-size: 11px !important; }
-  [style*="font-size:9px"]  { font-size: 12px !important; }
-  [style*="font-size:10px"] { font-size: 13px !important; }
-  [style*="font-size:11px"] { font-size: 14px !important; }
-  [style*="font-size:12px"] { font-size: 15px !important; }
-  [style*="font-size:13px"] { font-size: 16px !important; }
-  [style*="font-size:14px"] { font-size: 17px !important; }
-  [style*="font-size:15px"] { font-size: 18px !important; }
-  [style*="font-size: 7px"]  { font-size: 10px !important; }
-  [style*="font-size: 8px"]  { font-size: 11px !important; }
-  [style*="font-size: 9px"]  { font-size: 12px !important; }
-  [style*="font-size: 10px"] { font-size: 13px !important; }
-  [style*="font-size: 11px"] { font-size: 14px !important; }
-  [style*="font-size: 12px"] { font-size: 15px !important; }
-  [style*="font-size: 13px"] { font-size: 16px !important; }
-  [style*="font-size: 14px"] { font-size: 17px !important; }
-  [style*="font-size: 15px"] { font-size: 18px !important; }
-
-  /* 모달도 데스크톱에서 더 넓고 큰 폰트 */
-  .modal-content {
-    max-width: 720px !important;
-    width: 90%;
-    font-size: 15px;
-  }
-  .modal-body { padding: 22px; }
-
-  /* 카드·시간표 셀 padding 확대 */
-  .subj-cell { padding: 8px 6px !important; min-height: 44px !important; }
-
-  /* 기본 body 폰트 크기 상향 */
-  body { font-size: 16px; }
-
-  /* 일반 입력 폼들 폰트 확대 */
-  input, select, textarea, button { font-size: 15px !important; }
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -402,7 +361,7 @@ const STUDENTS = [
   {id:"21한봄",name:"한봄",grade:2,cls:1,clsKey:"2-1",clsLabel:"2학년 1반",num:19,phone:"010-8206-7592",note:"⚠ 민원 8회\n화·목 1교시 컴퓨터(방과후)\n⚠ [4/2] 컴퓨터 첫날 미이동 → 어머니 방문 후 조기하교\n⚠ [4/29] 하이클래스 사진 민원 + 빈번한 전화 업무방해 안내"},
   {id:"22김다운",name:"김다운",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:1,phone:"010-3386-4519",note:"화 로봇과학A(1교시)"},
   {id:"22김민재",name:"김민재",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:3,phone:"010-8266-0829",note:"수·목·금 1교시 후 이지향피아노학원 차량 탑승 (4/6~)\n월 축구(풋살) 취소 / 화 칼라클레이 취소"},
-  {id:"22오윤오",name:"오윤오",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:5,phone:"010-5543-8924",note:"맞춤형 2교시 미참여 (월요일 1교시 발레까지 참여 후 하교) / 화·목 1교시 컴퓨터(방과후)"},
+  {id:"22오윤오",name:"오윤오",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:5,phone:"010-5543-8924",note:"화·목 1교시 컴퓨터(방과후)"},
   {id:"22왕선호",name:"왕선호",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:6,phone:"010-7392-8793",note:"화 로봇과학A(1교시)"},
   {id:"22육민준",name:"육민준",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:7,phone:"010-8865-5774",note:"화 로봇과학A(1교시)"},
   {id:"22최성윤",name:"최성윤",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:8,phone:"010-8626-0407",note:"화 로봇과학B(2교시)\n목 2교시 방송댄스 취소"},
@@ -412,7 +371,7 @@ const STUDENTS = [
   {id:"22김주아",name:"김주아",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:13,phone:"010-2683-7615",note:""},
   {id:"22오선",name:"오선",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:14,phone:"010-7255-3454",note:""},
   {id:"22이선우",name:"이선우",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:15,phone:"010-8898-3935",note:""},
-  {id:"22이윤솔",name:"이윤솔",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:16,phone:"010-9382-5731",note:"화 로봇과학B(2교시)"},
+  {id:"22이윤솔",name:"이윤슬",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:16,phone:"010-9382-5731",note:"화 로봇과학B(2교시)\n목 2교시 방송댄스 취소"},
   {id:"22이효주",name:"이효주",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:17,phone:"010-6616-2672",note:""},
   {id:"22천하늘",name:"천하늘",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:18,phone:"010-8530-1544",note:""},
   {id:"22황리아",name:"황리아",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:20,phone:"010-5743-0549",note:"전입 (5/6~) / 월 첫수업만(동생 하교)"},
@@ -421,8 +380,8 @@ const STUDENTS = [
   {id:"23조연준",name:"조연준",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:5,phone:"010-5697-8882",note:"화 로봇과학A(1교시)"},
   {id:"23주원",name:"주원",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:6,phone:"010-6391-9450",note:"화 로봇과학A(1교시)"},
   {id:"23최지훈",name:"최지훈",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:8,phone:"010-8237-3226",note:"화·목 1교시 컴퓨터(방과후)\n14:50 후 2교시 늦게 도착"},
-  {id:"23최하담",name:"최하담",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:9,phone:"010-9929-8792",note:"화·목 1교시 컴퓨터(방과후) 후 하교 (2교시 미참여)"},
-  {id:"23최하율",name:"최하율",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:10,phone:"010-9929-8792",note:"화·목 1교시 컴퓨터(방과후) 후 하교 (2교시 미참여)"},
+  {id:"23최하담",name:"최하담",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:9,phone:"010-9929-8792",note:"화·목 1교시 컴퓨터(방과후)+로봇과학B(2교시) / 목취소"},
+  {id:"23최하율",name:"최하율",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:10,phone:"010-9929-8792",note:"화·목 1교시 컴퓨터(방과후)+로봇과학B(2교시) / 목취소"},
   {id:"23김리안",name:"김리안",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:11,phone:"010-6249-6442",note:"월·수 정규수업 후 1시간 교실 공부 → 맞춤형 참여 / 화 로봇과학B(2교시)"},
   {id:"23김서율",name:"김서율",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:12,phone:"010-9447-0801",note:""},
   {id:"23김지유",name:"김지유",grade:2,cls:3,clsKey:"2-3",clsLabel:"2학년 3반",num:13,phone:"010-5001-7827",note:"수 2교시(우쿨렐레) 당분간 미참여 (참여 시 전화 안내 요청)"},
@@ -434,7 +393,7 @@ const STUDENTS = [
   {id:"24김태범",name:"김태범",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:3,phone:"010-9947-5505",note:"화·목 1교시 컴퓨터(방과후)\n14:50 후 2교시 늦게 도착\n🏫 돌봄 대기 2번"},
   {id:"24안건우",name:"안건우",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:6,phone:"010-5121-0070",note:"월 도자공예(2교시) 후 하교 | 화·목·금 1교시만\n수 주산암산(1교시)+보드게임(2교시)\n🏫 돌봄 대기 4번"},
   {id:"24윤재영",name:"윤재영",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:7,phone:"010-9010-6618",note:"화·목 1교시 컴퓨터(방과후)\n14:50 후 2교시 늦게 도착"},
-  {id:"24정선우",name:"정선우",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:8,phone:"010-3226-9512"},
+  {id:"24정선우",name:"정선우",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:8,phone:"010-3226-9512",note:"월 2교시 결석(부진학생 지도) / 월 3교시·화·목·금 정상\n수 창의과학(1교시)+보드게임(2교시) 배정 / 7월 복귀 예정"},
   {id:"24허산",name:"허산",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:9,phone:"010-9154-2398",note:"월~금 전체 취소"},
   {id:"24김가온",name:"김가온",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:10,phone:"010-9507-4578",note:"수 주산암산(1교시)+보드게임(2교시) 특별 수강"},
   {id:"24박하윤",name:"박하윤",grade:2,cls:4,clsKey:"2-4",clsLabel:"2학년 4반",num:11,phone:"010-3411-1624",note:"화 로봇과학A(1)+방송댄스(2)\n⚠ [4/2] 전래놀이 결보강 폭행 가담"},
@@ -449,7 +408,7 @@ const STUDENTS = [
 const SCHEDULES = {
   "1-1":{월:["발레","칼라클레이"],화:["오카리나","음악줄넘기"],수:["주산암산","종이접기"],목:["오카리나","영어회화"],금:["놀이체육","전래놀이"]},
   "1-2":{월:["주산암산","종이접기"],화:["음악줄넘기","오카리나"],수:["보드게임","주산암산"],목:["영어회화","오카리나"],금:["영어야놀자","전래놀이"]},
-  "1-3":{월:["칼라클레이","주산암산"],화:["방송댄스","음악줄넘기"],수:["보드게임","주산암산"],목:["영어회화","토탈공예"],금:["전래놀이","영어야놀자"]},
+  "1-3":{월:["칼라클레이","주산암산"],화:["방송댄스","음악줄넘기"],수:["보드게임","주산암산"],목:["영어회화","토탈공예"],금:["놀이체육","영어야놀자"]},
   "1-4":{월:["종이접기+도자공예","칼라클레이"],화:["음악줄넘기","오카리나"],수:["창의과학","종이접기"],목:["토탈공예","오카리나"],금:["전래놀이","영어야놀자"]},
   "2-1":{월:["—","축구(풋살)","그림책놀이"],화:["뉴스포츠","칼라클레이"],수:["종이접기","우쿨렐레"],목:["뉴스포츠","중국어"],금:["창의미술","놀이체육"]},
   "2-2":{월:["—","발레","축구(풋살)"],화:["뉴스포츠","칼라클레이"],수:["우쿨렐레","창의과학"],목:["중국어","방송댄스"],금:["그림책놀이","창의미술"]},
@@ -474,14 +433,13 @@ const INSTRUCTOR_MAP = {
 };
 
 const INCIDENTS = [
-  {seq:18,date:"5/22(목)",subject:"놀이체육(맞춤형 1교시)",student:"1-3 최우찬",content:"📌 강사 지도 불응 - 훈육 지도\n\n[사건 경위]\n• 맞춤형 1교시 놀이체육 수업 중\n• 다른 친구에게 공을 던지는 행위\n• 강사가 \"공을 던지지 말라\"고 지도\n• 최우찬, 강사 지도에 따르지 않음\n\n[훈육 조치]\n• 늘봄지원실장 직접 훈육 지도\n• 다음 사항을 학생에게 주지시킴:\n  ① 강사 선생님 지도에 협조할 것\n  ② 반복 시 늘봄지원실로 이동\n  ③ 지원실장과 1:1 면담 진행\n  ④ 개별 지도(분리 지도) 받게 됨\n\n[참고]\n• 4/21 방송댄스 시간 안전사고(백태클) 이력 있음\n• 평소 장난 수위 높은 학생군에 포함되어 관찰 중",action:"강사 보고 접수 / 늘봄지원실장 1차 훈육 완료 / 담임 공유 예정 / 반복 시 분리 지도 적용",tag:"⚠ 요주의"},
   {seq:1,date:"3/23(월)",subject:"발레",student:"2-2 오윤오",content:"오윤오가 발레 수업 중 여학생을 놀림",action:"재발 시 반 변경 / 상대 신원 확인",tag:"⚠ 요주의"},
   {seq:2,date:"3/23(월)",subject:"종이접기(1교시)",student:"1-4 김라움 / 1-4 윤하람",content:"김라움 복통 귀가 → 강사가 윤하람으로 착각 → 어머니 갈등",action:"윤하람 어머니 오해 해소 / 강사 재교육",tag:"⚠ 민원"},
   {seq:3,date:"3/24(화)",subject:"종이접기(월1교시)",student:"1-2 박무율",content:"박무율 어머니 전화 — 종이접기 10분 일찍 종료",action:"강사 수업 시간 준수 안내",tag:"민원 1회"},
   {seq:4,date:"3/27(목)",subject:"돌봄교실(맞춤형)",student:"민원인(학부모)",content:"국민신문고 1AA-2603-1097277\n돌봄 학생 맞춤형 참여 제한 → 역차별 주장",action:"교육지원청 이첩 / 처리기한 4/6 → 답변 완료",tag:"✅ 처리완료"},
   {seq:5,date:"3/31(화)",subject:"뉴스포츠(1교시)",student:"2-2 이윤솔",content:"3/31 하교 시 흰색 겉옷 분실",action:"담임선생님과 확인 / 수강 학생 중 확인 필요",tag:"분실물 확인필요"},
   {seq:6,date:"4/2(목)",subject:"뉴스포츠→전래놀이 결보강",student:"피해: 2-1 김재준\n가해: 2-1 문채빈·이하린 / 2-4 박하윤",content:"수업 중 폭행 사건 발생 / 강사 지도 소홀",action:"강사 주의 / 담임 통보 / 재발 방지",tag:"⚠ 폭행사건"},
-  {seq:7,date:"4/6~7/3",subject:"맞춤형(정선우)",student:"2-4 정선우",content:"부진학생 보충수업으로 월·수 맞춤형 1교시 결석 → 2026-07-06(월)부터 원래대로 월~금 맞춤형 1·2교시 정상 참여 복귀",action:"보충지도 종료, 정상 참여 안내 완료",tag:"✅ 처리완료"},
+  {seq:7,date:"4/6~",subject:"맞춤형(정선우)",student:"2-4 정선우",content:"부진학생 보충수업으로 월·수 일부 결석",action:"출석부 비고란 결석 사유 기재 완료",tag:"📋 출석관리"},
   {seq:8,date:"4/2(목)",subject:"컴퓨터→중국어",student:"2-1 한봄",content:"컴퓨터 방과후 첫날 교실 이동 몰라 맞춤형으로 이동\n어머니 방문 후 조기하교",action:"이동 경로 재안내 필요",tag:"⚠ 조기하교"},
   {seq:9,date:"4/3(금)",subject:"전래놀이(2교시)",student:"1-1 정윤솔",content:"1-2 남학생 3명 불쾌 행동으로 조기하교",action:"신원 확인 / 담임 통보",tag:"⚠ 조기하교"},
   {seq:10,date:"4/21(화)",subject:"방송댄스",student:"1-3 최우찬 / 1-3 조경준",content:"수업 시작 전 복도에서 잡기 놀이 중 최우찬이 백태클 → 조경준 넘어짐\n강사 화장실 지도 중 부재 상황에서 발생\n최우찬·조경준·이산 3명은 평소 장난 수위 높아 매 수업 주의 지도 중\n서로 부딪히거나 타격하는 행위 빈번 → 신체 접촉 금지 강력 훈육",action:"강사 직접 훈육 완료 / 담임 통보 필요 / 3명 집중 관찰 지속",tag:"⚠ 안전사고"},
@@ -605,7 +563,11 @@ const CALENDAR = {
   "2026-07-17":[{type:"holiday",label:"제헌절"}],
   "2026-07-24":[{type:"event",label:"여름방학식"}],
   "2026-07-25":[{type:"vacation",label:"여름방학 시작(~8/18)"}],
-  "2026-08-19":[{type:"event",label:"개학식"}]
+  "2026-08-19":[{type:"event",label:"개학식"}],
+  "2026-08-24":[{type:"event",label:"스마트 건강지킴이 2차 측정",place:"슬기관 2",target:"3~6학년",detail:"1교시(09:10~09:50) 6-4 · 2교시(10:00~10:40) 5-4 · 3교시(10:50~11:30) 5-2 · 4교시 고학년(11:40~12:20) 4-3 · 4교시 저학년(12:20~13:00) 3-3 · 5교시(13:10~13:50) 5-3 · 6교시(13:50~14:30) 음악줄넘기"}],
+  "2026-08-25":[{type:"event",label:"스마트 건강지킴이 2차 측정",place:"슬기관 2",target:"3~6학년",detail:"1교시(09:10~09:50) 2-4 · 2교시(10:00~10:40) 1-4 · 3교시(10:50~11:30) 2-3 · 4교시 저학년(12:20~13:00) 3-1 · 5교시(13:10~13:50) 5-1 · 6교시(13:50~14:30) 6-1 · 7교시(14:30~) 사물놀이"}],
+  "2026-08-26":[{type:"event",label:"스마트 건강지킴이 2차 측정",place:"슬기관 2",target:"3~6학년",detail:"1교시(09:10~09:50) 2-2 · 2교시(10:00~10:40) 1-1 · 3교시(10:50~11:30) 2-1 · 4교시 고학년(11:40~12:20) 6-2 · 4교시 저학년(12:20~13:00) 3-2 · 5교시(13:10~13:50) 6-3"}],
+  "2026-08-27":[{type:"event",label:"스마트 건강지킴이 2차 측정",place:"슬기관 2",target:"3~6학년",detail:"1교시(09:10~09:50) 1-3 · 2교시(10:00~10:40) 1-2 · 3교시(10:50~11:30) 4-1 · 4교시 고학년(11:40~12:20) 4-2 · 5교시(13:10~13:50) 4-4 · 6교시(13:50~14:30) 음악줄넘기"}]
 };
 
 const LUNCH = {
@@ -671,32 +633,6 @@ const LUNCH = {
   "2026-06-26":["달걀카레라이스","배추김치","몬테크리스토 샌드위치","수박화채"],
   "2026-06-29":["강황쌀밥","감자옹칼국수","코다리무조림","알배추겉절이","단호박튀김","파인애플푸딩"],
   "2026-06-30":["산채비빔밥(채식급식)","누룽지탕","달걀부침","백김치","수박"],
-  // ── 7월 ──
-  "2026-07-01":["차수수밥","쇠고기미역국","돼지갈비찜","오이도라지무침","버섯잡채","배추김치","수박설기"],
-  "2026-07-02":["친환경쌀기장밥","만두전골","브로콜리·다시마&초장","쭈새닭볶음","열무김치","자두"],
-  "2026-07-03":["김치햄볶음밥","꼬치어묵국","크림소스떡볶이","쫄비빔만두","깍두기"],
-  "2026-07-06":["율무밥","두부된장찌개","영양부추들깨무침","고추장오리불고기","깻잎무쌈/쌈장","백김치"],
-  "2026-07-07":["버섯카로틴밥","대구탕","감자조림","열무호박무침","동그랑땡전/케찹","배추김치","삶은옥수수"],
-  "2026-07-08":["베트남쌀국수","반미샌드위치","공심채볶음","무김치","망고라씨"],
-  "2026-07-09":["친환경쌀발아현미밥","건새우아욱국","갈배제육볶음","깻잎순멸치볶음","배추김치","양배추쌈/쌈장","양구멜론"],
-  "2026-07-10":["소보로 덮밥","오이미역냉국","핫도그","열무김치","자두"],
-  "2026-07-13":["클로렐라밥","도토리묵냉국","감자꽈리고추조림","노각무침","닭봉오븐구이","열무김치"],
-  "2026-07-14":["찰보리기장밥","낙지연포탕","배추겉절이","쑥갓두부무침","떡갈비구이/양파채간장소스","통영식꿀빵"],
-  "2026-07-15":["한방전복닭죽","부추겉절이","오이고추무침","새송이관자살간장버터구이","섞박지","2색수박","비타민젤리"],
-  "2026-07-16":["라이코펜쌀밥","부대찌개","계란장조림","청경채겉절이","임연수구이","복숭아요거트"],
-  "2026-07-20":["곤드레밥/달래양념간장(정선)","순두부/양념장(강릉)","명태포무침(속초)","메밀전병(영월)","옥수수범벅(강원)","백김치"],
-  "2026-07-21":["누룽지찹쌀밥","꽃게된장국","연근조림","세발나물초장무침","제육김치볶음","오이소박이"],
-  "2026-07-22":["김치말이국수","뿌링클치킨","열무김치","감자빵"],
-  "2026-07-23":["친환경쌀기장밥","감자탕","감자채햄볶음","오이뱃두리","건파래볶음","총각김치","BR(바람과함께사라지다)"],
-  // ── 8월 (개학 후) ──
-  "2026-08-20":["오색찰밥","아귀살미역국","LA돼지갈비조림","올방개묵김무침","가지나물","배추김치","상하이버터떡"],
-  "2026-08-21":["밥버거","미소된장국","닭꼬치","깍두기","얼려먹는워터젤리"],
-  "2026-08-24":["클로렐라밥(채식급식)","시금치바지락된장국","코다리무조림","콩나물무침","명엽채볶음","배추김치","짜먹는 요구르트"],
-  "2026-08-25":["칼슘강화찹쌀밥","병천순대국","부추겉절이","떡볶이/어묵채튀김","섞박지","수박"],
-  "2026-08-26":["꼬마김밥","메밀소바(냉)","새우꼬치튀김","깍두기"],
-  "2026-08-27":["찰옥수수밥","건새우아욱국","오징어초무침","미역줄기팽이볶음","배추김치","조각피자"],
-  "2026-08-28":["현미찹쌀밥","대파육개장","두부조림","열대과일샐러드","달걀말이","배추김치"],
-  "2026-08-31":["감자보리밥","단배추된장국","상추쌈/두부쌈장","통삼겹오븐구이","보쌈김치","골드키위"],
 };
 // 이번주 월~금 날짜 동적 계산 (토·일은 다음주 기준)
 function getThisWeekRange(){
@@ -825,14 +761,14 @@ const MANUAL_OVERRIDE = {
   "주원":  { replaceS1:{화:"로봇과학A"} },
   "최예린":  { replaceS1:{화:"로봇과학A"} },
   "조연준":  { replaceS1:{화:"로봇과학A"} },
-  "최하담":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"}, skipS2Days:["화","목"] },
-  "최하율":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"}, skipS2Days:["화","목"] },
+  "최하담":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"}, replaceS2:{화:"로봇과학B"} },
+  "최하율":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"}, replaceS2:{화:"로봇과학B"} },
   "이윤슬": { replaceS2:{화:"로봇과학B"} },
   "김연준":  { replaceS2:{화:"로봇과학B"} },
   "김단아":  { replaceS2:{화:"로봇과학B"} },
   "백창훈":  { replaceS1:{화:"로봇과학A"}, replaceS2:{화:"로봇과학B"} },
   "이하린":  { replaceS2:{화:"로봇과학B"} },
-  "이윤솔":  { replaceS2:{화:"로봇과학B"} },
+  "이윤슬":  { replaceS2:{화:"로봇과학B"} },
   "최성윤":  { replaceS2:{화:"로봇과학B"}, skipS2Days:["목"] },
   "김민재":  { skipS3Days:["월"], skipS2Days:["화"] },
   "김리안":  { replaceS2:{화:"로봇과학B"} },
@@ -840,7 +776,7 @@ const MANUAL_OVERRIDE = {
   "최지훈":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"} },
   "윤재영":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"} },
   "김태범":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"} },
-  "오윤오":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"}, skipS2Days:["화","수","목","금"], skipS3Days:["월"] },
+  "오윤오":  { replaceS1:{화:"컴퓨터", 목:"컴퓨터"} },
 };
 
 // 맞춤형 수업 없는 날 (공휴일·휴업일)
@@ -889,7 +825,6 @@ let currentTTClass = '1-1';
 let stuFilter = '전체';
 let stuQuery = '';
 let notesTab = 'students';
-let notesSearch = '';
 let openDrop = null;
 
 function getTodayDay(){
@@ -4405,126 +4340,32 @@ function showIncidentsByDate(dateKey){
 }
 
 function renderNotes(){
-  // 헤더·검색바·탭 영역은 한 번만 그리고, 결과 영역만 동적으로 업데이트
-  // → input 요소를 보존해서 한글 IME 조합이 끊기지 않음
-  const q = (notesSearch || '').trim();
+  const noteStus = STUDENTS.filter(s=>s.note);
   document.getElementById('screen-notes').innerHTML = `
     <div style="background:#7B2C00;padding:20px;padding-top:calc(env(safe-area-inset-top,0px)+20px)">
       <div style="color:#fff;font-size:20px;font-weight:800">특이사항</div>
-      <div style="color:#fff;font-size:12px;opacity:0.7">${STUDENTS.filter(s=>s.note).length}명 기록됨 · 수업별 ${INCIDENTS.length}건 · DB ${ATTEND_DB.length}건</div>
+      <div style="color:#fff;font-size:12px;opacity:0.7">${noteStus.length}명 기록됨 · 수업별 ${INCIDENTS.length}건 · DB ${ATTEND_DB.length}건</div>
     </div>
-
-    <!-- 학생 검색바 (한 번만 렌더 → 한글 IME 안전) -->
-    <div style="background:#fff;padding:12px 14px;border-bottom:1px solid var(--border);">
-      <div style="position:relative;">
-        <input id="notes-search-input" type="text" value="${q.replace(/"/g,'&quot;')}"
-          oninput="notesSearch=this.value;_updateNotesBody()"
-          placeholder="🔍 학생 이름·키워드 검색 (예: 오윤오, 땅콩, 당뇨, 학교폭력)"
-          style="width:100%;padding:11px 38px 11px 14px;border:2px solid #FFE4D6;border-radius:10px;font-size:13px;font-weight:600;background:#FAFAFA;box-sizing:border-box;outline:none;"
-        />
-        <button id="notes-search-clear" onclick="notesSearch='';document.getElementById('notes-search-input').value='';_updateNotesBody();document.getElementById('notes-search-input').focus()"
-          style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#E5E7EB;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;color:#6B7280;display:${q?'inline-block':'none'}">✕</button>
-      </div>
-      <div id="notes-search-hint" style="margin-top:8px;font-size:11px;color:#7B2C00;font-weight:700;display:${q?'block':'none'}"></div>
+    <div style="display:flex;background:#fff;border-bottom:1px solid var(--border);overflow-x:auto;">
+      <button onclick="notesTab='students';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='students'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='students'?'#7B2C00':'transparent'};white-space:nowrap;">학생 특이</button>
+      <button onclick="notesTab='incidents';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='incidents'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='incidents'?'#7B2C00':'transparent'};white-space:nowrap;">수업별</button>
+      <button onclick="notesTab='calendar';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='calendar'?'#FF6B35':'var(--muted)'};border-bottom:3px solid ${notesTab==='calendar'?'#FF6B35':'transparent'};white-space:nowrap;">📅 캘린더</button>
+      <button onclick="notesTab='attenddb';renderNotes()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='attenddb'?'#1565C0':'var(--muted)'};border-bottom:3px solid ${notesTab==='attenddb'?'#1565C0':'transparent'};white-space:nowrap;">📋 출석DB</button>
     </div>
-
-    <!-- 탭 -->
-    <div id="notes-tabs" style="display:flex;background:#fff;border-bottom:1px solid var(--border);overflow-x:auto;"></div>
-
-    <!-- 결과 영역 -->
-    <div id="notes-body" style="padding:12px"></div>
-  `;
-  _updateNotesBody();
-}
-
-// 검색·탭 변경 시 결과 영역만 부분 업데이트 (input 요소 보존)
-function _updateNotesBody(){
-  const qRaw = (notesSearch || '').trim();
-  const q = qRaw.replace(/\s+/g,'').toLowerCase();
-  // 학생: 이름 + 노트 모두 검색
-  const matchStu = (s) => {
-    if(!q) return true;
-    const hay = ((s.name || '') + ' ' + (s.note || '')).replace(/\s+/g,'').toLowerCase();
-    return hay.includes(q);
-  };
-  // INCIDENTS: student + subject + content + action + tag 모두 검색
-  const matchInc = (inc) => {
-    if(!q) return true;
-    const hay = [inc.student, inc.subject, inc.content, inc.action, inc.tag, inc.date]
-      .filter(Boolean).join(' ').replace(/\s+/g,'').toLowerCase();
-    return hay.includes(q);
-  };
-  const noteStus = STUDENTS.filter(s => s.note).filter(matchStu);
-  const incidentsFiltered = INCIDENTS.filter(matchInc);
-
-  // 검색어 하이라이트 헬퍼
-  const highlight = (text) => {
-    if(!qRaw || !text) return text || '';
-    // 공백 무시 매칭이므로 단순 정규식 highlight (검색어가 그대로 들어간 경우만)
-    try {
-      const escaped = qRaw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-      return text.replace(new RegExp(escaped,'gi'),
-        m => `<mark style="background:#FEF3C7;color:#92400E;padding:0 2px;border-radius:3px;font-weight:800;">${m}</mark>`);
-    } catch(e){ return text; }
-  };
-
-  // ✕ 버튼 표시 토글
-  const clearBtn = document.getElementById('notes-search-clear');
-  if(clearBtn) clearBtn.style.display = q ? 'inline-block' : 'none';
-
-  // 검색 힌트
-  const hint = document.getElementById('notes-search-hint');
-  if(hint){
-    if(q){
-      hint.style.display = 'block';
-      hint.innerHTML = `🔎 '${qRaw}' 검색 결과 · 학생 특이 ${noteStus.length}건 / 수업별 ${incidentsFiltered.length}건`;
-    } else {
-      hint.style.display = 'none';
-    }
-  }
-
-  // 탭 영역 (카운트 포함)
-  const tabsEl = document.getElementById('notes-tabs');
-  if(tabsEl){
-    tabsEl.innerHTML = `
-      <button onclick="notesTab='students';_updateNotesBody()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='students'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='students'?'#7B2C00':'transparent'};white-space:nowrap;">학생 특이 ${q?`(${noteStus.length})`:''}</button>
-      <button onclick="notesTab='incidents';_updateNotesBody()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='incidents'?'#7B2C00':'var(--muted)'};border-bottom:3px solid ${notesTab==='incidents'?'#7B2C00':'transparent'};white-space:nowrap;">수업별 ${q?`(${incidentsFiltered.length})`:''}</button>
-      <button onclick="notesTab='calendar';_updateNotesBody()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='calendar'?'#FF6B35':'var(--muted)'};border-bottom:3px solid ${notesTab==='calendar'?'#FF6B35':'transparent'};white-space:nowrap;">📅 캘린더</button>
-      <button onclick="notesTab='attenddb';_updateNotesBody()" style="flex:1;min-width:80px;padding:11px 4px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:700;color:${notesTab==='attenddb'?'#1565C0':'var(--muted)'};border-bottom:3px solid ${notesTab==='attenddb'?'#1565C0':'transparent'};white-space:nowrap;">📋 출석DB</button>
-    `;
-  }
-
-  // 결과 영역
-  const bodyEl = document.getElementById('notes-body');
-  if(!bodyEl) return;
-  let html = '';
-  if(notesTab === 'calendar'){
-    html = renderIncidentCalendar();
-  } else if(notesTab === 'attenddb'){
-    html = renderAttendDB();
-  } else if(notesTab === 'students'){
-    if(noteStus.length === 0){
-      html = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">${q?`'${qRaw}'로 검색된 학생 특이사항이 없습니다.`:'기록된 학생 특이사항이 없습니다.'}</div>`;
-    } else {
-      html = noteStus.map(s=>{
+    <div style="padding:12px">
+      ${notesTab==='calendar' ? renderIncidentCalendar() : notesTab==='attenddb' ? renderAttendDB() : notesTab==='students' ? noteStus.map(s=>{
         const isW=s.note.includes("⚠");
         const bc=isW?"#F44336":"#FFB347";
-        return `<div class="incident-card" onclick="openStuModal('${s.id}')" style="border-color:${bc};cursor:pointer;">
+        return `<div class="incident-card" style="border-color:${bc}">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
-            <span style="font-weight:800;font-size:15px">${highlight(s.name)}</span>
+            <span style="font-weight:800;font-size:15px">${s.name}</span>
             <span style="background:${s.grade===1?"#1F386420":"#833C0020"};color:${s.grade===1?"var(--primary)":"var(--primary2)"};border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700">${s.clsLabel}</span>
             ${isW?`<span style="background:#FFCDD2;color:var(--danger);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">⚠ 민원</span>`:''}
           </div>
-          <div style="font-size:12px;color:#555;line-height:18px;white-space:pre-line">${highlight(s.note)}</div>
-          ${s.phone?`<a href="tel:${s.phone}" onclick="event.stopPropagation()" style="font-size:12px;color:var(--accent);font-weight:600;margin-top:8px;display:block">📞 ${s.phone}</a>`:''}
+          <div style="font-size:12px;color:#555;line-height:18px;white-space:pre-line">${s.note}</div>
+          ${s.phone?`<a href="tel:${s.phone}" style="font-size:12px;color:var(--accent);font-weight:600;margin-top:8px;display:block">📞 ${s.phone}</a>`:''}
         </div>`;
-      }).join('');
-    }
-  } else {
-    if(incidentsFiltered.length === 0){
-      html = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">${q?`'${qRaw}'로 검색된 수업별 기록이 없습니다.`:'기록된 수업별 사건이 없습니다.'}</div>`;
-    } else {
-      html = incidentsFiltered.map(inc=>{
+      }).join('') : INCIDENTS.map(inc=>{
         const tag=inc.tag||'';
         let bc="#FFB347";
         if(tag.includes("처리완료")) bc="#375623";
@@ -4536,18 +4377,17 @@ function _updateNotesBody(){
           onmousedown="this.style.transform='scale(0.99)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">
             <span style="background:${bc}22;color:${bc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">${inc.date}</span>
-            <span style="font-weight:800;font-size:13px;color:#7B2C00;flex:1">${highlight(inc.subject)}</span>
+            <span style="font-weight:800;font-size:13px;color:#7B2C00;flex:1">${inc.subject}</span>
             <span style="background:${bc}22;color:${bc};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">${tag}</span>
             <span style="font-size:11px;color:${bc};font-weight:700;">›</span>
           </div>
-          <div style="font-size:12px;font-weight:700;color:#B71C1C;margin-bottom:4px;white-space:pre-line">${highlight(inc.student)}</div>
-          <div style="font-size:12px;color:#555;line-height:18px;margin-bottom:6px;white-space:pre-line;max-height:80px;overflow:hidden;">${highlight(inc.content)}</div>
-          <div style="font-size:11px;color:${bc};font-weight:600">▶ ${highlight(inc.action)}</div>
+          <div style="font-size:12px;font-weight:700;color:#B71C1C;margin-bottom:4px;white-space:pre-line">${inc.student}</div>
+          <div style="font-size:12px;color:#555;line-height:18px;margin-bottom:6px;white-space:pre-line;max-height:80px;overflow:hidden;">${inc.content}</div>
+          <div style="font-size:11px;color:${bc};font-weight:600">▶ ${inc.action}</div>
         </div>`;
-      }).join('');
-    }
-  }
-  bodyEl.innerHTML = html;
+      }).join('')}
+    </div>
+  `;
 }
 
 // ── 학사일정 ──
@@ -4625,9 +4465,14 @@ function showCalEvent(key){
       <div style="color:#fff;font-size:16px;font-weight:800">${parseInt(m)}월 ${parseInt(d)}일</div>
     </div>
     <div style="padding:16px">
-      ${evs.map(ev=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
-        <div style="width:8px;height:8px;border-radius:50%;background:${ev.type==='holiday'?'#E53935':ev.type==='vacation'?'#1565C0':'#FF6B35'}"></div>
-        <span style="font-size:14px;font-weight:600">${ev.label}</span>
+      ${evs.map(ev=>`<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:${(ev.target||ev.place||ev.detail)?'6px':'0'}">
+          <div style="width:8px;height:8px;border-radius:50%;background:${ev.type==='holiday'?'#E53935':ev.type==='vacation'?'#1565C0':'#FF6B35'}"></div>
+          <span style="font-size:14px;font-weight:700">${ev.label}</span>
+        </div>
+        ${ev.target?`<div style="font-size:12px;color:#555;margin-left:18px;margin-top:2px;">👥 대상: <b>${ev.target}</b></div>`:''}
+        ${ev.place?`<div style="font-size:12px;color:#555;margin-left:18px;margin-top:2px;">📍 장소: <b>${ev.place}</b></div>`:''}
+        ${ev.detail?`<div style="font-size:11px;color:#555;margin-left:18px;margin-top:6px;padding:8px 10px;background:#F5F5F5;border-radius:6px;line-height:1.8;">${ev.detail}</div>`:''}
       </div>`).join('')}
       <button onclick="closePopup()" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:14px">닫기</button>
     </div>
