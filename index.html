@@ -1135,7 +1135,7 @@ function renderDaycare(){
           </div>
           <div style="flex:1;min-width:0;">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;">
-              <span onclick="openDaycareStudent('${s.cls}','${s.name}')" style="font-size:15px;font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${s.name}</span>
+              <span onclick="openDaycareStudent('${s.cls}','${s.name}')" style="font-size:15px;font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${s.name}</span>${healthBadge(s.cls, s.name)}
               <span style="font-size:10px;color:var(--muted);background:#F0F2F8;
                 border-radius:4px;padding:1px 6px;">${s.cls}</span>
               <span style="font-size:10px;font-weight:700;
@@ -1243,6 +1243,7 @@ function openDaycareStudent(cls, name){
         <div style="font-size:12px;color:#374151;">👤 보호자: ${found.guardian||'-'}</div>
         ${found.phone?`<a href="tel:${found.phone}" style="font-size:12px;color:#1565C0;font-weight:700;text-decoration:none;">📞 ${found.phone}</a>`:''}
       </div>
+      ${healthSecHtml(found.cls, found.name)}
       ${allNote
         ? `<div style="background:#FFF3CD;border-radius:10px;padding:10px 14px;border-left:3px solid #F59E0B;">
             <div style="font-size:10px;font-weight:800;color:#92400E;margin-bottom:4px;">📌 특이사항</div>
@@ -1338,6 +1339,7 @@ function renderHome(){
     {icon:"📋",label:"출석부",sub:"요일별 학생 명단",screen:"attendance",color:"#70AD47"},
     {icon:"🗓️",label:"시간표",sub:"반별 주간 시간표",screen:"timetable",color:"#ED7D31"},
     {icon:"⚠️",label:"특이사항",sub:"메모·민원·연락 기록",screen:"notes",color:"#C00000"},
+    {icon:"🩺",label:"요보호자 관리카드",sub:"전학년 보건 정보 (비밀번호 열람)",screen:"health",onclick:"openHealthAll()",wide:true,color:"#B03030"},
     {icon:"📅",label:"학사일정",sub:"1학기 주요 행사·공휴일",screen:"calendar",color:"#2C5F2E"}
   ];
 
@@ -1526,10 +1528,10 @@ function renderHome(){
       <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px">메뉴</div>
       <div class="menu-grid" style="padding:0">
         ${menus.map(m=>`
-          <div class="menu-item ${m.screen==='calendar'?'wide':'half'}" 
-               style="background:${m.color}15;border-color:${m.color}30;${m.screen==='calendar'?'display:flex;align-items:center;gap:14px':''}"
-               onclick="${m.screen==='calendar'?'goToCalendar()':'goTo(\''+m.screen+'\')'}">
-            <div class="menu-icon" style="margin-bottom:${m.screen==='calendar'?'0':'8px'}">${m.icon}</div>
+          <div class="menu-item ${(m.screen==='calendar'||m.wide)?'wide':'half'}" 
+               style="background:${m.color}15;border-color:${m.color}30;${(m.screen==='calendar'||m.wide)?'display:flex;align-items:center;gap:14px':''}"
+               onclick="${m.onclick?m.onclick:(m.screen==='calendar'?'goToCalendar()':'goTo(\''+m.screen+'\')')}">
+            <div class="menu-icon" style="margin-bottom:${(m.screen==='calendar'||m.wide)?'0':'8px'}">${m.icon}</div>
             <div>
               <h3 style="color:${m.color}">${m.label}</h3>
               <p>${m.sub}</p>
@@ -1753,7 +1755,7 @@ function renderStudentList(){
             <div style="flex:1;min-width:0;">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                 <span style="font-size:12px;font-weight:700;color:${roomColor[s.room]};min-width:26px;">${s.num}번</span>
-                <span onclick="openDaycareStudent('${s.cls}','${s.name}')" style="font-size:15px;font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${s.name}</span>
+                <span onclick="openDaycareStudent('${s.cls}','${s.name}')" style="font-size:15px;font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${s.name}</span>${healthBadge(s.cls, s.name)}
                 <span style="background:${roomBg[s.room]};color:${roomColor[s.room]};
                   border-radius:5px;padding:1px 6px;font-size:9px;font-weight:800;">${s.room}</span>
               </div>
@@ -1772,6 +1774,7 @@ function renderStudentList(){
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                 <span style="font-size:12px;font-weight:700;color:${gc};min-width:26px;">${s.num||'?'}번</span>
                 <span class="stu-name">${s.name}</span>
+                ${healthBadge(s.clsKey, s.name)}
                 ${s.note?'<span style="font-size:13px;">⚠</span>':''}
                 ${dc?`<span onclick="event.stopPropagation();daycareTab='${dc}';goTo('daycare')" style="background:${roomBg[dc]};color:${roomColor[dc]};border-radius:5px;padding:1px 6px;font-size:9px;font-weight:800;cursor:pointer;">${dc}</span>`:''}
               </div>
@@ -1791,6 +1794,144 @@ function renderStudentList(){
 }
 
 // ── 학생 모달 ──
+
+// ─── 요보호자 관리카드 (2026, 1·2학년) — 열람 비밀번호 보호 ───
+const HEALTH_DB = {"1-1|박건우": {"ill": "꽃가루 알러지", "note": "눈을 빠르게 많이 깜박거림"}, "1-1|박민재": {"ill": "뇌전증 · 꽃·송화가루 알러지", "note": "뇌전증약 복용 중(3개월마다 병원 진료, 1년마다 뇌파·혈액검사)\n봄철 알러지: 눈·코·팔·다리 접히는 부분 발적 및 두드러기\n5살 때 수면대발작으로 뇌전증 진단, 수면 중 발작 증상이 대체로 있음. 숨이 차는 격한 운동(달리기 등)은 조금만 달려도 힘들어하고 \"다리 저리다\"라고 표현할 때는 휴식 및 관찰 부탁.\n학부모 상담: 달리기 등 숨이 차면 저산소증으로 발작 위험. 격한 운동은 하지 않도록 지도 필요. 평소 다리가 저려 주무르는 등 자세가 흐트러져도 기다려주기 요청. 알러지 시 항히스타민제를 처방받아 복용 중이므로 보건실에서는 항히스타민제를 따로 투약하지 않음."}, "1-1|황지오": {"ill": "항생제 알러지 (세파계열)", "note": "세파계열 항생제 복용 시 두드러기·발진이 나타남. 교내에서 항생제 계열 약을 투약해야 할 경우 반드시 보호자에게 사전 확인 필요."}, "1-1|유하연": {"ill": "유제품 알러지", "note": "설사"}, "1-1|석가은": {"ill": "비염", "note": ""}, "1-1|이예나": {"ill": "치아교정 중", "note": ""}, "1-1|이나은": {"ill": "달걀 알러지", "note": "얼굴·입 주위에 붉게 올라옴, 심하면 목 안이 가렵거나 불편하다고 표현. 알레르기 약 소지 중 — 증상 시 입 주위를 씻고 약 복용.\n학부모 상담: 돈까스·스파게티는 괜찮으나 계란찜·계란말이는 증상 발생. 증상 시 챔프알러논시럽 1포 복용하면 호전."}, "1-2|변민재": {"ill": "1형 소아당뇨", "note": "인슐린 복용, 팔에 연속혈당측정기 부착 중. 혈당관리를 위해 핸드폰 항상 지참 필요. 저혈당 시 주스나 사탕 섭취.\n학부모 상담: 고혈당 시 뛰어다니며 땀을 내 혈당을 낮추고, 저혈당 시 오렌지주스·사탕으로 혈당을 높여야 함. 저·고혈당 발생 시 핸드폰 알람이 울림. 보건실에 교정 인슐린 보관 중."}, "1-2|황준표": {"ill": "신우확장증 · 날계란 알러지", "note": "신우확장증 추적검사 중이나 평소 특이사항 없음(복용·소지 약물 없음). 날계란 섭취 시 두드러기 발생."}, "1-2|조이현": {"ill": "호두 알러지", "note": "혀가 간지러움"}, "1-3|김경민": {"ill": "계절성 비염", "note": "콧물, 코막힘"}, "1-3|이다은": {"ill": "환절기 비염", "note": ""}, "1-3|정윤서": {"ill": "비염", "note": "코막힘, 재채기"}, "1-4|백창훈": {"ill": "견과류 알러지", "note": "호두·아몬드·땅콩 — 붓고 두드러기"}, "1-4|윤하람": {"ill": "음식 알러지", "note": "호두·밤 — 두드러기, 피부 붉어짐, 간지러움"}, "2-1|곽나현": {"ill": "비염", "note": "약간의 두드러기"}, "2-1|문채빈": {"ill": "뇌전증 · 단감 알러지", "note": "뇌전증 약 복용 중(2025.8. 진단). 약 부작용으로 어지러움이 있을 수 있어 무리한 활동 지양 요청. 단감 알러지 — 발진.\n학부모 상담: 알러지는 입 주변 발진으로 심하지 않음. 8월 수면 중 경련 후 진단. 매일 복약 중이며 무리한 신체활동 금지 요청."}, "2-1|박세아": {"ill": "만성신장병 · 신경성 방광 · 음식 알러지", "note": "심장수술 1회, 장수술 1회, 이중척추증수술 1회, 요관역류 3회, 눈수술 3회 경험.\n방광염으로 요로감염 시 신장손상 위험 — 배변 후 앞에서 뒤로 닦도록 지도, 소변 통증·불편 호소 시 즉시 연락 요청.\n우유·호두 — 복통, 설사, 호흡곤란.\n학부모 상담: 호두는 아예 먹이지 않음. 우유는 설사·배앓이 심함. 격하게 움직이면 입술이 파래질 때가 있어 격한 체육활동 주의 부탁."}, "2-1|이하린": {"ill": "음식 알러지(견과류)", "note": "견과류 — 두드러기, 숨이 참.\n학부모 상담: 증상 시 세노바액 5ml 먼저 투약 후 학부모 연락. 태어날 때부터 기도가 약간 작아 숨이 차는 증상이 나타남. 소량의 견과류는 괜찮음."}, "2-1|김민성": {"ill": "틱장애 · 비염", "note": "저녁 식후 약물 복용(페리돌정). 스트레스·긴장 시 반복적 신체행동(틱)이 나타남 — 지적하거나 혼내지 말고 지켜봐 주세요. 틱은 상승기·소강기가 반복됨. 비염이 심해 코피 주의."}, "2-2|김도현": {"ill": "잦은 코피", "note": ""}, "2-2|육민준": {"ill": "비염", "note": "비염으로 인한 잦은 감기"}, "2-2|김나온": {"ill": "비염", "note": "코막힘"}, "2-2|오선": {"ill": "계절성 비염", "note": "건강 양호하나 계절성 비염이 있음"}, "2-3|정래은": {"ill": "알러지 비염 · 두드러기 · 음식 알러지", "note": "봄철(꽃가루) 알러지로 비염·피부가려움증이 매우 심해 일상생활에 큰 불편. 부어오르거나 긁어 피가 나기도 함. 봄·가을 코피·코막힘·피부가려움 매우 심함.\n두드러기·알러지 치료제 소지 중(코스프레이+연고). 천하장사 소세지 금지."}, "2-3|최하담": {"ill": "만성 변비", "note": "수업 중이더라도 배가 아프다면 화장실에 보내주세요."}, "2-3|최하율": {"ill": "잦은 소화불량", "note": "밥을 너무 빨리 먹어 자주 체함. 속이 불편하거나 배가 아프다고 하면 소화시켜 주세요."}, "2-3|유다연": {"ill": "비염", "note": "콧물"}, "2-3|전아인": {"ill": "음식 알러지", "note": "가공식품 및 열매의 껍질 — 가려움 및 두드러기"}, "2-4|강현우": {"ill": "아토피 · 비염", "note": ""}, "3-1|안태율": {"ill": "알레르기 비염", "note": "코막힘, 재채기"}, "3-1|최라현": {"ill": "우유 알러지", "note": "두드러기"}, "3-2|김민재": {"ill": "음식 알러지", "note": "브로콜리 — 두드러기"}, "3-2|손지훈": {"ill": "코피", "note": "코 혈관이 약한지 코피가 가끔씩 남"}, "3-2|진재연": {"ill": "성조숙증", "note": "3개월마다 주사 치료(원주세브란스병원)"}, "3-3|노하율": {"ill": "음식 알러지", "note": "땅콩·들깨(소량은 상관없음) — 입 주변 두드러기"}, "3-3|유소연": {"ill": "성조숙증", "note": "3개월마다 주사 치료(원주세브란스병원)"}, "3-3|최다희": {"ill": "꽃가루 알러지 · 강아지털 알러지", "note": "봄·여름 꽃가루 알러지 심함(눈 부음, 콧물, 코막힘, 재채기). 강아지털 알러지."}, "3-3|김시현": {"ill": "비염", "note": "먼지나 털 알레르기 비염이 심함. 보통 코막힘 증상이지만 심해지면 눈으로 올라가 눈을 많이 깜빡거림."}, "4-1|김태양": {"ill": "낮은 시력", "note": "시력이 낮아 자리 배치 시 뒤쪽은 피해 주세요."}, "4-1|전준우": {"ill": "음식 알러지 · 꽃가루 알러지", "note": "계란 — 쌕쌕거리는 호흡, 귀 부종, 기침, 콧물, 가래, 눈 충혈. 씨잘 가방에 소지 — 아나필락시스 주의.\n봄·가을 꽃가루 날림이 심할 때 알러지 증상이 심하게 나타남 — 노출 차단이 가장 좋음.\n학부모 상담: (전화) 현재 젝스트를 학생 가방에 소지 중. 계란은 완전히 익은 것은 괜찮으나 덜 익은 것은 증상 발생(혀·귀·목 간지러움, 쌕쌕거림 등). 급식에서 본인이 계란을 골라 먹고 증상에 따라 학부모에게 연락하기로 함. 꽃가루가 심한 날은 가래·기침이 하루 종일 나타나고 숨쉬기 어려움 — 바깥 체육활동 지양. 꽃가루 알러지약을 매일 자기 전 복용 중. 젝스트는 가방에 있으나 병원 동의서 작성이 어려워 학교에는 따로 두지 않고 학부모에게 연락하기로 함."}, "4-1|최서준": {"ill": "호두 알러지 · 비염", "note": "호두 — 콧물, 재채기, 두통. 가방에 두통약과 소화제 소지 중(섭취 부분 지도 부탁).\n학부모 상담: 아직 경험은 없으나 호두 섭취 시 호흡곤란 가능성이 높음 — 이 경우 학부모 연락 및 119 이송하기로 함."}, "4-1|김아린": {"ill": "요관역류", "note": "2023년 수술 후 완치"}, "4-2|권범수": {"ill": "비염", "note": "콧물, 코막힘, 코피"}, "4-2|김태민": {"ill": "비염 · 자폐스펙트럼", "note": "콧물, 코막힘. 아빌리파이정 2mg 복용 중. 매달 정신의학과 내원 진료 및 매년 세브란스 정기 진료."}, "4-2|이승원": {"ill": "아토피", "note": ""}, "4-2|강지율": {"ill": "뇌전증", "note": "트리렙탈 복용 중. 2026년 9월까지 복용하며 증상 없을 시 완치 예정.\n학부모 상담: 체육활동 등 학교에서 특별히 주의할 것은 없다고 함."}, "4-2|김민주": {"ill": "알레르기 비염", "note": "환절기 알레르기 비염(미세먼지, 꽃가루). 코막힘과 눈 주위 가려움."}, "4-3|차은우": {"ill": "심장혈관 기형", "note": "주기적으로 관찰 중(강릉아산병원 진단, 복용약 없음). 격한 운동 후 호흡이 거칠어지면 잠시 쉬게 해주세요.\n학부모 상담: 체육활동 중 힘들어하면 잠깐 쉬어 호흡을 안정시키는 정도 필요. 주기적으로 검사 중이며 일상생활에는 문제 없음."}, "4-3|박은영": {"ill": "유당불내증", "note": "식사 시 락타아제 복용"}, "4-3|신지후": {"ill": "갑상선저하증", "note": "씬지로이드(0.025mg) 하루 1회 복용. 2025.4. 강릉아산병원 진단(한 달에 한 번 정기 피검사).\n학부모 상담: 타이레놀 등 약을 먹어도 되며, 체육활동 등 크게 주의해야 할 것은 없다고 함."}, "4-4|성하준": {"ill": "비염", "note": ""}, "4-4|최유성": {"ill": "알레르기 비염", "note": "코막힘, 재채기, 콧물, 두통"}, "4-4|유아영": {"ill": "한랭알러지", "note": "찬 공기·찬물로 인해 두드러기가 올라옴. 두드러기가 심하거나 많이 가려워할 때는 항히스타민제 복용(가방에 상비약 있음)."}, "4-4|이채연": {"ill": "송화가루 알러지", "note": "눈이 부음"}, "4-4|조승아": {"ill": "비염", "note": "눈 가려움"}, "4-4|최용휘": {"ill": "쇄골두개이형성증", "note": "서울아산병원 진단(2025.2.)"}, "5-1|안성후": {"ill": "아토피", "note": ""}, "5-1|석주은": {"ill": "비염", "note": ""}, "5-2|박도현": {"ill": "꽃가루 알러지 · 비염", "note": "봄철 꽃가루 알러지(눈 부음). 비염(코막힘, 재채기)."}, "5-2|김보아": {"ill": "음식 알러지", "note": "브로콜리, 갑각류 — 두드러기"}, "5-3|김연우": {"ill": "음식 알러지", "note": "과일류 — 두드러기, 간지러움"}, "5-3|노소담": {"ill": "비염", "note": "코막힘"}, "5-3|주혜랑": {"ill": "알레르기성 비염", "note": ""}, "5-4|이기준": {"ill": "음식 알러지", "note": "바나나, 망고, 복숭아, 키위 — 두드러기"}, "5-4|김민서": {"ill": "환절기 비염", "note": "코막힘, 코안 건조, 코피"}, "5-4|김예솔": {"ill": "음식 알러지 · 섭식장애", "note": "바나나 — 두드러기. 섭식의 어려움에 대한 배려 필요(음식 권유 안 됨)."}, "5-4|백정은": {"ill": "비염", "note": "킁킁거릴 때가 있음"}, "5-4|홍수아": {"ill": "신증후군 · 용혈성 빈혈", "note": "재발을 반복하는 질병이라 추적관찰 중. 현재 복용 중인 약은 없음. 몸이 피곤하거나 힘든 체육활동을 하면 재발 위험이 높아짐.\n학부모 상담: 비장이 남들보다 큰 편이라 혈소판 파괴가 일어나 용혈성 빈혈이 있음. 오래뛰기·빨리뛰기 등 몸이 힘든 운동(팝스 포함)은 심한 타격을 주어 혈소판감소증이나 신증후군이 재발할 수 있으므로 무리한 체육활동은 하지 않도록 요청함."}, "5-4|김민준": {"ill": "급성골수성 백혈병 · 음식 알러지", "note": "2025.9.11.~2026.5.16. 항암 종료 후 추적검사 중(한 달에 2회 병원). 항암 종료 한 달째로 날 음식은 먹으면 안 됨. 체력이 예전처럼 회복되지 않았고, 항암 중 부정맥이 생겨 심장과 외래 진료 중이며 심장약(나도가드정) 복용 중 — 체육활동 주의 필요. 폐렴예방약(박트림) 복용 중.\n체리, 두유, 마카다미아, 꽃가루 알레르기 — 눈이 간지럽고 붓고, 코막힘.\n학부모 상담: 꽃가루·음식 알러지 증상이 있을 때는 약을 먹이지 말고 학부모에게 전화해 인계하기로 함. 과격한 운동을 하면 심장 통증을 호소하므로 휴식 필요."}, "6-1|권해솔": {"ill": "비염", "note": "코막힘"}, "6-1|이주원": {"ill": "비염", "note": "재채기"}, "6-1|조민건": {"ill": "음식 알러지", "note": "새우, 게 — 두드러기, 눈 가려움"}, "6-1|박서영": {"ill": "골종양 · 음식 알러지", "note": "왼쪽 다리 골종양으로 뼈가 약해 많이 걷거나 뛰거나 무리한 활동을 하면 안 됨. 골절·인대 등 쉽게 다치거나 며칠 동안 잘 걷지 못하기도 함 — 체육활동 주의 부탁. 가지 알러지 — 기도가 붓고 호흡곤란.\n학부모 상담: 아버지가 가지 알러지가 심해 한 번도 먹여본 적 없음. 왼쪽 다리 골종양으로 체육활동 주의 요청."}, "6-1|박지혜": {"ill": "음식 알러지", "note": "포도 — 부어오름, 간지러움"}, "6-2|정효준": {"ill": "비염", "note": "코막힘, 두드러기. 가끔 날씨 변화로 인해 두드러기가 나고 손이 부음."}, "6-2|이수환": {"ill": "비염", "note": ""}, "6-2|정민준": {"ill": "비염", "note": "코막힘. 가끔 손이 부음."}, "6-3|김민재": {"ill": "음식 알러지 · 비염·축농증", "note": "복숭아 알러지. 비염·축농증으로 인한 코막힘, 콧물. 코가 약해서 찬바람을 많이 쐬면 비염·축농증이 심해짐."}, "6-3|임도원": {"ill": "비염", "note": "비염 시 코막힘. 때때로 킁킁 소리가 나고 눈 주변 물집(현재는 없음). 비염으로 한 달에 한 번 정도 병원 방문. 증상이 심해지는데 약을 안 먹을 때 특정 소리를 냄 — 수업 중 불편하면 연락 요망."}, "6-3|정연호": {"ill": "비염", "note": "코막힘, 재채기, 콧물"}, "6-3|유소희": {"ill": "음식 알러지", "note": "견과류"}, "6-3|윤수정": {"ill": "음식 알러지 · 비염", "note": "코코넛 — 얼굴이 빨개지고 부음"}, "6-3|채서윤": {"ill": "한랭알러지", "note": "두드러기"}, "6-4|권기윤": {"ill": "비염", "note": "콧물, 코막힘, 재채기"}};
+const HEALTH_PW = '0125';
+function healthKey(cls, name){ return cls + '|' + String(name).replace(/\s+/g,''); }
+function getHealth(cls, name){ return HEALTH_DB[healthKey(cls, name)]; }
+function isHealth(cls, name){ return !!getHealth(cls, name); }
+function healthUnlocked(){ return false; } // 매 열람마다 비밀번호 입력
+function healthBadge(cls, name){
+  return isHealth(cls, name)
+    ? '<span title="요보호자" style="background:#FDEDEC;border:1px solid #F5B7B1;border-radius:6px;padding:0 4px;font-size:11px;line-height:1.5;">🩺</span>'
+    : '';
+}
+function healthCardHtml(hd){
+  // note에서 '학부모 상담:' 이후를 분리해 별도 필드로 표시
+  let care='', consult='';
+  if(hd.note){
+    const i = hd.note.indexOf('학부모 상담:');
+    if(i>=0){ care=hd.note.slice(0,i).trim(); consult=hd.note.slice(i+7).trim(); }
+    else care=hd.note.trim();
+  }
+  const field=(label, body, bg)=> body ? `
+    <div style="margin-top:7px;background:${bg};border-radius:9px;padding:8px 11px;">
+      <div style="font-size:10px;font-weight:900;color:#8A2020;margin-bottom:3px;">${label}</div>
+      <div style="font-size:12.5px;line-height:1.75;color:#4A2020;white-space:pre-line;">${body}</div>
+    </div>` : '';
+  return `<div class="healthSec" style="background:#FFF5F5;border:1.5px solid #F1B5B5;border-radius:12px;padding:13px 14px;margin-bottom:10px;">
+    <div style="display:flex;align-items:center;gap:7px;">
+      <span style="font-size:16px;">🩺</span>
+      <b style="font-size:13.5px;color:#B03030;">요보호자 관리카드</b>
+      <span style="margin-left:auto;font-size:10px;color:#C08080;font-weight:800;">개인정보 · 취급주의</span>
+    </div>
+    <div style="margin-top:9px;background:#FBE4E4;border-radius:9px;padding:8px 11px;">
+      <div style="font-size:10px;font-weight:900;color:#8A2020;margin-bottom:3px;">질병명</div>
+      <div style="font-size:14px;font-weight:900;color:#7A1515;">${hd.ill}</div>
+    </div>
+    ${field('증상 · 주의사항', care, '#FDF0F0')}
+    ${field('학부모 상담 내용', consult, '#FFF8EE')}
+    <div style="margin-top:8px;font-size:10px;color:#BB8888;">※ 2026. 3. 요보호자 관리카드 기준 · 외부 공유 금지</div>
+  </div>`;
+}
+function healthSecHtml(cls, name){
+  const hd=getHealth(cls, name);
+  if(!hd) return '';
+  if(healthUnlocked()) return healthCardHtml(hd);
+  return `<div class="healthSec" style="background:#FFF9F4;border:1.5px dashed #E0A96D;border-radius:12px;padding:13px 14px;margin-bottom:10px;">
+    <div style="display:flex;align-items:center;gap:7px;">
+      <span style="font-size:16px;">🩺</span>
+      <b style="font-size:13.5px;color:#9A5B10;">요보호자 관리카드</b>
+      <span style="margin-left:auto;font-size:10px;color:#C09060;font-weight:800;">🔒 열람 제한</span>
+    </div>
+    <div style="display:flex;gap:7px;margin-top:9px;">
+      <input type="password" class="healthPw" inputmode="numeric" maxlength="8" placeholder="비밀번호 입력"
+        style="flex:1;border:1.5px solid #E0C9A8;border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;"
+        onkeydown="if(event.key==='Enter')healthTry(this,'${cls}','${name}')">
+      <button onclick="healthTry(this,'${cls}','${name}')"
+        style="border:0;border-radius:9px;background:#B9770E;color:#fff;font-weight:900;font-size:13px;padding:0 16px;font-family:inherit;cursor:pointer;">열람</button>
+    </div>
+    <div class="healthErr" style="font-size:11px;color:#C0392B;font-weight:800;margin-top:5px;"></div>
+  </div>`;
+}
+function healthTry(srcEl, cls, name){
+  const box = srcEl && srcEl.closest ? srcEl.closest('.healthSec') : null;
+  if(!box) return;
+  const input = box.querySelector('.healthPw');
+  const v = (input ? input.value : '').trim();
+  if(v===HEALTH_PW){
+    box.outerHTML = healthCardHtml(getHealth(cls, name));
+  } else {
+    const e = box.querySelector('.healthErr');
+    if(e) e.textContent='비밀번호가 올바르지 않습니다.';
+    if(input){ input.value=''; input.focus(); }
+  }
+}
+
+// ─── 요보호자 전학년 열람 (홈 메뉴) ───
+function healthAllListHtml(){
+  const grades={};
+  Object.entries(HEALTH_DB).forEach(([k,hd])=>{
+    const cls=k.split('|')[0], name=k.split('|')[1];
+    const g=cls.split('-')[0];
+    (grades[g]=grades[g]||[]).push({cls,name,hd});
+  });
+  const gsec=Object.keys(grades).sort().map(g=>{
+    const list=grades[g].sort((a,b)=> a.cls===b.cls ? a.name.localeCompare(b.name,'ko') : a.cls.localeCompare(b.cls,'ko'));
+    const items=list.map(e=>`
+      <details style="border:1px solid #F0D9D9;border-radius:10px;margin-bottom:6px;background:#FFFDFD;">
+        <summary style="padding:9px 12px;font-size:13px;cursor:pointer;list-style-position:inside;">
+          <b>${e.cls} ${e.name}</b> <span style="color:#B03030;font-size:12px;">— ${e.hd.ill}</span>
+        </summary>
+        <div style="padding:0 8px 8px;">${healthCardHtml(e.hd)}</div>
+      </details>`).join('');
+    return `
+      <details ${g==='1'?'open':''} style="margin-bottom:10px;">
+        <summary style="background:#B03030;color:#fff;border-radius:10px;padding:9px 14px;font-size:14px;font-weight:900;cursor:pointer;list-style-position:inside;">${g}학년 (${list.length}명)</summary>
+        <div style="padding:8px 2px 0;">${items}</div>
+      </details>`;
+  }).join('');
+  return `
+    <div style="background:#B03030;padding:16px;border-radius:18px 18px 0 0;">
+      <div style="color:#fff;font-size:16px;font-weight:900;">🩺 요보호자 관리카드 — 전학년</div>
+      <div style="color:rgba(255,255,255,.8);font-size:11px;margin-top:3px;">총 ${Object.keys(HEALTH_DB).length}명 · 2026. 3. 기준 · 외부 공유 금지</div>
+    </div>
+    <div style="padding:14px;">${gsec}</div>`;
+}
+function openHealthAll(){
+  showPopup(`
+    <div style="background:#B03030;padding:16px;border-radius:18px 18px 0 0;">
+      <div style="color:#fff;font-size:16px;font-weight:900;">🩺 요보호자 관리카드 — 전학년</div>
+      <div style="color:rgba(255,255,255,.8);font-size:11px;margin-top:3px;">보건 정보 · 열람 제한</div>
+    </div>
+    <div class="healthAllLock" style="padding:18px 16px;">
+      <div style="font-size:13px;color:#6B4444;margin-bottom:10px;">전학년 요보호자 관리카드를 열람하려면 비밀번호를 입력하세요.</div>
+      <div style="display:flex;gap:7px;">
+        <input type="password" class="healthPw" inputmode="numeric" maxlength="8" placeholder="비밀번호 입력"
+          style="flex:1;border:1.5px solid #E0C9A8;border-radius:9px;padding:10px 12px;font-size:15px;font-family:inherit;"
+          onkeydown="if(event.key==='Enter')healthAllTry(this)">
+        <button onclick="healthAllTry(this)"
+          style="border:0;border-radius:9px;background:#B03030;color:#fff;font-weight:900;font-size:13px;padding:0 18px;font-family:inherit;cursor:pointer;">열람</button>
+      </div>
+      <div class="healthErr" style="font-size:11px;color:#C0392B;font-weight:800;margin-top:6px;"></div>
+    </div>`);
+}
+function healthAllTry(srcEl){
+  const sec = srcEl && srcEl.closest ? srcEl.closest('.healthAllLock') : null;
+  if(!sec) return;
+  const v = (sec.querySelector('.healthPw')||{value:''}).value.trim();
+  if(v===HEALTH_PW){
+    const wrap = sec.parentElement;
+    wrap.innerHTML = healthAllListHtml();
+  } else {
+    const e = sec.querySelector('.healthErr');
+    if(e) e.textContent='비밀번호가 올바르지 않습니다.';
+    const pw = sec.querySelector('.healthPw');
+    if(pw){ pw.value=''; pw.focus && pw.focus(); }
+  }
+}
+
 function openStuModal(id){
   const s = STUDENTS.find(x=>x.id===id);
   if(!s) return;
@@ -1857,6 +1998,7 @@ function openStuModal(id){
     : `<span style="color:rgba(255,255,255,0.5);font-size:12px">연락처 없음</span>`;
 
   document.getElementById('stu-modal-body').innerHTML = `
+    ${healthSecHtml(s.clsKey, s.name)}
     ${s.note?`<div onclick="showStudentNoteDetail('${s.id}')" style="background:#FFF0F0;border-radius:12px;padding:14px;border:1.5px solid #FFCDD2;margin-bottom:10px;cursor:pointer;transition:transform 0.1s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
         <div style="font-size:12px;font-weight:700;color:var(--danger);">⚠ 특이사항</div>
