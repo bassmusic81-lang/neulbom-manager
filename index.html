@@ -1340,6 +1340,7 @@ function renderHome(){
     {icon:"🗓️",label:"시간표",sub:"반별 주간 시간표",screen:"timetable",color:"#ED7D31"},
     {icon:"⚠️",label:"특이사항",sub:"메모·민원·연락 기록",screen:"notes",color:"#C00000"},
     {icon:"🌞",label:"여름방학 맞춤형 운영",sub:"7/27~8/13 · 코스별 시간표·명단 (91명)",screen:"summer",onclick:"openSummer()",wide:true,color:"#E8590C"},
+    {icon:"🦺",label:"안전시니어 출근 캘린더",sub:"9월 근무·교육·휴무 일정",screen:"senior",onclick:"openSenior()",wide:true,color:"#7B5E00"},
     {icon:"🩺",label:"요보호자 관리카드",sub:"전학년 보건 정보 (비밀번호 열람)",screen:"health",onclick:"openHealthAll()",wide:true,color:"#B03030"},
     {icon:"📅",label:"학사일정",sub:"1학기 주요 행사·공휴일",screen:"calendar",color:"#2C5F2E"}
   ];
@@ -4712,6 +4713,43 @@ function showPopup(html){
   document.getElementById('popup-content').innerHTML=html;
   document.getElementById('popup-overlay').classList.remove('hidden');
 }
+
+// ─── 안전시니어 출근 캘린더 (2026. 9.) ───
+const SENIOR_CAL = {
+  month:'2026년 9월',
+  special:{ '9-1':['edu','시니어 교육'], '9-15':['edu','시니어 교육'],
+    '9-24':['hol','추석 연휴'], '9-25':['hol','추석'],
+    '9-29':['off','시니어 휴무'], '9-30':['off','시니어 휴무'] },
+  weeks:[ [null,1,2,3,4],[7,8,9,10,11],[14,15,16,17,18],[21,22,23,24,25],[28,29,30,null,null] ]
+};
+const SENIOR_STYLE={work:['#E6F4EA','#1F7A45','정상 근무'],edu:['#DCEBFB','#1B5FA8','시니어 교육(미출근)'],off:['#EFEDE8','#8A8478','시니어 휴무'],hol:['#FDE3E3','#C0392B','공휴일']};
+function openSenior(){
+  let cnt={work:0,edu:0,off:0,hol:0};
+  const head=['월','화','수','목','금'].map(w=>`<th style="padding:7px;background:#1F3864;color:#fff;font-size:12px;border:1.5px solid #fff;border-radius:7px;">${w}</th>`).join('');
+  const rows=SENIOR_CAL.weeks.map(wk=>'<tr>'+wk.map(d=>{
+    if(d===null) return '<td style="background:#FAF9F6;border:1.5px solid #fff;border-radius:9px;"></td>';
+    const sp=SENIOR_CAL.special['9-'+d];
+    const kind=sp?sp[0]:'work', label=sp?sp[1]:'근무';
+    cnt[kind]++;
+    const [bg,fg]=SENIOR_STYLE[kind];
+    return `<td style="border:1.5px solid #fff;background:${bg};border-radius:9px;padding:8px 4px;text-align:center;vertical-align:top;">
+      <div style="font-size:15px;font-weight:900;color:${fg};">${d}</div>
+      <div style="font-size:9.5px;font-weight:800;color:${fg};margin-top:2px;">${label}</div></td>`;
+  }).join('')+'</tr>').join('');
+  const legend=Object.values(SENIOR_STYLE).map(([bg,fg,t])=>`<span style="background:${bg};color:${fg};border-radius:7px;padding:3px 10px;font-size:10.5px;font-weight:800;">${t}</span>`).join(' ');
+  showPopup(`
+    <div style="font-size:16px;font-weight:900;color:#1F3864;margin-bottom:2px;">🦺 안전시니어 출근 캘린더 — ${SENIOR_CAL.month}</div>
+    <div style="font-size:11px;color:#777;margin-bottom:8px;">학교 출근 <b style="color:#1F7A45;">16일</b> · 교육 2일 · 휴무 2일 · 추석 연휴 2일 (평일 기준)</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">${legend}</div>
+    <table style="width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;">
+      <thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+    <div style="margin-top:10px;background:#FFF9EC;border:1.5px dashed #E0B84A;border-radius:9px;padding:9px 12px;font-size:11px;color:#7A5A10;line-height:1.8;">
+      <b>등교 안내 공백일(4일)</b> — 9/1(화)·9/15(화) 교육, 9/29(화)·9/30(수) 휴무.<br>
+      해당일 아침 로비 학생 안내는 늘봄지원실에서 대체 필요.</div>
+    <button onclick="closePopup()" style="width:100%;margin-top:12px;padding:11px;border:0;border-radius:10px;background:#1F3864;color:#fff;font-size:13.5px;font-weight:900;cursor:pointer;font-family:inherit;">닫기</button>
+  `);
+}
+
 function closePopup(){
   document.getElementById('popup-overlay').classList.add('hidden');
 }
