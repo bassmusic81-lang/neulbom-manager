@@ -2131,47 +2131,33 @@ function openStuModal(id){
   const nm = s.name.trim();
   const is2 = s.grade===2;
 
-  // 개인 특수 일정: 노트 자동 파싱 + 수동 보완
-  const SKIP_ALL_M   = new Set(["허산"]);
-  const WED_JUSA_M   = new Set(["이연희"]);
+  // ── 2학기 수강 현황 (SEM2_ENROLL 기반) ──
   const sp = getStudentSpecial(nm, s.note);
-
-  // 요일별 수강 현황 계산
+  const en2 = SEM2_ENROLL[s.clsKey+'|'+nm.replace(/\s+/g,'')];
+  const isComp2 = COMPUTER_AB.has(s.clsKey+'|'+nm.replace(/\s+/g,''));
+  function has2(day, per){
+    if(!en2 || en2.mode==='NONE') return false;
+    switch(en2.mode){
+      case 'WED1': return day==='수' && per===0;
+      case 'WED': return day==='수';
+      case 'NOWED': return day!=='수' && (per===0?en2.p1:en2.p2);
+      case 'P1WED': return day==='수' ? true : per===0;
+      case 'P1': return per===0;
+      case 'MON1': return day==='월' ? per===0 : (per===0?en2.p1:en2.p2);
+      default: return per===0?en2.p1:en2.p2;
+    }
+  }
   function getPersonalSubjs(day) {
-    if(SKIP_ALL_M.has(nm)) return null;
-    if(WED_JUSA_M.has(nm)) return day==='수' ? ['주산암산'] : null;
-    if(sp?.skipDays?.includes(day)) return null;
-
+    if(!en2 || en2.mode==='NONE') return null; // 2학기 미신청
     const daysc = sc[day]||[];
     const subjs = [];
-
-    if(!is2) {
-      // 1학년: replaceS1/S2 포함
-      const s1raw = (sp?.replaceS1?.[day]) || daysc[0];
-      const s2raw = (sp?.replaceS2?.[day]) || daysc[1];
-      if(!sp?.skipS1Days?.includes(day) && s1raw && s1raw!=='—') subjs.push(s1raw);
-      if(!sp?.skipS2Days?.includes(day) && s2raw) subjs.push(s2raw);
-    } else {
-      if(day==='월') {
-        // s[0]="—" 건너뜀, s[1]=2교시, s[2]=3교시
-        if(!sp?.skipS2Days?.includes(day) && daysc[1] && daysc[1]!=='—') subjs.push(daysc[1]);
-        if(!sp?.skipS3Days?.includes(day) && daysc[2]) subjs.push(daysc[2]);
-      } else if(day==='수') {
-        const s1w = (sp?.replaceS1?.[day]) || (daysc[0]&&daysc[0]!=='—'?daysc[0]:null);
-        const s2w = (sp?.replaceS2?.[day]) || daysc[1];
-        if(!sp?.skipS1Days?.includes(day) && s1w) subjs.push(s1w);
-        if(!sp?.skipS2Days?.includes(day) && s2w) subjs.push(s2w);
-      } else {
-        // 화·목·금
-        const s1 = (sp?.replaceS1?.[day]) || (daysc[0]&&daysc[0]!=='—'?daysc[0]:null);
-        const s2 = (sp?.replaceS2?.[day]) || daysc[1];
-        if(!sp?.skipS1Days?.includes(day) && s1) subjs.push(s1);
-        if(!sp?.skipS2Days?.includes(day) && s2) subjs.push(s2);
-      }
-    }
-    return subjs.length>0 ? subjs : [];
+    let s1 = has2(day,0) ? ((sp?.replaceS1?.[day]) || (daysc[0]&&daysc[0]!=='—'?daysc[0]:null)) : null;
+    let s2 = has2(day,1) ? ((sp?.replaceS2?.[day]) || (daysc[1]&&daysc[1]!=='—'?daysc[1]:null)) : null;
+    if((day==='화'||day==='목') && isComp2 && has2(day,0)) s1='컴퓨터(방과후)';
+    if(s1) subjs.push(s1);
+    if(s2) subjs.push(s2);
+    return subjs;
   }
-
   document.getElementById('stu-modal-header').style.background = hc;
   const avatarEl = document.getElementById('stu-modal-avatar');
   const _mpk = s.clsKey.replace('-','')+s.name;
@@ -2233,7 +2219,6 @@ function openStuModal(id){
         function getSlotKey(idx) {
           if(!is2) return idx===0?'s1':'s2';
           if(day==='수') return idx===0?'s1':'s2';
-          if(day==='월') return idx===0?'s2':'s3'; // 2학년 월: s[1]=2교시,s[2]=3교시
           return idx===0?'s1':'s2';
         }
 
@@ -2244,7 +2229,7 @@ function openStuModal(id){
           <div style="flex:1">
             <div style="font-size:10px;color:var(--muted);margin-bottom:3px">${day}요일 (${DAY_DATES[day]})</div>
             ${isCancelled
-              ? `<span style="background:#FFCDD2;color:#B71C1C;border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700">취소</span>`
+              ? `<span style="background:#FFCDD2;color:#B71C1C;border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700">2학기 미신청</span>`
               : isEmpty
                 ? `<span style="color:var(--muted);font-size:12px">맞춤형 없음</span>`
                 : subjs.map((subj,idx)=>`
