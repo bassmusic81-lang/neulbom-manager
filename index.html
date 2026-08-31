@@ -518,6 +518,7 @@ const INSTRUCTOR_MAP = {
   "책놀이":{name:"김정이",phone:"010-2927-8490"}
 };
 
+const SUBJECT_TEACHERS = {"백미향": {"role": "교무", "subject": "영어(4-1,2), 영어(5학년)", "hours": "16시간", "place": "①동 1층 / 영어체험실", "grid": {"1": {"월": "4-2", "화": "4-1", "수": "", "목": "5-1", "금": "5-2"}, "2": {"월": "4-1", "화": "4-2", "수": "", "목": "5-4", "금": "5-4"}, "3": {"월": "5-1", "화": "5-4", "수": "", "목": "5-3", "금": "5-3"}, "4": {"월": "5-2", "화": "5-3", "수": "", "목": "5-2", "금": "5-1"}}, "note": "4학년 2시간 · 5학년 3시간"}, "장신영": {"role": "연구", "subject": "과학(4학년), 영어(4-3,4)", "hours": "16시간", "place": "신축동 전담① 예정", "grid": {"1": {"월": "4-1", "화": "", "수": "4-3", "목": "4-4", "금": ""}, "2": {"월": "4-3", "화": "4-3", "수": "4-4", "목": "4-3", "금": "4-3"}, "3": {"월": "4-2", "화": "4-1", "수": "4-2", "목": "4-4", "금": "4-4"}, "4": {"월": "4-4", "화": "4-1", "수": "4-2", "목": "", "금": ""}}, "note": "월~수 과학 3시간 · 목~금 영어 2시간"}, "권효주": {"role": "", "subject": "영어(3학년, 6학년)", "hours": "18시간", "place": "다목적실", "grid": {"1": {"월": "3-3", "화": "순회교육(맹방초)", "수": "6-3", "목": "3-3", "금": "6-1"}, "2": {"월": "3-1", "화": "", "수": "6-4", "목": "3-2", "금": "6-2"}, "3": {"월": "3-2", "화": "", "수": "6-1", "목": "3-1", "금": "6-3"}, "4": {"월": "6-1", "화": "", "수": "6-2", "목": "6-3", "금": "6-4"}, "5": {"월": "6-2", "화": "", "수": "", "목": "6-4", "금": ""}}, "note": "3학년 2시간 · 6학년 3시간"}, "권순규": {"role": "", "subject": "체육◯협 (3, 6학년)", "hours": "14시간", "place": "슬기관 / 운동장", "grid": {"1": {"월": "6-3", "화": "순회교육(호산초)", "수": "6-1", "목": "6-2", "금": ""}, "2": {"월": "6-4", "화": "", "수": "6-3", "목": "6-3", "금": "4-1"}, "3": {"월": "6-1", "화": "", "수": "6-2", "목": "6-4", "금": "4-2"}, "4": {"월": "6-2", "화": "", "수": "6-4", "목": "6-1", "금": ""}}, "note": "4학년 4-1(1시간)·4-2(1시간) · 6학년 3시간"}, "김권일": {"role": "", "subject": "체육◯협 (3, 5학년)", "hours": "14시간", "place": "슬기관 / 운동장", "grid": {"1": {"월": "4-3", "화": "5-1", "수": "순회교육(하장초)", "목": "5-3", "금": "5-4"}, "2": {"월": "4-4", "화": "5-2", "수": "", "목": "5-2", "금": "5-3"}, "3": {"월": "5-3", "화": "5-1", "수": "", "목": "5-1", "금": ""}, "4": {"월": "5-4", "화": "5-4", "수": "", "목": "5-2", "금": ""}}, "note": "4학년 4-3(1시간)·4-4(1시간) · 5학년 3시간"}, "이기백": {"role": "체육", "subject": "체육(3, 4학년)", "hours": "17시간", "place": "슬기관 / 운동장", "grid": {"1": {"월": "3-3", "화": "4-2", "수": "4-1", "목": "3-3", "금": ""}, "2": {"월": "3-2", "화": "3-1", "수": "4-3", "목": "4-2", "금": "3-1"}, "3": {"월": "3-3", "화": "3-2", "수": "4-1", "목": "4-3", "금": "3-2"}, "4": {"월": "3-1", "화": "", "수": "4-4", "목": "4-4", "금": ""}}, "note": "3학년 3시간 · 4학년 2시간"}, "장현숙": {"role": "과학", "subject": "과학(3, 5학년)", "hours": "16.5시간", "place": "5학년: 신축동 과학실 · 3학년: 후동 과학실", "grid": {"1": {"월": "5-2", "화": "5-4", "수": "5-1", "목": "3-1", "금": ""}, "2": {"월": "5-3", "화": "5-4", "수": "5-1", "목": "3-1", "금": ""}, "3": {"월": "5-4", "화": "5-2", "수": "5-3", "목": "3-3", "금": "3-3"}, "4": {"월": "5-1", "화": "5-2", "수": "5-3", "목": "", "금": ""}, "5": {"월": "3-1", "화": "", "수": "", "목": "", "금": ""}}, "note": "1학기: 3-1·5학년(15시간) / 2학기: 3-1·3-3·5학년(18시간)"}, "김미경": {"role": "생활", "subject": "과학(3, 6학년)", "hours": "16.5시간", "place": "후동 과학실", "grid": {"1": {"월": "6-1", "화": "6-4", "수": "6-2", "목": "3-2", "금": ""}, "2": {"월": "6-2", "화": "6-4", "수": "6-2", "목": "3-2", "금": ""}, "3": {"월": "6-3", "화": "6-1", "수": "6-3", "목": "", "금": ""}, "4": {"월": "6-4", "화": "6-1", "수": "6-3", "목": "3-2", "금": ""}}, "note": "1학기: 3-2·3-3·6학년(18시간) / 2학기: 3-2·6학년(15시간)"}, "전소정": {"role": "", "subject": "보건교육(5학년), 창체", "hours": "", "place": "", "grid": {"2": {"월": "", "화": "5-1", "수": "5-4", "목": "5-3", "금": "5-2"}}, "note": "5학년 1학기 10차시 · 2학기 7차시 (2교시)"}, "정춘영": {"role": "", "subject": "영양교육(1~6학년), 창체", "hours": "", "place": "③동 2층 / 영양교육실", "grid": {}, "note": "1~6학년 (2차시)"}, "이선자/김지연": {"role": "", "subject": "독서교육(1~6학년), 창체", "hours": "6시간", "place": "①동 1층 / 도서관", "grid": {"1": {"월": "2-4", "화": "2-3", "수": "2-2", "목": "2-1", "금": ""}, "2": {"월": "1-4", "화": "1-3", "수": "1-2", "목": "1-1", "금": ""}}, "note": "2학기 기준 · 전 학년 6차시 수업"}};
 const INCIDENTS = [
   {seq:1,date:"3/23(월)",subject:"발레",student:"2-2 오윤오",content:"오윤오가 발레 수업 중 여학생을 놀림",action:"재발 시 반 변경 / 상대 신원 확인",tag:"⚠ 요주의"},
   {seq:2,date:"3/23(월)",subject:"종이접기(1교시)",student:"1-4 김라움 / 1-4 윤하람",content:"김라움 복통 귀가 → 강사가 윤하람으로 착각 → 어머니 갈등",action:"윤하람 어머니 오해 해소 / 강사 재교육",tag:"⚠ 민원"},
@@ -1543,6 +1544,13 @@ function renderHome(){
 
     <!-- 일일시정표 + 교실 검색 + 유휴교실 -->
     <div style="padding:10px 16px 0;display:flex;gap:8px;">
+      <button onclick="showSubjectTeachers()" style="flex:1;background:#fff;border:1.5px solid #E8DFF5;border-radius:14px;padding:13px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,0.06);">
+        <span style="font-size:22px;">📚</span>
+        <div style="flex:1;text-align:left;">
+          <div style="font-size:12px;font-weight:800;color:#6A3FB5;">교과전담</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:1px;">교사별 시간표</div>
+        </div>
+      </button>
       <button onclick="showSchedulePopup()" style="flex:1;background:#fff;border:1.5px solid #E0E7FF;border-radius:14px;padding:13px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,0.06);">
         <span style="font-size:22px;">📅</span>
         <div style="flex:1;text-align:left;">
@@ -3312,6 +3320,46 @@ function showIdleRoomWizard(){
   };
 }
 
+
+function showSubjectTeachers(){
+  const DAYS=['월','화','수','목','금'];
+  const cards = Object.entries(SUBJECT_TEACHERS).map(([name,info])=>{
+    const periods = Object.keys(info.grid||{}).sort();
+    let table='';
+    if(periods.length){
+      table = `<table style="width:100%;border-collapse:collapse;margin-top:8px;table-layout:fixed;">
+        <thead><tr>
+          <th style="border:1px solid #DDD;background:#1F3864;color:#fff;font-size:10px;padding:4px 2px;width:32px;">교시</th>
+          ${DAYS.map(d=>`<th style="border:1px solid #DDD;background:#3D5A85;color:#fff;font-size:11px;padding:4px 2px;">${d}</th>`).join('')}
+        </tr></thead><tbody>
+        ${periods.map(p=>`<tr>
+          <td style="border:1px solid #DDD;background:#F5F5F5;font-size:10px;font-weight:800;text-align:center;padding:4px 2px;">${p}</td>
+          ${DAYS.map(d=>{
+            const v=(info.grid[p]||{})[d]||'';
+            const isTrip=v.includes('순회');
+            return `<td style="border:1px solid #DDD;font-size:${isTrip?'8.5':'11'}px;text-align:center;padding:4px 2px;${v?'font-weight:700;color:#1F3864;':'background:#FAFAFA;'}${isTrip?'color:#C0392B;':''}">${v||'-'}</td>`;
+          }).join('')}
+        </tr>`).join('')}
+        </tbody></table>`;
+    }
+    return `<div style="background:#fff;border-radius:12px;padding:12px 13px;margin-bottom:10px;border-left:4px solid #1F3864;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+      <div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;">
+        <b style="font-size:15px;color:#1F3864;">${info.role?info.role+'-':''}${name}</b>
+        ${info.hours?`<span style="background:#E8F5E9;color:#2E7D32;border-radius:5px;padding:1px 7px;font-size:10px;font-weight:800;">${info.hours}</span>`:''}
+      </div>
+      <div style="font-size:12px;color:#555;font-weight:700;margin-top:3px;">${info.subject}</div>
+      ${info.place?`<div style="font-size:11px;color:#8A6BA8;font-weight:700;margin-top:2px;">📍 ${info.place}</div>`:''}
+      ${table}
+      ${info.note?`<div style="font-size:10px;color:#999;margin-top:6px;line-height:1.5;">※ ${info.note}</div>`:''}
+    </div>`;
+  }).join('');
+  showPopup(`<div style="padding:4px 2px;">
+    <div style="font-size:17px;font-weight:900;color:#1F3864;margin-bottom:3px;">📚 교과전담 교사별 시간표</div>
+    <div style="font-size:11px;color:#999;margin-bottom:12px;">2026학년도 2학기 (26.08.25. 기준)</div>
+    ${cards}
+    <div style="font-size:10px;color:#AAA;margin-top:4px;line-height:1.6;">※ 예술강사 국악 시수(180) — 추후 시수 배부는 담당 선생님이 안내 예정</div>
+  </div>`);
+}
 function showRoomSearch(){
   // 맞춤형: PLACE_MAP_WEB 기반
   const roomMap = {};
