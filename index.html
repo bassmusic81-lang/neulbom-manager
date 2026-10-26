@@ -3053,7 +3053,7 @@ const AFTER_SCHOOL = [
   {no:7,  name:"도자공예",   days:["금"],           timeA:"14:00~14:40", timeB:"14:50~15:30", material:"1회 재료비 6,000원",        place:"3동 1층 과학실 2", teacher:"최대성"},
   {no:8,  name:"방송댄스",   days:["화","목"],      timeA:"15:30~16:10", timeB:"16:20~17:00", material:"실내화, 편안한 복장",       place:"3동 2층 나리실", teacher:"이다영"},
   {no:9,  name:"음악줄넘기", days:["월","목","금"], timeA:"14:00~14:40", timeB:"14:50~15:30", material:"줄넘기, 운동화",            place:"슬기관 2", teacher:"김권일"},
-  {no:10, name:"배드민턴",   days:["수","목","금"], timeA:"14:00~14:40", timeB:"14:50~15:30", material:"라켓, 운동화",              place:"2동 2층 다목적강당", teacher:"권순규"},
+  {no:10, name:"배드민턴",   days:["수","목","금"], timeA:"14:00~14:40", timeB:"14:50~15:30", material:"라켓, 운동화",              place:"슬기관 1", teacher:"권순규"},
   {no:11, name:"로봇과학",   days:["월"],           timeA:"14:00~14:40", timeB:"14:50~15:30", material:"재료비 99,000원",           place:"1동 1층 영어체험실", teacher:"김소영"},
   {no:12, name:"보드게임",   days:["화"],           timeA:"14:40~15:20", timeB:"15:30~16:10", material:"필기도구",                  place:"1동 1층 영어체험실", teacher:"이혜진"},
   {no:13, name:"창의미술",   days:["수"],           timeA:"14:00~14:40", timeB:"14:50~15:30", material:"미술도구 개별안내",          place:"1동 1층 영어체험실", note:"80분 수업 (A·B 연속)", teacher:"전은정"},
@@ -3078,7 +3078,7 @@ function programBadge(subj){
 }
 
 const PLACE_MAP_WEB = {
-  "발레":"2동 2층 다목적강당","음악줄넘기":"2동 2층 다목적강당","놀이체육":"운동장",
+  "발레":"2동 2층 다목적강당","음악줄넘기":"2동 2층 다목적강당","놀이체육":"2동 2층 다목적강당",
   "축구(풋살)":"운동장","뉴스포츠":"슬기관 1",
   "오카리나":"2동 1층 전담교실 2","종이접기":"2동 1층 전담교실 2","그림책놀이":"2동 1층 전담교실 2",
   "주산암산":"2동 1층 전담교실 1","토탈공예":"2동 1층 전담교실 1","창의미술":"2동 1층 전담교실 1",
@@ -3099,7 +3099,7 @@ function getPlaceByDay(subj, day, slot){
   // 체육관 지붕공사 (5/6~): 뉴스포츠·놀이체육 장소 변경
   if(subj==='뉴스포츠' && day==='목') return '운동장 (우천시 1동 3층 늘봄교실 1)';
   if(subj==='뉴스포츠' && day==='화') return '운동장 (우천시 본동 3층 다목적실)';
-  if(subj==='놀이체육' && day==='금') return '운동장 (우천시 본동 3층 다목적실)';
+  if(subj==='놀이체육' && day==='금') return '2동 2층 다목적강당';
   return getPlace(subj);
 }
 
@@ -3717,7 +3717,7 @@ function downloadTimetableXlsx(clsOnly){
     if(subj==='그림책놀이' && day==='금') return '2동 1층 전담교실 2';
     if(subj==='뉴스포츠' && day==='목') return '운동장 (우천시 1동 3층 늘봄교실 1)';
     if(subj==='뉴스포츠' && day==='화') return '운동장 (우천시 본동 3층 다목적실)';
-    if(subj==='놀이체육' && day==='금') return '운동장 (우천시 본동 3층 다목적실)';
+    if(subj==='놀이체육' && day==='금') return '2동 2층 다목적강당';
     return PLACE_MAP_WEB?.[subj]||'';
   }
 
