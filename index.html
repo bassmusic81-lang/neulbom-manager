@@ -384,7 +384,7 @@ const STUDENTS = [
   {id:"22김주아",name:"김주아",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:13,phone:"010-2683-7615",note:""},
   {id:"22오선",name:"오선",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:14,phone:"010-7255-3454",note:""},
   {id:"22이선우",name:"이선우",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:15,phone:"010-8898-3935",note:""},
-  {id:"22이윤솔",name:"이윤솔",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:16,phone:"010-9382-5731",note:"화 로봇과학B(2교시)"},
+  {id:"22이윤솔",name:"이윤솔",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:16,phone:"010-9382-5731",note:"화 2교시 창의코딩 (로봇과학B 취소, 11/10~)"},
   {id:"22이효주",name:"이효주",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:17,phone:"010-6616-2672",note:""},
   {id:"22천하늘",name:"천하늘",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:18,phone:"010-8530-1544",note:""},
   {id:"22최라희",name:"최라희",grade:2,cls:2,clsKey:"2-2",clsLabel:"2학년 2반",num:19,phone:"010-7686-7679",note:""},
@@ -498,7 +498,7 @@ SEM2_ENROLL["1-1|이소율1"]=SEM2_ENROLL["1-1|이소율"];
 SEM2_ENROLL["1-2|이지아"]=SEM2_ENROLL["1-2|이지아(12)"];
 SEM2_ENROLL["1-3|이지아B"]=SEM2_ENROLL["1-3|이지아(13)"];
 const ROBOT_A = new Set(["정건", "정윤솔", "양우진", "고태규", "배준원", "백창훈", "최아린", "김재준", "김다운", "왕선호", "조연준", "주원", "최예린", "박하윤"]);
-const ROBOT_B = new Set(["김단아", "김연준", "이윤슬", "백창훈", "이하린", "이윤솔", "최성윤", "김리안"]);
+const ROBOT_B = new Set(["김단아", "김연준", "이윤슬", "백창훈", "이하린", "최성윤", "김리안"]);
 function isSem2NotEnrolled(clsKey,name){ const en=SEM2_ENROLL[clsKey+"|"+(name||"").replace(/\s+/g,"")]; return !en || en.mode==="NONE" || en.mode==="TUE1"; }   // TUE1 = 맞춤형 전부 취소(방과후만 수강)
 function sem2MatCount(){ return STUDENTS.filter(s=>!isSem2NotEnrolled(s.clsKey,s.name)).length; }
 function sem2NoneCount(){ return STUDENTS.filter(s=>isSem2NotEnrolled(s.clsKey,s.name)).length; }
@@ -559,6 +559,8 @@ const INCIDENTS = [
   {seq:32,date:"9/21(월)",subject:"수강 형태 변경",student:"2-4 안건우 / 1-4 배준원 / 2-3 김지유 / 2-4 김태범",content:"안건우: 월·화·목·금 1교시만, 수 1·2교시 / 배준원: 매일 1교시만 / 김지유: 월요일 1·2교시 미참여 / 김태범: 월·수·금 1교시만, 화·목 1·2교시",action:"앱 3종 수강 모드 반영(NOMON·MWF1 신설), 출석부 11개 세션 정리·열 제목 줄 14곳 복구, 시간표 문서 인원 갱신",tag:"📌 수강 변경"},{seq:33,date:"10/19(월)~",subject:"수강 형태 변경",student:"1-4 유명환",content:"어머니 전화(10/19 10:13) — 월·화·목·금 맞춤형 전체 취소, 수요일 1교시 종이접기만 수강. 10/19(월)부터 시행",action:"앱 3종 수강 모드 WED1 반영 완료. 월(발레·칼라클레이)·화·목·금 출석부 명단 제외 필요, 수요일 종이접기(1교시)만 유지",tag:"📌 수강 변경"},{seq:34,date:"10/20(화)~",subject:"수강 형태 변경",student:"2-2 김민재",content:"10/20(화)부터 월·화·목·금 맞춤형 1교시만 참여, 수요일만 1·2교시 모두 참여. 수·목·금은 1교시 후 이지향피아노학원 차량 탑승",action:"앱 3종 수강 모드 P1WED 반영(10/26 처리). 월·화·목·금 2교시 출석부 명단 제외 필요 — 소급 적용분 강사 확인 요망",tag:"📌 수강 변경"},
   {seq:35,date:"11/2(월)",subject:"전래놀이",student:"2-4 임라임",content:"전래놀이 수업 참여 거부 민원\n· 강사님이 학생에게 '하기 싫으면 부모님과 의논 후 참여하지 않아도 된다'고 말함 → 학생이 전래놀이 수업을 싫어하는 것 같아 그렇게 말했다고 설명\n· 분반(다른 반) 이동 불가함을 강사님께 전달\n· 11/2 14:00 어머니 통화 — 학생이 수업이 어려워서 참여하고 싶지 않다고 함",action:"강사님께 수업 수준을 학생 수준에 맞추어 운영해 주실 것 전달 / 수강 중단·변경 안내는 강사가 학생에게 직접 하지 않고 늘봄지원실 경유하도록 안내 / 어머니는 학생 설득하기로 함 → 추후 참여 상황 재확인",tag:"⚠ 민원"},
   {seq:36,date:"11/6(금)~",subject:"수강 형태 변경",student:"2-2 육민준",content:"맞춤형 프로그램 전부 취소 — 월~금 1·2교시 모두 미참여\n방과후 로봇과학 A반(화 1교시)도 함께 취소 → 늘봄 수강 전부 종료",action:"관리자앱·학부모앱 수강 모드 NONE 반영, 로봇과학 A반 명단에서 제외(15명→14명). 월~금 맞춤형 출석부 명단 전체 제외. 강사앱 반영 필요 / 로봇과학 수익자부담 정산 확인 필요",tag:"📌 수강 변경"},
+  {seq:37,date:"11/6(금)",subject:"배드민턴(방과후)",student:"4-? 김태양",content:"어머니 전화 — 배드민턴 방과후 수강 가능 여부 문의\n· 이전 통화 시 체육관 공사 관계로 수강 가능 여부를 안내하지 못함\n· 보호자 연락처 010-2468-1643",action:"다음 주 중 권순규 강사와 수강 가능 여부(정원·운영) 협의 후 어머니께 회신하기로 함. 체육관(슬기관 1)은 11/2부터 정상 사용 가능 — 장소 문제는 해소된 상태",tag:"⏳ 회신 예정"},
+  {seq:38,date:"11/10(화)~",subject:"수강 형태 변경",student:"2-2 이윤솔",content:"화요일 2교시 맞춤형 수업을 로봇과학 B반에서 창의코딩으로 변경",action:"앱 3종 로봇과학 B반 명단 제외(7명→6명) · 화 2교시 창의코딩 명단 포함(12명). 김소영·이기백 강사 전달 필요",tag:"📌 수강 변경"},
 ];
 
 // ── 출석 DB (구글폼 신청 데이터) ──
@@ -938,7 +940,6 @@ const MANUAL_OVERRIDE = {
   "김단아":  { replaceS2:{화:"로봇과학B"} },
   "백창훈":  { replaceS1:{화:"로봇과학A"}, replaceS2:{화:"로봇과학B"} },
   "이하린":  { replaceS2:{화:"로봇과학B"} },
-  "이윤솔":  { replaceS2:{화:"로봇과학B"} },
   "최성윤":  { replaceS2:{화:"로봇과학B"}, skipS2Days:["목"] },
   "김민재":  { skipS3Days:["월"], skipS2Days:["화"] },
   "김리안":  { replaceS2:{화:"로봇과학B"} },
